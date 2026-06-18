@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Hamburger Menu Logic
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            // Toggle icon from list to x
+            const icon = hamburger.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('ph-list');
+                icon.classList.add('ph-x');
+            } else {
+                icon.classList.remove('ph-x');
+                icon.classList.add('ph-list');
+            }
+        });
+        
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                const icon = hamburger.querySelector('i');
+                icon.classList.remove('ph-x');
+                icon.classList.add('ph-list');
+            });
+        });
+    }
+
     // Navbar scroll effect
     const navbar = document.querySelector('.navbar');
     
@@ -26,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reveal elements on scroll
     // In minimalist design, we use subtler reveals
-    const revealElements = document.querySelectorAll('.glass-card, .member-card, .event-card, .stat-card, .contact-info, .social-links, .section-title');
+    const revealElements = document.querySelectorAll('.glass-card:not(.org-node), .org-tree, .member-card, .event-card, .stat-card, .contact-info, .social-links, .section-title');
     
     // Set initial class
     revealElements.forEach(el => el.classList.add('reveal'));
