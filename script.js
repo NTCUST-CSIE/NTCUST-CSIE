@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reveal elements on scroll
     // In minimalist design, we use subtler reveals
-    const revealElements = document.querySelectorAll('.glass-card, .event-card, .stat-card, .contact-info, .social-links, .section-title');
+    const revealElements = document.querySelectorAll('.glass-card, .member-card, .event-card, .stat-card, .contact-info, .social-links, .section-title');
     
     // Set initial class
     revealElements.forEach(el => el.classList.add('reveal'));

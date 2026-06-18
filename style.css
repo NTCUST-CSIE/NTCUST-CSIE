@@ -308,6 +308,61 @@ section {
     color: var(--text-secondary);
 }
 
+/* Members Section */
+.members-section {
+    background-color: var(--bg-primary);
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2.5rem;
+}
+
+.member-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.member-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--color-brand-light);
+    color: var(--color-brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.member-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.2rem;
+}
+
+.member-nickname {
+    font-size: 0.95rem;
+    color: var(--text-tertiary);
+    margin-bottom: 1.2rem;
+}
+
+.member-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-brand-primary);
+    background-color: var(--color-brand-light);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+}
+
 /* Events Section */
 .events-section {
     background-color: var(--bg-secondary);
