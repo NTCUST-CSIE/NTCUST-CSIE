@@ -313,6 +313,33 @@ section {
     background-color: var(--bg-primary);
 }
 
+.department {
+    margin-bottom: 4rem;
+}
+
+.department:last-child {
+    margin-bottom: 0;
+}
+
+.department-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2.5rem;
+    text-align: center;
+    position: relative;
+}
+
+.department-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--color-brand-primary);
+    margin: 0.8rem auto 0;
+    border-radius: 2px;
+}
+
 .members-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
