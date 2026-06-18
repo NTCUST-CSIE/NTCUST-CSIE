@@ -422,6 +422,23 @@ section {
     padding: 1.2rem 0.5rem;
 }
 
+.bottom-level .org-node-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.side-node-wrapper {
+    position: absolute;
+    left: calc(100% + 2rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+}
+
+.side-node {
+    width: 100%;
+}
+
 .bottom-level .org-node::before {
     content: '';
     position: absolute;
@@ -441,12 +458,13 @@ section {
     padding: 1.5rem 2rem;
     min-width: 140px;
     z-index: 2;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     white-space: nowrap;
 }
 
 .org-node:hover {
     transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
     border-color: var(--color-brand-secondary);
 }
 
@@ -496,7 +514,7 @@ section {
     .side-connector {
         display: none !important;
     }
-    .side-node {
+    .side-node-wrapper {
         position: relative;
         left: auto;
         top: auto;
@@ -505,14 +523,15 @@ section {
         height: auto;
         margin: 0;
     }
-    .side-node,
-    .bottom-level .org-node {
+    .side-node-wrapper,
+    .bottom-level .org-node-wrapper {
         margin-left: 4rem;
         flex: auto;
+        position: relative;
     }
-    .side-node::after,
-    .bottom-level .org-node::after,
-    .bottom-level .org-node:not(:last-child)::after {
+    .side-node-wrapper::after,
+    .bottom-level .org-node-wrapper::after,
+    .bottom-level .org-node-wrapper:not(:last-child)::after {
         content: '';
         position: absolute;
         top: 50%;
@@ -524,7 +543,7 @@ section {
         z-index: 1;
     }
     .org-node {
-        width: auto;
+        width: 100%;
         min-width: 0;
         align-items: flex-start;
         padding: 1.5rem;
@@ -532,11 +551,12 @@ section {
     }
     .org-node:hover {
         transform: translateX(5px);
+        box-shadow: var(--shadow-lg);
         border-color: var(--color-brand-secondary);
     }
     
     /* Mask the protruding trunk line below the last node */
-    .bottom-level .org-node:last-child::before {
+    .bottom-level .org-node-wrapper:last-child::before {
         display: block !important;
         content: '';
         position: absolute;
