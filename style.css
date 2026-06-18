@@ -478,31 +478,44 @@ section {
         align-items: stretch;
     }
     .org-tree::before {
+        display: none !important;
+    }
+    .top-level {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin-bottom: 0;
+        padding-bottom: 1rem;
+        position: relative;
+    }
+    .top-level::before {
+        display: block !important;
         content: '';
         position: absolute;
         top: 5rem;
         bottom: 0;
         left: 2rem;
         width: 2px;
-        background: var(--color-brand-primary);
-        opacity: 0.5;
+        background: rgba(30, 58, 138, 0.5);
         z-index: 1;
     }
-    .top-level, .bottom-level {
+    .bottom-level {
         flex-direction: column;
         align-items: stretch;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 0;
+        margin-bottom: 0;
         padding-top: 0;
     }
     .top-level-wrapper {
         flex-direction: column;
         align-items: stretch;
-        gap: 1rem;
+        gap: 0;
+    }
+    .top-level-wrapper > .org-node-wrapper {
+        padding-bottom: 1rem;
     }
     .top-level::after,
     .bottom-level::before,
-    .bottom-level .org-node::before,
     .side-connector {
         display: none !important;
     }
@@ -517,23 +530,52 @@ section {
     }
     .side-node-wrapper,
     .bottom-level .org-node-wrapper {
-        margin-left: 4rem;
+        margin-left: 2rem;
+        padding-left: 2rem;
+        padding-bottom: 1rem;
         flex: auto;
         position: relative;
     }
+    
+    .bottom-level .org-node-wrapper::before {
+        display: block !important;
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 2px;
+        height: auto !important;
+        background: rgba(30, 58, 138, 0.5);
+        z-index: 1;
+        opacity: 1 !important;
+        transform: none;
+    }
+    
+    .bottom-level .org-node-wrapper:last-child {
+        padding-bottom: 0;
+    }
+    .bottom-level .org-node-wrapper:last-child::before {
+        bottom: 50%;
+    }
+    
     .side-node-wrapper::after,
     .bottom-level .org-node-wrapper::after,
     .bottom-level .org-node-wrapper:not(:last-child)::after {
         content: '';
         position: absolute;
-        top: 50%;
-        left: -2rem;
+        top: calc(50% - 0.5rem);
+        left: 0;
         width: 2rem;
         height: 2px;
         background: var(--color-brand-primary);
         opacity: 0.5;
         z-index: 1;
     }
+    .bottom-level .org-node-wrapper:last-child::after {
+        top: 50%;
+    }
+    
     .org-node {
         width: 100%;
         min-width: 0;
@@ -545,21 +587,6 @@ section {
         transform: translateX(5px);
         box-shadow: var(--shadow-lg);
         border-color: var(--color-brand-secondary);
-    }
-    
-    /* Mask the protruding trunk line below the last node */
-    .bottom-level .org-node-wrapper:last-child::before {
-        display: block !important;
-        content: '';
-        position: absolute;
-        top: calc(50% + 2px);
-        bottom: auto;
-        left: -2rem;
-        width: 2px;
-        height: 50rem;
-        background: var(--bg-primary);
-        opacity: 1 !important; /* Override global opacity: 0.5 */
-        z-index: 2;
     }
 }
 
