@@ -20,6 +20,24 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 }
 
+[data-theme="dark"] {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    
+    --color-brand-primary: #60a5fa;
+    --color-brand-secondary: #93c5fd;
+    --color-brand-light: rgba(59, 130, 246, 0.15);
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -140,6 +158,10 @@ ul {
     border-bottom: 1px solid transparent;
 }
 
+[data-theme="dark"] .navbar {
+    background-color: rgba(15, 23, 42, 0.95);
+}
+
 .navbar.scrolled {
     padding: 1rem 0;
     border-bottom: 1px solid var(--bg-tertiary);
@@ -177,6 +199,7 @@ ul {
 .nav-links {
     display: flex;
     gap: 2.5rem;
+    align-items: center;
 }
 
 .nav-links a {
@@ -200,6 +223,32 @@ ul {
 .hamburger:hover {
     color: var(--color-brand-primary);
 }
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+    margin-left: auto;
+    padding: 0.5rem;
+}
+
+.theme-toggle:hover {
+    color: var(--color-brand-primary);
+    transform: rotate(15deg);
+}
+
+/* 隱藏/顯示對應圖示 */
+[data-theme="dark"] .ph-moon { display: none; }
+[data-theme="light"] .ph-sun { display: none; }
+
+/* 預設沒設定屬性時，當作 light theme */
+:root:not([data-theme="dark"]) .ph-sun { display: none; }
 
 /* Hero Section */
 .hero {
@@ -618,6 +667,7 @@ section {
 
 .department {
     margin-bottom: 4rem;
+    scroll-margin-top: 100px;
 }
 
 .department:last-child {
@@ -883,13 +933,14 @@ section {
 .footer {
     text-align: center;
     padding: 4rem 0;
-    background-color: var(--text-primary);
-    color: #ffffff;
+    background-color: #0f172a; /* Slate 900 (Always dark) */
+    color: #f8fafc;
+    border-top: 1px solid var(--bg-tertiary);
 }
 
 .footer-note {
     font-size: 0.85rem;
-    color: var(--text-tertiary);
+    color: #94a3b8; /* Slate 400 */
     margin-top: 1rem;
 }
 
@@ -930,6 +981,10 @@ section {
         padding: 2rem;
         box-shadow: var(--shadow-md);
         border-top: 1px solid var(--bg-tertiary);
+    }
+
+    [data-theme="dark"] .nav-links {
+        background-color: rgba(15, 23, 42, 0.98);
     }
 
     .nav-links.active {
