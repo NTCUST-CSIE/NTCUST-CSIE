@@ -538,6 +538,7 @@ section {
         bottom: auto;
         transform: none;
         height: auto;
+        width: auto;
         margin: 0;
     }
     .side-node-wrapper,
