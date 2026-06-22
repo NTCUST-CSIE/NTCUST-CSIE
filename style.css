@@ -18,6 +18,10 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    
+    /* Particle Colors */
+    --particle-color: 148, 163, 184; /* Slate 400 */
+    --particle-line-color: 203, 213, 225; /* Slate 300 */
 }
 
 [data-theme="dark"] {
@@ -36,6 +40,10 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    
+    /* Particle Colors */
+    --particle-color: 148, 163, 184; /* Slate 400 */
+    --particle-line-color: 71, 85, 105; /* Slate 600 */
 }
 
 * {
@@ -49,13 +57,30 @@ html, body {
     width: 100%;
 }
 
+html {
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
+}
+
+/* Particle Canvas */
+#particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background-color: transparent;
+}
+
 body {
     font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: transparent;
 }
 
 a {
@@ -80,7 +105,9 @@ ul {
 
 /* Minimalist Card */
 .glass-card {
-    background-color: var(--bg-primary);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--bg-tertiary);
     border-radius: 12px;
     padding: 2.5rem;
@@ -91,6 +118,11 @@ ul {
 .glass-card:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-4px);
+}
+
+[data-theme="dark"] .glass-card {
+    background-color: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+    border-color: rgba(148, 163, 184, 0.15); /* Subtle border for dark mode */
 }
 
 /* Buttons */
@@ -131,10 +163,7 @@ ul {
 .btn-outline {
     background: transparent;
     color: var(--color-brand-secondary);
-    border: 1px solid var(--color-brand-secondary);
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    border-radius: 6px;
+    border: 2px solid var(--color-brand-secondary);
 }
 
 .btn-outline:hover {
@@ -252,30 +281,37 @@ ul {
 
 /* Hero Section */
 .hero {
-    min-height: 90vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--bg-secondary);
-    background-image: radial-gradient(var(--bg-tertiary) 1px, transparent 1px);
-    background-size: 30px 30px;
+    /* Removed radial-gradient dot background to keep it clean */
     padding-top: 80px; /* Offset for navbar */
+    position: relative;
+    overflow: hidden;
 }
 
 .hero-content {
     text-align: center;
     padding: 0 2rem;
     max-width: 800px;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-title {
     font-size: clamp(3rem, 5vw, 4.5rem);
     font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -0.05em;
     line-height: 1.1;
+    background: linear-gradient(to right, var(--text-primary), var(--color-brand-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
+
 
 .hero-subtitle {
     font-size: clamp(1.1rem, 2vw, 1.25rem);
@@ -326,7 +362,7 @@ section {
 
 /* About Section */
 .about-section {
-    background-color: var(--bg-primary);
+    background-color: transparent;
 }
 
 .about-grid {
@@ -384,7 +420,7 @@ section {
 
 /* Organization Section */
 .org-section {
-    background-color: var(--bg-primary);
+    background-color: transparent;
 }
 
 .org-tree {
@@ -662,7 +698,7 @@ section {
 
 /* Members Section */
 .members-section {
-    background-color: var(--bg-primary);
+    background-color: transparent;
 }
 
 .department {
@@ -850,7 +886,9 @@ section {
 
 .event-card {
     padding: 0;
-    background-color: var(--bg-primary);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--bg-tertiary);
     border-radius: 12px;
     overflow: hidden;
@@ -893,9 +931,14 @@ section {
     align-self: flex-start;
 }
 
+[data-theme="dark"] .event-card {
+    background-color: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Contact Section */
 .contact-section {
-    background-color: var(--bg-primary);
+    background-color: transparent;
     text-align: center;
 }
 
