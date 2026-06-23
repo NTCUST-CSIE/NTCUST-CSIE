@@ -369,12 +369,18 @@ section {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
-    align-items: start;
+    align-items: stretch;
+}
+
+.about-text {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 
 .about-text p {
-    margin-bottom: 1.5rem;
+    margin: 0;
     font-size: 1.1rem;
     color: var(--text-secondary);
 }
@@ -387,9 +393,10 @@ section {
 
 .stat-card {
     text-align: center;
-    padding: 2.5rem 1.5rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--bg-tertiary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 
 .stat-number {
