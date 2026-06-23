@@ -5,7 +5,7 @@ const initTheme = () => {
     
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
-    } else if (prefersDarkScheme.matches) {
+    } else {
         document.documentElement.setAttribute('data-theme', 'dark');
     }
 };

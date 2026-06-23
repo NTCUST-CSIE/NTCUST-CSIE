@@ -372,17 +372,6 @@ section {
     align-items: start;
 }
 
-.about-text {
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-}
-
-.about-text:hover {
-    transform: none;
-    box-shadow: none;
-}
 
 .about-text p {
     margin-bottom: 1.5rem;

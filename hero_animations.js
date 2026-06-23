@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // Use brand color for grid lines so they are clearly visible
-        // Previously they were too faint, making nodes look like "strange disconnected dots"
-        ctx.strokeStyle = `rgba(${brandColor}, 0.15)`;
+        // Increased opacity to make the grid more prominent
+        ctx.strokeStyle = `rgba(${brandColor}, 0.35)`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         for(let x=25; x<canvas.width; x+=50) {
@@ -179,8 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 let dist = Math.sqrt(dx * dx + dy * dy);
                 
                 if (dist < 120) {
-                    ctx.strokeStyle = `rgba(${lColor}, ${(1 - dist/120) * 0.5})`;
-                    ctx.lineWidth = 1;
+                    // Increased line visibility from 0.5 to 0.8 multiplier
+                    ctx.strokeStyle = `rgba(${lColor}, ${(1 - dist/120) * 0.8})`;
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(retroParticles[a].x, retroParticles[a].y);
                     ctx.lineTo(retroParticles[b].x, retroParticles[b].y);
@@ -192,7 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 let dy = retroParticles[a].y - mouse.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 150) {
-                    ctx.strokeStyle = `rgba(${lColor}, ${(1 - dist/150) * 0.8})`;
+                    // Increased line visibility for mouse connections
+                    ctx.strokeStyle = `rgba(${lColor}, ${(1 - dist/150) * 1.0})`;
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(retroParticles[a].x, retroParticles[a].y);
                     ctx.lineTo(mouse.x, mouse.y);
