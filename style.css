@@ -694,7 +694,7 @@ section {
 
 /* Members Section */
 .members-section {
-    background-color: transparent;
+    background-color: var(--bg-secondary);
 }
 
 .department {
@@ -739,6 +739,7 @@ section {
     text-align: center;
     padding: 3rem 2rem;
     transition: all 0.3s ease;
+    background-color: var(--bg-primary) !important; /* Deep contrast referring to footer */
 }
 
 .clickable-card {
