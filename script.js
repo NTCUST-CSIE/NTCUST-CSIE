@@ -207,11 +207,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
                 links: [
                     { text: "第七屆 404陀螺俱樂部", url: "https://www.instagram.com/404_beybladex/" },
+                    { text: "第七屆 𝐒𝐢𝐧𝐠 𝟒 𝐲𝐨𝐮", url: "https://www.instagram.com/p/DV8xzwckU-I/" }
+                ]
+            },
+            "courses": {
+                title: "💻技術課程💻",
+                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
+                links: [
                     { text: "第七屆 APSC 課程", url: "https://www.instagram.com/p/DX9PP8oxsSJ/" },
                     { text: "第七屆 網頁設計初學 課程", url: "https://www.instagram.com/p/DYxASKbzxTI/" },
-                    { text: "第七屆 開源 改變世界 課程", url: "https://www.instagram.com/p/DY9JXxyRla2/" },
-                    { text: "第七屆 𝐒𝐢𝐧𝐠 𝟒 𝐲𝐨𝐮", url: "https://www.instagram.com/p/DV8xzwckU-I/" },
-                    { text: "第七屆 資戰無界", url: "https://www.instagram.com/p/DUaRcOGk6WK/" },
+                    { text: "第七屆 開源 改變世界 課程", url: "https://www.instagram.com/p/DY9JXxyRla2/" }
+                ]
+            },
+            "esports": {
+                title: "🎮電競月🎮",
+                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
+                links: [
+                    { text: "第七屆 資戰無界", url: "https://www.instagram.com/p/DUaRcOGk6WK/" }
                 ]
             }
         };
@@ -252,3 +264,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+const themeToggleBtn = document.querySelector('.theme-toggle');
+
+let clickCount = 0;
+let lastClickTime = 0;
+
+themeToggleBtn.addEventListener('click', () => {
+    const currentTime = new Date().getTime();
+    
+    if (currentTime - lastClickTime > 1500) {
+        clickCount = 0;
+    }
+    
+    clickCount++;
+    lastClickTime = currentTime;
+    
+    if (clickCount === 10) {
+        triggerEasterEgg();
+        clickCount = 0;
+    }
+});
+
+function triggerEasterEgg() {
+    const secretMessage = decodeURIComponent(atob("5YGa6YCZ5YCL57ay6aCB55qE5Lq677ya5oiR5b6M5oKU562U5oeJ5pyD6ZW35YGa6YCZ5YCL57ay6aCB5LqG77yM5bCk5YW25pivIGV2ZW50Lmh0bWwg5rKS5Lq66IO95bmr5oiR5pW055CG5q235bGG5rS75YuV77yM56+p5o6J5rKS6L6m5oiQ55qE77yM54S25b6M5YGa5Ye65L6G6YKE5Y+v6IO96KKr572177yM54S25b6M54Wn54mH55qE6YOo5YiG77yM5oe255qE5pW055CG5ZOq5Lqb5rS75YuV5pyJ5rKS5pyJ57C96IKW5YOP5qyK5ZCM5oSP5pu477yM5Zug54K6R29vZ2xlIERyaXZl57WQ5qeL5b6I6KSH6Zuc77yM6YKE5pyJ5LiA5Lqb5piv55So5YCL5Lq65biz6Jmf55m85YiwIEdvb2dsZSBEcml2ZSDnmoTvvIzmiJbmmK/nlKjmjbflvpHmi4nliLAgR29vZ2xlIERyaXZlIOaJgOS7peenkeacg+W4s+iZn+aykuacieaJgOacieasiu+8jOacieS6m+WFp+WuuemChOaJk+S4jemWi+S6hi4uLg=="));
+    alert(secretMessage);
+}

@@ -1138,3 +1138,12 @@ section {
         font-size: 1.8rem;
     }
 }
+#egg-btn {
+            display: none;
+            padding: 10px 20px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
