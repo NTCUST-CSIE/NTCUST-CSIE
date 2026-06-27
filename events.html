@@ -49,7 +49,7 @@
                         <div class="event-info">
                             <h3>五專部迎新活動</h3>
                             <p>歡迎新生加入資工科的大家庭，破冰遊戲、學長姐經驗分享，帶你快速認識校園！</p>
-                            <a href="#" class="btn btn-outline">查看詳情</a>
+                            <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="freshman">查看詳情</a>
                         </div>
                     </div>
                     
@@ -58,7 +58,7 @@
                         <div class="event-info">
                             <h3>資訊工程科 羽球週</h3>
                             <p>讀書也要顧身體！來和同學切磋球技，揮灑汗水，爭奪冠軍榮耀。</p>
-                            <a href="#" class="btn btn-outline">查看詳情</a>
+                            <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="badminton">查看詳情</a>
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@
                         <div class="event-info">
                             <h3>資工科大會烤</h3>
                             <p>秋高氣爽最適合烤肉，在煙火與美食中拉近彼此距離，享受難得的悠閒時光。</p>
-                            <a href="#" class="btn btn-outline">查看詳情</a>
+                            <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="bbq">查看詳情</a>
                         </div>
                     </div>
 
@@ -76,13 +76,32 @@
                         <div class="event-info">
                             <h3>聖誕歲末晚會</h3>
                             <p>交換禮物、精彩表演、摸彩活動，與資工科的大家一起度過溫馨的聖誕節。</p>
-                            <a href="#" class="btn btn-outline">查看詳情</a>
+                            <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="christmas">查看詳情</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal-overlay">
+        <div class="modal-card event-modal-card glass-card">
+            <button class="modal-close"><i class="ph-bold ph-x"></i></button>
+            <div class="event-modal-grid">
+                <div class="event-modal-left">
+                    <h3 id="eventModalTitle">活動標題</h3>
+                    <p id="eventModalDesc">活動介紹...</p>
+                </div>
+                <div class="event-modal-right">
+                    <h4>歷屆活動紀錄</h4>
+                    <ul id="eventModalLinks" class="past-events-list">
+                        <!-- Links populated by JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="container">

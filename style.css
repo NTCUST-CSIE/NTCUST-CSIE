@@ -865,6 +865,73 @@ section {
     text-align: left;
 }
 
+.event-modal-card {
+    max-width: 800px;
+}
+
+.event-modal-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 3rem;
+}
+
+.event-modal-left h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.event-modal-left p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.event-modal-right {
+    border-left: 1px solid var(--bg-tertiary);
+    padding-left: 2rem;
+}
+
+.event-modal-right h4 {
+    margin-bottom: 1rem;
+    color: var(--color-brand-secondary);
+    font-size: 1.1rem;
+}
+
+.past-events-list {
+    list-style: none;
+    padding: 0;
+}
+
+.past-events-list li {
+    margin-bottom: 0.8rem;
+}
+
+.past-events-list a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.past-events-list a:hover {
+    color: var(--color-brand-primary);
+}
+
+@media (max-width: 768px) {
+    .event-modal-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .event-modal-right {
+        border-left: none;
+        border-top: 1px solid var(--bg-tertiary);
+        padding-left: 0;
+        padding-top: 2rem;
+    }
+}
+
 .btn-sm {
     padding: 0.4rem 1.2rem;
     font-size: 0.85rem;
