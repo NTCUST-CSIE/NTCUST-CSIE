@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財務報表 | 五專部資訊工程科 科學會</title>
+    <meta name="description" content="國立臺中科技大學 五專部資訊工程科 科學會財務公開報表。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">NTCUST <span class="highlight">CSIE</span></span>
+                <span class="logo-subtext">五專部科學會</span>
+            </a>
+            <div class="hamburger">
+                <i class="ph-bold ph-list"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#about">關於我們</a></li>
+                <li><a href="members.html">科會成員</a></li>
+                <li><a href="events.html">近期活動</a></li>
+                <li><a href="finance.html" class="active">財務報表</a></li>
+                <li><a href="index.html#contact">聯絡資訊</a></li>
+                <li>
+                    <button class="theme-toggle" aria-label="切換深色/淺色模式">
+                        <i class="ph-fill ph-moon"></i>
+                        <i class="ph-fill ph-sun"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Padding since no hero section here -->
+    <div style="height: 100px;"></div>
+
+    <main>
+        <section id="finance" class="finance-section">
+            <div class="container">
+                <h2 class="section-title">財務報表 <span class="highlight">Finance</span></h2>
+                
+                <div class="glass-card finance-card">
+                    <div class="finance-header">
+                        <h3 id="finance-title" class="finance-title">115 學年度上學期 收支明細表</h3>
+                        <p id="finance-last-updated" class="last-updated"></p>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="finance-table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>摘要</th>
+                                    <th class="amount-col income">收入 (NT$)</th>
+                                    <th class="amount-col expense">支出 (NT$)</th>
+                                    <th class="amount-col balance">結餘 (NT$)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="finance-table-body">
+                                <!-- 財務報表資料由 script.js 動態渲染 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="finance-footer">
+                        <p class="finance-note">※ 本報表經由系學會財務長編製，並由監查委員審核通過。所有開銷皆有發票收據留存備查。</p>
+                        <a href="javascript:void(0)" class="btn btn-outline download-btn"><i class="ph-bold ph-download-simple"></i> 下載詳細 PDF 報表</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 國立臺中科技大學<br>五專部 資訊工程科 科學會</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1036,6 +1036,131 @@ section {
     box-shadow: var(--shadow-md);
 }
 
+/* Finance Section */
+.finance-section {
+    background-color: var(--bg-secondary);
+    padding-bottom: 5rem;
+}
+
+.finance-card {
+    padding: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.finance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--bg-tertiary);
+    padding-bottom: 1rem;
+}
+
+.finance-title {
+    margin-bottom: 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.last-updated {
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.finance-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.finance-table th, .finance-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.finance-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .finance-table th {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.amount-col {
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.income { color: #10b981; } /* Emerald 500 */
+.expense { color: #ef4444; } /* Red 500 */
+.balance { color: var(--text-primary); }
+
+.highlight-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-brand-primary);
+}
+
+.total-row td {
+    border-top: 2px solid var(--text-tertiary);
+    border-bottom: none;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.month-divider td {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0.8rem 1rem;
+    border-top: 2px solid var(--color-brand-primary);
+}
+
+[data-theme="light"] .month-divider td {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.finance-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-top: 1px dashed var(--bg-tertiary);
+    padding-top: 2rem;
+}
+
+.finance-note {
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+    margin-bottom: 1rem;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .finance-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .finance-card {
+        padding: 1.5rem;
+    }
+}
+
 /* Footer */
 .footer {
     text-align: center;

@@ -1,0 +1,46 @@
+{
+    "months": [
+        {
+            "monthLabel": "2026年 7月",
+            "records": [
+                { "date": "07/01", "desc": "上學期結轉", "income": 66087, "expense": null, "balance": 66087 }
+            ]
+        },
+        {
+            "monthLabel": "2026年 8 月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense":null , "balance":null  }
+            ]
+        },
+        {
+            "monthLabel": "2026年 9月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense": null, "balance": null }
+            ]
+        },
+        {
+            "monthLabel": "2026年 10月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense": null, "balance": null }
+            ]
+        },
+        {
+            "monthLabel": "2026年 11月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense": null, "balance": null }
+            ]
+        },
+        {
+            "monthLabel": "2026年 12月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense": null, "balance": null }
+            ]
+        },
+        {
+            "monthLabel": "2026年 1月",
+            "records": [
+                { "date": "null", "desc": "尚無支出", "income": null, "expense": null, "balance": null }
+            ]
+        }
+    ]
+}

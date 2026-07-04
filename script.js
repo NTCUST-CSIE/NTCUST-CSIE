@@ -263,6 +263,108 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+// ==========================================
+// 財務報表資料庫 (Finance Data)
+// ==========================================
+// 格式化金額 (加上千分位逗號)
+function formatCurrency(num) {
+    if (num === null || num === undefined) return "-";
+    return num.toLocaleString('en-US');
+}
+
+// 渲染財務報表與產生 JSON-LD
+async function renderFinancePage() {
+    const tbody = document.getElementById('finance-table-body');
+    if (!tbody) return; // Not on the finance page
+
+    try {
+        const response = await fetch('finance.json');
+        if (!response.ok) throw new Error('無法載入財務資料');
+        const financeData = await response.json();
+
+    // 計算總計與結餘
+    let totalIncome = 0;
+    let totalExpense = 0;
+    financeData.months.forEach(month => {
+        month.records.forEach(record => {
+            if (record.income) totalIncome += record.income;
+            if (record.expense) totalExpense += record.expense;
+        });
+    });
+    // 結餘 = 總收入 - 總支出
+    let finalBalance = totalIncome - totalExpense;
+
+    let html = "";
+    
+    // Render Rows
+    financeData.months.forEach(month => {
+        html += `
+            <tr class="month-divider">
+                <td colspan="5">${month.monthLabel}</td>
+            </tr>
+        `;
+        
+        month.records.forEach(record => {
+            html += `
+                <tr>
+                    <td>${record.date}</td>
+                    <td>${record.desc}</td>
+                    <td class="amount-col income">${formatCurrency(record.income)}</td>
+                    <td class="amount-col expense">${formatCurrency(record.expense)}</td>
+                    <td class="amount-col balance">${formatCurrency(record.balance)}</td>
+                </tr>
+            `;
+        });
+    });
+
+    // Render Total Row
+    html += `
+        <tr class="total-row">
+            <td colspan="2" style="text-align: right; font-weight: bold;">本期結餘總計</td>
+            <td class="amount-col income">${formatCurrency(totalIncome)}</td>
+            <td class="amount-col expense">${formatCurrency(totalExpense)}</td>
+            <td class="amount-col balance highlight-amount">${formatCurrency(finalBalance)}</td>
+        </tr>
+    `;
+
+    tbody.innerHTML = html;
+
+    const semesterTitle = document.getElementById('finance-title').textContent.replace(' 收支明細表', '').trim();
+    const lastUpdatedDate = document.getElementById('finance-last-updated').textContent.replace('最後更新日期：', '').trim();
+
+    // Inject JSON-LD structured data for Crawlers and AI
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": `國立臺中科技大學五專部資工科科學會 - ${semesterTitle} 財務報表`,
+        "description": `最後更新於 ${lastUpdatedDate}，本期結餘 ${formatCurrency(finalBalance)} 元。`,
+        "creator": {
+            "@type": "Organization",
+            "name": "NTCUST CSIE Student Association"
+        },
+        "dateModified": lastUpdatedDate.replace(/\//g, '-'),
+        "hasPart": financeData.months.flatMap(m => m.records.map(r => ({
+            "@type": "DataFeedItem",
+            "dateCreated": r.date,
+            "name": r.desc,
+            "value": r.balance
+        })))
+    };
+
+    const scriptObj = document.createElement("script");
+    scriptObj.type = "application/ld+json";
+    scriptObj.text = JSON.stringify(jsonLd, null, 2);
+    document.head.appendChild(scriptObj);
+
+    } catch (error) {
+        console.error("載入財務報表失敗：", error);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--color-danger);">載入資料失敗，若您在本地端開啟，請確認是否透過伺服器環境 (如 Live Server) 執行。</td></tr>';
+    }
+}
+
+// 初始化
+renderFinancePage();
 });
 
 function triggerEasterEgg() {
