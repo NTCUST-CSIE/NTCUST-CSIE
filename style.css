@@ -1042,11 +1042,65 @@ section {
     padding-bottom: 5rem;
 }
 
+.finance-tabs-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+    margin-bottom: -1px; /* Overlap the card's top border */
+}
+
 .finance-card {
     padding: 3rem;
     max-width: 1000px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    border-top-left-radius: 0 !important; /* 讓卡片左上角變直角，完美接合頁籤 */
 }
+
+.finance-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-left: 0;
+}
+
+.finance-tab {
+    display: block;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid transparent;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 0.5rem 1rem;
+    margin-bottom: -1px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.finance-tab:hover {
+    border-color: var(--bg-tertiary) var(--bg-tertiary) var(--glass-border);
+    color: var(--text-primary);
+}
+
+.finance-tab.active {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    border-color: var(--bg-tertiary) var(--bg-tertiary) var(--bg-secondary) !important; /* 利用背景色覆蓋下方卡片的頂部邊框 */
+    box-shadow: none;
+    z-index: 3;
+}
+
+.finance-tab:first-child {
+    border-top-left-radius: 12px; /* 配合原本卡片的圓角弧度 */
+}
+
 
 .finance-header {
     display: flex;
