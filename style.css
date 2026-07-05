@@ -1342,3 +1342,61 @@ section {
             border-radius: 5px;
             cursor: pointer;
         }
+
+/* GitHub Meow Tooltip */
+.github-link-tooltip {
+    position: relative;
+}
+
+.github-link-tooltip::after {
+    content: "meow~~";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 6px;
+    background: var(--color-brand-primary);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    z-index: 100;
+}
+
+/* Little triangle pointing down */
+.github-link-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: var(--color-brand-primary) transparent transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* Hover state with 3s delay */
+.github-link-tooltip:hover::after,
+.github-link-tooltip:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 3s;
+}
+
+/* Remove delay when not hovering so it disappears immediately */
+.github-link-tooltip:not(:hover)::after,
+.github-link-tooltip:not(:hover)::before {
+    transition-delay: 0s;
+}
