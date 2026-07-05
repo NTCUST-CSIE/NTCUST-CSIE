@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let eventData = {};
 
         // 載入外部活動資料
-        fetch('events.json')
+        fetch('data/events.json')
             .then(response => {
                 if (!response.ok) throw new Error('無法載入活動資料');
                 return response.json();
@@ -268,7 +268,7 @@ async function renderFinancePage() {
     if (!tbody) return; // Not on the finance page
 
     try {
-        const response = await fetch('finance.json');
+        const response = await fetch('data/finance.json');
         if (!response.ok) throw new Error('無法載入財務資料');
         const financeData = await response.json();
 

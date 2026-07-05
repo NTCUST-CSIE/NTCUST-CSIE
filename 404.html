@@ -79,7 +79,7 @@
         const path = decodeURIComponent(rawPath).toLowerCase();
 
         try {
-          const response = await fetch("./404.json", { cache: "no-store" });
+          const response = await fetch("data/404.json", { cache: "no-store" });
 
           if (!response.ok) {
             throw new Error(`links.json responded with ${response.status}`);
