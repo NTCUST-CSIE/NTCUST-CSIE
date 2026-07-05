@@ -218,6 +218,22 @@ ul {
     color: var(--text-primary);
 }
 
+.nav-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .logo-text, .logo-subtext {
+        display: none;
+    }
+    .nav-logo {
+        display: block;
+    }
+}
+
 .logo-subtext {
     font-size: 0.75rem;
     color: var(--text-secondary);

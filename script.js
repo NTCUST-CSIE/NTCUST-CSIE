@@ -1,3 +1,49 @@
+// Developer Console Easter Egg (Multi-layered detection)
+(function() {
+    let isEasterEggShown = false;
+    const showEasterEgg = () => {
+        if (isEasterEggShown) return;
+        isEasterEggShown = true;
+        console.clear();
+        console.log(
+            "%c嗨！",
+            "font-size: 25px; line-height: 1.6; font-family: 'Noto Sans TC', sans-serif;"
+        );
+        console.log(
+            "%c你開了F12 想必是對於這個網頁改善有充足的想法\n歡迎加入資訊工程科學會協助我們改善！！",
+            "font-size: 20px; line-height: 1.6; font-family: 'Noto Sans TC', sans-serif;"
+        );
+    };
+
+    // Method 1: Keyboard shortcuts (F12, Ctrl+Shift+I, Cmd+Opt+I, etc.)
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || 
+           (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c')) || 
+           (e.metaKey && e.altKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c'))) {
+            showEasterEgg();
+        }
+    });
+
+    // Method 2: Resize detection (works when DevTools is docked and opened via right-click)
+    const checkResize = () => {
+        const threshold = 160;
+        if (window.outerWidth - window.innerWidth > threshold || 
+            window.outerHeight - window.innerHeight > threshold) {
+            showEasterEgg();
+        }
+    };
+    window.addEventListener('resize', checkResize);
+    setInterval(checkResize, 1000);
+
+    // Method 3: RegExp toString evaluation trick (Fallback for some browsers)
+    const devtools = /./;
+    devtools.toString = function() {
+        showEasterEgg();
+        return '';
+    };
+    console.log('%c', devtools);
+})();
+
 // Theme Initialization (runs immediately to prevent flash)
 const initTheme = () => {
     const currentTheme = localStorage.getItem('theme');
@@ -158,75 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const eModalDesc = document.getElementById('eventModalDesc');
         const eModalLinks = document.getElementById('eventModalLinks');
 
-        const eventData = {
-            "freshman": {
-                title: "✨迎新✨",
-                desc: "歡迎新生加入資工科的大家庭！我們將舉辦一系列破冰遊戲與學長姐經驗分享，帶你快速認識校園環境與科上特色，並且認識未來五年的好夥伴。透過各項團康活動，我們將幫助新生打破隔閡，快速建立起同學之間的情感連結，並為未來的五專生活打下良好的基礎。",
-                links: [
-                    { text: "第七屆 資工迎新宿營", url: "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
-                    { text: "第六屆 資工迎新宿營", url: "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
-                    { text: "第五屆 資工迎新宿營", url: "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
-                ]
-            },
-            "badminton": {
-                title: "🏅體育活動🏅",
-                desc: "讀書也要顧身體！來和同學切磋球技，揮灑汗水，爭奪冠軍榮耀。活動分為單打與雙打等多個組別，無論是羽球校隊等級的高手，還是只想來流流汗的新手，都能在這裡找到屬於自己的舞台。",
-                links: [
-                    { text: "第七屆 資想羽你在一企", url: "https://drive.google.com/drive/folders/1kafqC9ohIbpxMRk0LDNlzcuaN1njBCmo?usp=sharing" },
-                    { text: "第六屆 排球週", url: "https://drive.google.com/drive/folders/1JSyz6b_4Km2o2QYVlULpiheIOa2GS7Ix?usp=sharing?usp=sharing" },
-                    { text: "第五屆 羽你討拍の日資", url: "https://drive.google.com/drive/folders/1kafqC9ohIbpxMRk0LDNlzcuaN1njBCmo?usp=sharing" },
-                    { text: "第五屆 資訊會工", url: "https://drive.google.com/drive/folders/1EO9gzgsJaAok9geVtOU73LjGRfOB90vq?usp=sharing" }
-                ]
-            },
-            "bbq": {
-                title: "🍖科烤🍖",
-                desc: "秋高氣爽最適合烤肉，在煙火與美食中拉近彼此距離，享受難得的悠閒時光。各年級難得齊聚一堂，不僅能大啖美食，還有學長姐精心準備的餘興節目，是資工科每年最具指標性的大型活動。",
-                links: [
-                    { text: "第七屆 企工宴", url: "https://www.instagram.com/p/DXWuinzkfPA/" },
-                    { text: "第六屆 護住美味 工掐你胃", url: "https://drive.google.com/drive/folders/1aDiAUmXaUVISqWUGCDiR3DZkYC0HZUZN?usp=sharing" },
-                    { text: "第五屆 哩洗勒烤", url: "https://drive.google.com/drive/folders/1M5yfrioqfHA4s40UZhlKNi9UiLyn8mP7?usp=sharing" }
-                ]
-            },
-            "christmas": {
-                title: "🎄聖誕晚會🎄",
-                desc: "交換禮物、精彩表演、摸彩活動，與資工科的大家一起度過溫馨的聖誕節。歲末年終的特別活動，在冷冷的冬天裡，帶給你最溫暖的回憶與最刺激的抽獎環節！",
-                links: [
-                    { text: "第七屆 Count Down Xmas", url: "https://www.instagram.com/stories/highlights/18071770307458616/" },
-                    { text: "第五屆 中科友派對", url: "https://drive.google.com/drive/folders/1LvXDep0aqWshqh6H8ube-HE_BgIJlQhJ?usp=sharing" }
-                ]
-            },
-            "school-bd": {
-                title: "🏫校慶、創意進場🏫",
-                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
-                links: [
-                    { text: "第五屆 校慶、創意進場", url: "https://drive.google.com/drive/folders/1Tvtja33cy8GZpbi8DvPK9WAiYIjlVVXw?usp=sharing" }
-                ]
-            },
-            "other": {
-                title: "其他活動",
-                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
-                links: [
-                    { text: "第七屆 404陀螺俱樂部", url: "https://www.instagram.com/404_beybladex/" },
-                    { text: "第七屆 𝐒𝐢𝐧𝐠 𝟒 𝐲𝐨𝐮", url: "https://www.instagram.com/p/DV8xzwckU-I/" }
-                ]
-            },
-            "courses": {
-                title: "💻技術課程💻",
-                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
-                links: [
-                    { text: "第七屆 APSC 課程", url: "https://www.instagram.com/p/DX9PP8oxsSJ/" },
-                    { text: "第七屆 網頁設計初學 課程", url: "https://www.instagram.com/p/DYxASKbzxTI/" },
-                    { text: "第七屆 開源 改變世界 課程", url: "https://www.instagram.com/p/DY9JXxyRla2/" }
-                ]
-            },
-            "esports": {
-                title: "🎮電競月🎮",
-                desc: "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
-                links: [
-                    { text: "第七屆 資戰無界", url: "https://www.instagram.com/p/DUaRcOGk6WK/" }
-                ]
-            }
-        };
+        let eventData = {};
+
+        // 載入外部活動資料
+        fetch('events.json')
+            .then(response => {
+                if (!response.ok) throw new Error('無法載入活動資料');
+                return response.json();
+            })
+            .then(data => {
+                eventData = data;
+            })
+            .catch(error => console.error('載入 events.json 失敗:', error));
 
         document.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -414,7 +403,7 @@ function triggerEasterEgg() {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
     }
-    alert(b64DecodeUnicode("5YGa6YCZ5YCL57ay6aCB55qE5Lq677ya5oiR5b6M5oKU562U5oeJ5pyD6ZW35YGa6YCZ5YCL57ay6aCB5LqG77yM5bCk5YW25pivIGV2ZW50Lmh0bWwg5rKS5Lq66IO95bmr5oiR5pW055CG5q235bGG5rS75YuV77yM56+p5o6J5rKS6L6m5oiQ55qE77yM54S25b6M5YGa5Ye65L6G6YKE5Y+v6IO96KKr572177yM54S25b6M54Wn54mH55qE6YOo5YiG77yM5oe255qE5pW055CG5ZOq5Lqb5rS75YuV5pyJ5rKS5pyJ57C96IKW5YOP5qyK5ZCM5oSP5pu477yM5Zug54K6R29vZ2xlIERyaXZl57WQ5qeL5b6I6KSH6Zuc77yM6YKE5pyJ5LiA5Lqb5piv55So5YCL5Lq65biz6Jmf55m85YiwIEdvb2dsZSBEcml2ZSDnmoTvvIzmiJbmmK/nlKjmjbflvpHmi4nliLAgR29vZ2xlIERyaXZlIOaJgOS7peenkeacg+W4s+iZn+aykuacieaJgOacieasiu+8jOacieS6m+WFp+WuuemChOaJk+S4jemWi+S6hi4uLg=="));
+    alert(b64DecodeUnicode("6YCZ5qij546p55y8552b5LiN55eb5ZeO"));
 }
 
 const themeToggleBtn = document.querySelector('.theme-toggle');
