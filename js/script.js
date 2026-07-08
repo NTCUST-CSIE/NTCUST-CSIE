@@ -10,8 +10,12 @@
             "font-size: 25px; line-height: 1.6; font-family: 'Noto Sans TC', sans-serif;"
         );
         console.log(
-            "%c你開了F12 想必是對於這個網頁改善有充足的想法\n歡迎加入資訊工程科學會協助我們改善！！",
+            "%c你開了F12\n想必是對於這個網頁改善有充足的想法\n歡迎加入資訊工程科學會協助我們改善！！",
             "font-size: 20px; line-height: 1.6; font-family: 'Noto Sans TC', sans-serif;"
+        );
+        console.log(
+            "%c如果您不是為了協助我們改善，那我有一些小知識送給你：\n《刑法》第 36 章：\n\n第358條：無故入侵電腦罪（最高 3 年徒刑）\n第359條：無故取得、變更電磁紀錄罪（最高 5 年徒刑）\n第360條：干擾電腦系統罪（最高 3 年徒刑）\n\n依第363條規定，以上行為「未遂犯亦罰之」\n只要有嘗試著手即構成犯罪。\n請立即停止任何未經授權的動作。\n若您發現漏洞，請與我們聯絡。",
+            "font-size:14px;line-height:1.8;font-family:'Noto Sans TC',sans-serif;"
         );
     };
 
@@ -389,7 +393,7 @@ async function renderFinancePage() {
 
     } catch (error) {
         console.error("載入財務報表失敗：", error);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--color-danger);">載入資料失敗，若您在本地端開啟，請確認是否透過伺服器環境 (如 Live Server) 執行。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--color-danger);">載入資料失敗。</td></tr>';
     }
 }
 
