@@ -89,6 +89,14 @@ a {
     transition: color 0.2s ease;
 }
 
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
 ul {
     list-style: none;
 }
@@ -779,6 +787,13 @@ section {
     justify-content: center;
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
+    overflow: hidden; /* Ensure image doesn't break border-radius */
+}
+
+.member-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .member-name {
