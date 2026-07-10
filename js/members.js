@@ -67,6 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         window.addEventListener('scroll', checkReveal);
         checkReveal(); // Check immediately on render
+
+        // 處理從首頁或其他頁面連過來的錨點跳轉 (Anchor Links)
+        if (window.location.hash) {
+            setTimeout(() => {
+                const target = document.querySelector(window.location.hash);
+                if (target) {
+                    // 因為有 fixed navbar，可以考慮往下偏移一點，或者直接使用 scrollIntoView
+                    const navbarHeight = document.querySelector('.navbar') ? document.querySelector('.navbar').offsetHeight : 80;
+                    const targetPosition = target.getBoundingClientRect().top + window.scrollY - navbarHeight - 20;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100); // 給予微小延遲讓 DOM 確實渲染完成
+        }
     }
 
     function bindModalEvents() {
