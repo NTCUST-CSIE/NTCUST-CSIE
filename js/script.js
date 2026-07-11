@@ -100,13 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Hamburger Menu Logic (Event Delegation for dynamically added links)
+    // Hamburger Menu Logic
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     
     if (hamburger && navLinks) {
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
+            // Toggle icon from list to x
             const icon = hamburger.querySelector('i');
             if (navLinks.classList.contains('active')) {
                 icon.classList.remove('ph-list');
@@ -118,15 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Close menu when clicking a link
-        navLinks.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
                 navLinks.classList.remove('active');
                 const icon = hamburger.querySelector('i');
-                if (icon) {
-                    icon.classList.remove('ph-x');
-                    icon.classList.add('ph-list');
-                }
-            }
+                icon.classList.remove('ph-x');
+                icon.classList.add('ph-list');
+            });
         });
     }
 
@@ -140,70 +139,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Dynamic Navbar Links Loading
-    if (navLinks) {
-        fetch('data/nav.json')
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to load nav.json');
-                return res.json();
-            })
-            .then(links => {
-                const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-                
-                // Identify the theme toggle li to keep it at the end
-                let themeToggleLi = null;
-                Array.from(navLinks.children).forEach(child => {
-                    if (child.querySelector('.theme-toggle')) {
-                        themeToggleLi = child;
-                    } else {
-                        child.remove(); // Clear old hardcoded links
-                    }
-                });
-                
-                links.forEach(link => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    
-                    let finalUrl = link.url;
-                    // For same-page anchor links on index.html
-                    if (currentPage === 'index.html' || currentPage === '') {
-                        if (link.url.startsWith('index.html#')) {
-                            finalUrl = link.url.replace('index.html', '');
-                        }
-                    }
-                    
-                    a.href = finalUrl;
-                    a.textContent = link.text;
-                    
-                    if (link.url === currentPage || (currentPage === '' && link.url === 'index.html')) {
-                        a.classList.add('active');
-                    }
-                    
-                    li.appendChild(a);
-                    if (themeToggleLi) {
-                        navLinks.insertBefore(li, themeToggleLi);
-                    } else {
-                        navLinks.appendChild(li);
-                    }
-                });
-            })
-            .catch(err => console.error('載入導覽列失敗:', err));
-    }
-
-    // Smooth scroll for anchor links (Event Delegation for dynamic elements)
-    document.body.addEventListener('click', function (e) {
-        // Find closest anchor tag
-        const anchor = e.target.closest('a');
-        if (anchor && anchor.getAttribute('href') && anchor.getAttribute('href').startsWith('#')) {
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(anchor.getAttribute('href'));
+            const target = document.querySelector(this.getAttribute('href'));
             if (target) {
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
             }
-        }
+        });
     });
 
     // Reveal elements on scroll
