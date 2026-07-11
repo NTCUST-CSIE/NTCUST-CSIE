@@ -1,69 +1,80 @@
 {
-    "freshman": {
-        "title": "✨迎新✨",
-        "desc": "歡迎新生加入資工科的大家庭！我們將舉辦一系列破冰遊戲與學長姐經驗分享，帶你快速認識校園環境與科上特色，並且認識未來五年的好夥伴。透過各項團康活動，我們將幫助新生打破隔閡，快速建立起同學之間的情感連結，並為未來的五專生活打下良好的基礎。",
+    "Noob&food": {
+        "title": "新生茶會",
+        "desc": "剛踏入資工大家庭的各位想必對彼此都很陌生吧？沒關係，資工迎新宿營的第一個活動就是讓大家彼此認識的「新生茶會」！在這裡，你可以和同學們一起聊天、玩遊戲，甚至還有機會認識到未來的室友或是隊友！",
+        "image": "./img/Noob&food.jpg",
+        "links": [
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
+        ]
+    },
+    "Basketball": {
+        "title": "籃球週",
+        "desc": "學生不是只要學習就好，運動也是很重要的！在這裡，你可以和同學們一起打籃球，展現你的籃球實力！",
+        "image": "",
         "links": [
             { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
             { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
             { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "badminton": {
-        "title": "🏅體育活動🏅",
-        "desc": "讀書也要顧身體！來和同學切磋球技，揮灑汗水，爭奪冠軍榮耀。活動分為單打與雙打等多個組別，無論是羽球校隊等級的高手，還是只想來流流汗的新手，都能在這裡找到屬於自己的舞台。",
+    "Volleyball": {
+        "title": "排球週",
+        "desc": "資工科裡有許多熱愛排球的同學，這個活動就是為了讓大家一起享受排球的樂趣！在這裡，你可以和同學們一起打排球，展現你的排球實力！",
+        "image": "./img/Volleyball.jpg",
         "links": [
-            { "text": "第七屆 資想羽你在一企", "url": "https://drive.google.com/drive/folders/1kafqC9ohIbpxMRk0LDNlzcuaN1njBCmo?usp=sharing" },
-            { "text": "第六屆 排球週", "url": "https://drive.google.com/drive/folders/1JSyz6b_4Km2o2QYVlULpiheIOa2GS7Ix?usp=sharing?usp=sharing" },
-            { "text": "第五屆 羽你討拍の日資", "url": "https://drive.google.com/drive/folders/1kafqC9ohIbpxMRk0LDNlzcuaN1njBCmo?usp=sharing" },
-            { "text": "第五屆 資訊會工", "url": "https://drive.google.com/drive/folders/1EO9gzgsJaAok9geVtOU73LjGRfOB90vq?usp=sharing" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "bbq": {
-        "title": "🍖科烤🍖",
-        "desc": "秋高氣爽最適合烤肉，在煙火與美食中拉近彼此距離，享受難得的悠閒時光。各年級難得齊聚一堂，不僅能大啖美食，還有學長姐精心準備的餘興節目，是資工科每年最具指標性的大型活動。",
+    "Theme_Courses": {
+        "title": "主題課程",
+        "desc": "學校提供給各位的課程相對枯燥乏味，資工科的學長姐們特別為大家準備了許多有趣的主題課程，讓大家在學習之餘也能享受學習的樂趣！",
+        "image": "",
         "links": [
-            { "text": "第七屆 企工宴", "url": "https://www.instagram.com/p/DXWuinzkfPA/" },
-            { "text": "第六屆 護住美味 工掐你胃", "url": "https://drive.google.com/drive/folders/1aDiAUmXaUVISqWUGCDiR3DZkYC0HZUZN?usp=sharing" },
-            { "text": "第五屆 哩洗勒烤", "url": "https://drive.google.com/drive/folders/1M5yfrioqfHA4s40UZhlKNi9UiLyn8mP7?usp=sharing" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "christmas": {
-        "title": "🎄聖誕晚會🎄",
-        "desc": "交換禮物、精彩表演、摸彩活動，與資工科的大家一起度過溫馨的聖誕節。歲末年終的特別活動，在冷冷的冬天裡，帶給你最溫暖的回憶與最刺激的抽獎環節！",
+    "Halloween": {
+        "title": "萬聖節企劃",
+        "desc": "萬聖節即將到來，期中考也步步緊逼，科學會為大家提供歐趴糖果，讓大家在忙碌的學習之餘也能享受萬聖節的樂趣！",
+        "image": "./img/Halloween.jpg",
         "links": [
-            { "text": "第七屆 Count Down Xmas", "url": "https://www.instagram.com/stories/highlights/18071770307458616/" },
-            { "text": "第五屆 中科友派對", "url": "https://drive.google.com/drive/folders/1LvXDep0aqWshqh6H8ube-HE_BgIJlQhJ?usp=sharing" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "school-bd": {
-        "title": "🏫校慶、創意進場🏫",
-        "desc": "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
+    "School_anniversary": {
+        "title": "運動會進場",
+        "desc": "每年的例行公事！資工科的同學們都會在運動會上展現出他們的活力與熱情，這個活動就是為了讓大家一起享受運動會的樂趣！",
+        "image": "./img/School_anniversary.jpg",
         "links": [
-            { "text": "第五屆 校慶、創意進場", "url": "https://drive.google.com/drive/folders/1Tvtja33cy8GZpbi8DvPK9WAiYIjlVVXw?usp=sharing" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "other": {
-        "title": "其他活動",
-        "desc": "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
+    "Christmas": {
+        "title": "聖誕活動",
+        "desc": "",
+        "image": "./img/Christmas.jpg",
         "links": [
-            { "text": "第七屆 404陀螺俱樂部", "url": "https://www.instagram.com/404_beybladex/" },
-            { "text": "第七屆 𝐒𝐢𝐧𝐠 𝟒 𝐲𝐨𝐮", "url": "https://www.instagram.com/p/DV8xzwckU-I/" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     },
-    "courses": {
-        "title": "💻技術課程💻",
-        "desc": "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
+    "BBQ": {
+        "title": "資工科烤肉活動",
+        "desc": "科會烤肉，本屆壓軸活動，讓大家在期末考前好好放鬆一下，享受美食與同學們的歡樂時光！別把課本丟下去烤喔...",
+        "image": "./img/BBQ.jpg",
         "links": [
-            { "text": "第七屆 APSC 課程", "url": "https://www.instagram.com/p/DX9PP8oxsSJ/" },
-            { "text": "第七屆 網頁設計初學 課程", "url": "https://www.instagram.com/p/DYxASKbzxTI/" },
-            { "text": "第七屆 開源 改變世界 課程", "url": "https://www.instagram.com/p/DY9JXxyRla2/" }
-        ]
-    },
-    "esports": {
-        "title": "🎮電競月🎮",
-        "desc": "做網站的人很懶，什麼都沒留下，如果你看到這個，提醒一下做網站的人補上來，謝謝",
-        "links": [
-            { "text": "第七屆 資戰無界", "url": "https://www.instagram.com/p/DUaRcOGk6WK/" }
+            { "text": "第七屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1yibFNRfDjlXbiEQWW2KV3oizhs09Z9NO?usp=sharing" },
+            { "text": "第六屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1YNDYXn9n58YUlYSHgbilqxzXwVd5xr9V?usp=sharing" },
+            { "text": "第五屆 資工迎新宿營", "url": "https://drive.google.com/drive/folders/1IJ3-iAYoMM7y9mGLHJc-_h6C0i2_RFpb?usp=sharing" }
         ]
     }
 }

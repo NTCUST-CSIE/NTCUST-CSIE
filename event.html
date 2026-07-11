@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>近期活動 - 資訊工程科 科學會 | 國立臺中科技大學</title>
+    <meta name="description" content="國立臺中科技大學 資訊工程科 科學會近期活動資訊。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.2"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">NTCUST <span class="highlight">CSIE</span></span>
+                <img src="./img/logo.png" alt="NTCUST CSIE Logo" class="nav-logo">
+                <span class="logo-subtext">國立臺中科技大學 資訊工程科 科學會</span>
+            </a>
+            <div class="hamburger">
+                <i class="ph-bold ph-list"></i>
+            </div>
+            <ul class="nav-links">
+                <!-- Links will be populated by script.js from nav.json -->
+                <li>
+                    <button class="theme-toggle" aria-label="切換深色/淺色模式">
+                        <i class="ph-fill ph-moon"></i>
+                        <i class="ph-fill ph-sun"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Padding since no hero section here -->
+    <div style="height: 100px;"></div>
+
+    <main>
+        <section id="events" class="events-section">
+            <div class="container">
+                <h2 class="section-title">近期活動 <span class="highlight">Events</span></h2>
+                <div class="events-grid" id="events-container">
+                    <!-- Events will be populated by events.js -->
+                     <h2 style="text-align: center; color: #666;">活動仍在規劃階段，請稍後再回來查看！</h2>
+                </div>
+            </div>
+        </section>
+    </main> 
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 國立臺中科技大學<br>資訊工程科 科學會</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/events.js"></script>
+</body>
+</html>
