@@ -10,6 +10,7 @@
   "tally": "https://tally.so/r/RGaK24",
   "feedback": "./feedback.html",
   "events": "./events.html",
+  "event": "./events.html",
   "members": "./members.html",
-  "404": "./404.html"
+  "member": "./members.html"
 }
