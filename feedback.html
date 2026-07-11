@@ -3,13 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>科會成員 | 資訊工程科 科學會</title>
-    <meta name="description" content="國立臺中科技大學 資訊工程科 科學會成員介紹。">
+    <title>匿名意見箱 | 資訊工程科 科學會</title>
+    <meta name="description" content="國立臺中科技大學 資訊工程科 科學會 匿名意見箱。有任何問題或建議，歡迎透過此表單告訴我們！">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.2"></script>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .iframe-container {
+            width: 100%;
+            height: 800px;
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+        }
+
+        /* 針對深色模式與 Tally 預設白底的微調 */
+        html[data-theme='dark'] .iframe-container {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -27,8 +51,7 @@
                 <li><a href="members.html">科會成員</a></li>
                 <li><a href="events.html">近期活動</a></li>
                 <li><a href="finance.html">財務報表</a></li>
-                <li><a href="feedback.html">意見箱</a></li>
-                <li><a href="index.html#contact">聯絡資訊</a></li>
+                <li><a href="feedback.html" class="active">意見箱</a></li>
                 <li>
                     <button class="theme-toggle" aria-label="切換深色/淺色模式">
                         <i class="ph-fill ph-moon"></i>
@@ -43,10 +66,13 @@
     <div style="height: 100px;"></div>
 
     <main>
-        <section id="members" class="members-section">
-            <div class="container">
-                <h2 class="section-title">科會成員 <span class="highlight">Members</span></h2>
-                <div id="members-container"></div>
+        <section class="container" style="max-width: 800px; padding: 2rem 1rem;">
+            <h2 class="section-title">匿名意見箱 <span class="highlight">Feedback</span></h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: var(--color-text-light);">
+                對於系學會有任何想法、建議或疑問嗎？歡迎透過下方的匿名表單告訴我們！
+            </p>
+            <div class="glass-card iframe-container reveal active">
+                <iframe src="https://tally.so/r/RGaK24?transparentBackground=1" title="匿名意見箱"></iframe>
             </div>
         </section>
     </main>
@@ -57,22 +83,6 @@
         </div>
     </footer>
 
-    <!-- Member Modal -->
-    <div id="memberModal" class="modal-overlay">
-        <div class="modal-card glass-card">
-            <button class="modal-close" aria-label="Close modal"><i class="ph-fill ph-x-circle"></i></button>
-            <div class="modal-header">
-                <div class="member-icon" id="modalIcon"></div>
-                <div class="modal-header-info">
-                    <div class="member-name" id="modalName">Name</div>
-                    <div class="member-title" id="modalTitle">Title</div>
-                </div>
-            </div>
-            <div class="modal-body" id="modalIntro"></div>
-        </div>
-    </div>
-
     <script src="js/script.js"></script>
-    <script src="js/members.js"></script>
 </body>
 </html>
