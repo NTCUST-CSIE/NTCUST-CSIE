@@ -1,7 +1,7 @@
 [
     { "text": "關於我們", "url": "/#about" },
     { "text": "科會成員", "url": "members.html" },
-    { "text": "近期活動", "url": "event.html" },
+    { "text": "近期活動", "url": "events.html" },
     { "text": "財務報表", "url": "finance.html" },
     { "text": "意見箱", "url": "feedback.html" },
     { "text": "聯絡資訊", "url": "/#contact" }

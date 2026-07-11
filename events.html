@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav class="navbar">
+        <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
                 <span class="logo-text">NTCUST <span class="highlight">CSIE</span></span>
@@ -23,12 +23,12 @@
                 <i class="ph-bold ph-list"></i>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html#about">關於我們</a></li>
+                <li><a href="/#about">關於我們</a></li>
                 <li><a href="members.html">科會成員</a></li>
-                <li><a href="events.html" class="active">近期活動</a></li>
-                <li><a href="finance.html">財務報表</a></li>
+                <li><a href="events.html">近期活動</a></li>
+                <li><a href="finance.html" class="active">財務報表</a></li>
                 <li><a href="feedback.html">意見箱</a></li>
-                <li><a href="index.html#contact">聯絡資訊</a></li>
+                <li><a href="/#contact">聯絡資訊</a></li>
                 <li>
                     <button class="theme-toggle" aria-label="切換深色/淺色模式">
                         <i class="ph-fill ph-moon"></i>
@@ -48,29 +48,11 @@
                 <h2 class="section-title">近期活動 <span class="highlight">Events</span></h2>
                 <div class="events-grid" id="events-container">
                     <!-- Events will be populated by events.js -->
+                     <h2 style="text-align: center; color: #666;">活動仍在規劃階段，請稍後再回來查看！</h2>
                 </div>
             </div>
         </section>
     </main> 
-
-    <!-- Event Modal -->
-    <div id="eventModal" class="modal-overlay">
-        <div class="modal-card event-modal-card glass-card">
-            <button class="modal-close"><i class="ph-bold ph-x"></i></button>
-            <div class="event-modal-grid">
-                <div class="event-modal-left">
-                    <h3 id="eventModalTitle">活動標題</h3>
-                    <p id="eventModalDesc">活動介紹...</p>
-                </div>
-                <div class="event-modal-right">
-                    <h4>相關連結</h4>
-                    <ul id="eventModalLinks" class="past-events-list">
-                        <!-- Links populated by JS -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <footer class="footer">
         <div class="container">
