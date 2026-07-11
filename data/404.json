@@ -1,4 +1,5 @@
 {
+  "": "./index.html",
   "github": "https://github.com/NTCUST-CSIE",
   "gh": "https://github.com/NTCUST-CSIE",
   "instagram": "https://instagram.com/NTCUST_CSIE",
@@ -6,5 +7,9 @@
   "linktree": "https://linktr.ee/nutccsie",
   "lt": "https://linktr.ee/nutccsie",
   "line": "https://page.line.me/797hsgke",
-  "tally": "https://tally.so/r/RGaK24"
+  "tally": "https://tally.so/r/RGaK24",
+  "feedback": "./feedback.html",
+  "event": "./event.html",
+  "members": "./members.html",
+  "404": "./404.html"
 }
