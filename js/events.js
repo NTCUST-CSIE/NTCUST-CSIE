@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const eModalTitle = document.getElementById('eventModalTitle');
     const eModalDesc = document.getElementById('eventModalDesc');
     const eModalLinks = document.getElementById('eventModalLinks');
+    const eModalImage = document.getElementById('eventModalImage');
+    const eModalGrid = document.querySelector('.event-modal-grid');
 
     let eventData = {};
 
@@ -31,11 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderEvents(data) {
         eventsContainer.innerHTML = '';
         
-        // 遍歷物件的 key 和 value
-        Object.keys(data).forEach(eventId => {
-            const ev = data[eventId];
-            
-            const imageUrl = ev.image ? ev.image : './img/nopng.png';
+        const eventKeys = Object.keys(data);
+        if (eventKeys.length === 0) {
+            eventsContainer.innerHTML = '<p style="text-align:center; color:var(--text-secondary); grid-column:1/-1;">目前沒有近期活動。</p>';
+            return;
+        }
+
+        eventKeys.forEach(key => {
+            const ev = data[key];
+            const imageUrl = ev.image ? ev.image : './logo.png';
 
             const cardHtml = `
                 <div class="event-card glass-card">
@@ -44,31 +50,56 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="event-info">
                         <h3>${ev.title}</h3>
-                        <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="${eventId}">查看詳情</a>
+                        <a href="javascript:void(0)" class="btn btn-outline event-btn" data-event="${key}">查看詳情</a>
                     </div>
                 </div>
             `;
-            eventsContainer.insertAdjacentHTML('beforeend', cardHtml);
+            eventsContainer.innerHTML += cardHtml;
         });
     }
 
     function bindModalEvents() {
-        document.querySelectorAll('.event-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const eventId = btn.getAttribute('data-event');
+        const eventTriggers = document.querySelectorAll('.event-btn');
+        
+        eventTriggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                const eventId = e.target.getAttribute('data-event');
                 const data = eventData[eventId];
                 
                 if (data) {
                     eModalTitle.textContent = data.title;
                     eModalDesc.textContent = data.desc;
                     
+                    if(eModalImage) {
+                        const imgSrc = data.image ? data.image : './logo.png';
+                        eModalImage.src = imgSrc;
+                        eModalImage.removeAttribute('data-fallback-applied');
+                        
+                        const imageContainer = eModalImage.closest('.event-modal-image-container');
+                        if (imgSrc.includes('nopng.png')) {
+                            if (imageContainer) imageContainer.style.display = 'none';
+                        } else {
+                            if (imageContainer) imageContainer.style.display = 'block';
+                        }
+                    }
+                    
                     eModalLinks.innerHTML = '';
-                    data.links.forEach(link => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<a href="${link.url}" target="_blank" rel="noopener noreferrer"><i class="ph-bold ph-link"></i> ${link.text}</a>`;
-                        eModalLinks.appendChild(li);
-                    });
+                    
+                    const validLinks = (data.links || []).filter(link => link.text && link.url);
+                    const rightPanel = eModalLinks.closest('.event-modal-right');
+                    
+                    if (validLinks.length > 0) {
+                        if (eModalGrid) eModalGrid.classList.remove('no-links');
+                        if (rightPanel) rightPanel.style.display = 'block';
+                        validLinks.forEach(link => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<a href="${link.url}" target="_blank" rel="noopener noreferrer"><i class="ph-bold ph-link"></i> ${link.text}</a>`;
+                            eModalLinks.appendChild(li);
+                        });
+                    } else {
+                        if (eModalGrid) eModalGrid.classList.add('no-links');
+                        if (rightPanel) rightPanel.style.display = 'none';
+                    }
                     
                     eventModal.classList.add('active');
                     document.body.style.overflow = 'hidden';

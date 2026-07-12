@@ -861,11 +861,30 @@ section {
     font-size: 1.8rem;
     cursor: pointer;
     color: var(--text-tertiary);
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    z-index: 10;
 }
 
 .modal-close:hover {
     color: var(--color-brand-primary);
+}
+
+.event-modal-card .modal-close {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.event-modal-card .modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
 }
 
 .modal-header {
@@ -903,7 +922,43 @@ section {
 .event-modal-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
+    grid-template-areas: 
+        "image image"
+        "left right";
     gap: 3rem;
+}
+
+.event-modal-grid.no-links {
+    grid-template-columns: 1fr 1.5fr;
+    grid-template-areas: 
+        "image left";
+    gap: 2rem;
+    align-items: center;
+}
+
+.event-modal-image-container {
+    grid-area: image;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.event-modal-grid:not(.no-links) .event-modal-image-container {
+    margin: -3rem -3rem 3rem -3rem;
+    width: calc(100% + 6rem);
+    border-radius: 12px 12px 0 0;
+    max-height: 350px;
+}
+
+.event-modal-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.event-modal-left {
+    grid-area: left;
 }
 
 .event-modal-left h3 {
@@ -918,6 +973,7 @@ section {
 }
 
 .event-modal-right {
+    grid-area: right;
     border-left: 1px solid var(--bg-tertiary);
     padding-left: 2rem;
 }
@@ -951,8 +1007,12 @@ section {
 }
 
 @media (max-width: 768px) {
-    .event-modal-grid {
+    .event-modal-grid, .event-modal-grid.no-links {
         grid-template-columns: 1fr;
+        grid-template-areas: 
+            "image"
+            "left"
+            "right";
         gap: 2rem;
     }
     .event-modal-right {
