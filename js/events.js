@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardHtml = `
                 <div class="event-card glass-card">
                     <div class="event-image">
-                        <img src="${imageUrl}" alt="${ev.title}">
+                        <img src="${imageUrl}" alt="${ev.title}" loading="lazy">
                     </div>
                     <div class="event-info">
                         <h3>${ev.title}</h3>
