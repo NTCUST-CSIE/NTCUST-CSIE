@@ -1,7 +1,7 @@
 # NTCUST CSIE 資訊工程科 科學會
 
 <div align="center">
-  <img src="logo.png" alt="NTCUST CSIE Logo" width="200" />
+  <img src="./img/logo.png" alt="NTCUST CSIE Logo" width="200" />
   <br />
   <h3>國立臺中科技大學 資訊工程科 科學會 官方網站</h3>
   <p>這是一個以 HTML、CSS 和 JavaScript 打造的純前端靜態網站，採用「資料與介面分離 (Data-UI Separation)」架構，用以展示科學會介紹、財務報表、活動資訊等相關內容。</p>
