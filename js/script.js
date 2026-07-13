@@ -82,7 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Prevent infinite loop if the fallback image itself is missing
             if (e.target.getAttribute('data-fallback-applied') !== 'true') {
                 e.target.setAttribute('data-fallback-applied', 'true');
-                e.target.src = './img/nopng.png';
+                const isEventsPage = window.location.pathname.includes('events.html');
+                e.target.src = isEventsPage ? './img/event_nopng.png' : './img/nopng.png';
             }
         }
     }, true); // Use capture phase because error events don't bubble

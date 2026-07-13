@@ -310,7 +310,6 @@ ul {
     align-items: center;
     justify-content: center;
     background-color: var(--bg-secondary);
-    /* Removed radial-gradient dot background to keep it clean */
     padding-top: 80px; /* Offset for navbar */
     position: relative;
     overflow: hidden;
