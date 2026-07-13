@@ -23,7 +23,7 @@
 - **資料層 (Data)**：`data/*.json`。非技術背景的同學也能輕鬆維護網站內容。
 - **介面層 (UI)**：**HTML5** 與 **CSS3**。採用 CSS Variables、Flexbox、Grid 佈局，並支援深色模式 (Dark Mode)。全站圖片已加入防拖曳保護。
 - **邏輯層 (Logic)**：**JavaScript (ES6+)**。模組化拆分 (Vanilla JS)，不依賴大型前端框架。
-- **動畫與視覺 (Animation)**：**GSAP 3.15.0** 負責高效能的頁面捲動與動畫。
+- **動畫與視覺 (Animation)**：**Vanilla JS** 搭配 CSS Transitions 處理高效能的頁面捲動與動畫。
 - **圖示庫 (Icons)**：**Phosphor Icons 2.1.2** 現代簡約的開源圖示庫。
 
 ## 📂 目錄結構 (Directory Structure)

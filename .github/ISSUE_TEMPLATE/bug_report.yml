@@ -1,0 +1,60 @@
+name: Bug Report
+description: 回報網頁錯誤或功能異常
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝您花時間回報問題！為了幫助我們更快定位問題，請盡量填寫詳細資訊。
+  - type: input
+    id: url
+    attributes:
+      label: 發生問題的網址
+      placeholder: 例如：https://nutccsie.org/events.html
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 問題描述
+      description: 發生了什麼事？
+      placeholder: 點擊活動卡片時，圖片沒有正確載入...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 重現步驟
+      description: 請描述如何重現此問題
+      placeholder: |
+        1. 進入首頁
+        2. 點擊導覽列的「活動剪影」
+        3. 點擊第一個活動
+        4. 看到錯誤
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 瀏覽器
+      options:
+        - Chrome
+        - Safari
+        - Firefox
+        - Edge
+        - 其他
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: 作業系統
+      options:
+        - Windows
+        - macOS
+        - iOS
+        - Android
+        - Linux
+    validations:
+      required: true

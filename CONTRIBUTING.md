@@ -50,6 +50,7 @@ git checkout -b feature/new-gallery-page
 ### 3. 開發與測試 (Development & Testing)
 - 由於專案使用 `fetch()` 讀取 JSON 資料，請務必使用 **Live Server** 或 `npx serve` 來預覽您的修改，直接雙擊 HTML 檔案會導致 CORS 錯誤。
 - 如果您是開發者，請確認您的修改在**電腦版**與**手機版 (Responsive)** 都有良好的顯示效果。
+- **請保持 Vanilla JS 精神，切勿隨意引入未使用的外部依賴庫（如 CDN）以維持極致效能。**
 
 ### 4. 提交更改 (Commit Your Changes)
 我們鼓勵使用 **Conventional Commits (約定式提交)** 來讓 Commit 歷史保持乾淨易讀：

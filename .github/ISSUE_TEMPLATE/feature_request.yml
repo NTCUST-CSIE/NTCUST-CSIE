@@ -1,0 +1,31 @@
+name: Feature Request
+description: 提出新功能建議
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝您為系學會網站提供建議！請告訴我們您的想法。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 遇到的問題或痛點
+      description: 這個功能是為了解決什麼問題？
+      placeholder: 目前在找歷屆活動時很不方便...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: 建議的解決方案
+      description: 您希望這個功能長什麼樣子？
+      placeholder: 我希望在活動頁面加上年份過濾器...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 其他替代方案
+      description: 有沒有其他可以解決這個問題的方法？
+      placeholder: 或者也可以加上搜尋列...
