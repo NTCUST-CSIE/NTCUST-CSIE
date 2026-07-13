@@ -33,11 +33,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Prepare public directory
+        run: |
+          mkdir public
+          cp *.html public/
+          cp -r css js img data public/
+          cp _headers public/ 2>/dev/null || :
+          cp favicon.ico public/ 2>/dev/null || :
+          cp CNAME public/ 2>/dev/null || :
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload only the public directory
+          path: 'public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
