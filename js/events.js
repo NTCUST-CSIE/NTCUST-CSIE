@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         eventKeys.forEach(key => {
             const ev = data[key];
-            const imageUrl = ev.image ? ev.image : './logo.png';
+            const imageUrl = ev.image ? ev.image : './event_nopng.png';
 
             const cardHtml = `
                 <div class="event-card glass-card">
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     eModalDesc.textContent = data.desc;
                     
                     if(eModalImage) {
-                        const imgSrc = data.image ? data.image : './logo.png';
+                        const imgSrc = data.image ? data.image : './event_nopng.png';
                         eModalImage.src = imgSrc;
                         eModalImage.removeAttribute('data-fallback-applied');
                         

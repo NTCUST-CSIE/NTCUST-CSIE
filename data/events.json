@@ -10,7 +10,7 @@
     "Basketball": {
         "title": "籃球週",
         "desc": "學生不是只要學習就好，運動也是很重要的！在這裡，你可以和同學們一起打籃球，展現你的籃球實力！",
-        "image": "./img/Basketball.jpg",
+        "image": "./img/event_nopng.png",
         "links": [
             { "text": "有4個連結的樣子", "url": "https://example.com" },
             { "text": "有4個連結的樣子", "url": "https://example.com" },
