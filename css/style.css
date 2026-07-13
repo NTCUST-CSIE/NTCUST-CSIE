@@ -929,24 +929,20 @@ section {
 }
 
 .event-modal-grid.no-links {
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1fr;
     grid-template-areas: 
-        "image left";
-    gap: 2rem;
-    align-items: center;
+        "image"
+        "left";
+    gap: 3rem;
+    align-items: start;
 }
 
 .event-modal-image-container {
     grid-area: image;
-    border-radius: 12px;
-    overflow: hidden;
-    width: 100%;
-}
-
-.event-modal-grid:not(.no-links) .event-modal-image-container {
     margin: -3rem -3rem 3rem -3rem;
     width: calc(100% + 6rem);
     border-radius: 12px 12px 0 0;
+    overflow: hidden;
     max-height: 350px;
 }
 
