@@ -39,14 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        eventKeys.forEach(key => {
+        eventKeys.forEach((key, index) => {
             const ev = data[key];
             const imageUrl = ev.image ? ev.image : './img/event_nopng.png';
+            const loadingAttr = index < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
 
             const cardHtml = `
                 <div class="event-card glass-card">
                     <div class="event-image">
-                        <img src="${imageUrl}" alt="${ev.title}" loading="lazy">
+                        <img src="${imageUrl}" alt="${ev.title}" ${loadingAttr}>
                     </div>
                     <div class="event-info">
                         <h3>${ev.title}</h3>
