@@ -125,16 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const revealElements = eventsContainer.querySelectorAll('.event-card');
         revealElements.forEach(el => el.classList.add('reveal'));
         
-        const checkReveal = () => {
-            const windowHeight = window.innerHeight;
-            revealElements.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                if (elementTop < windowHeight - 100) {
-                    el.classList.add('active');
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
                 }
             });
-        };
-        window.addEventListener('scroll', checkReveal);
-        checkReveal(); // 立即檢查一次確保第一個進入畫面的卡片會顯示
+        }, { root: null, rootMargin: '0px', threshold: 0.1 });
+        
+        revealElements.forEach(el => observer.observe(el));
     }
 });

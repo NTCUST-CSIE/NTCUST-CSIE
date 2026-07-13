@@ -55,18 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const revealElements = container.querySelectorAll('.member-card');
         revealElements.forEach(el => el.classList.add('reveal'));
         
-        const checkReveal = () => {
-            const windowHeight = window.innerHeight;
-            revealElements.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                if (elementTop < windowHeight - 100) {
-                    el.classList.add('active');
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
                 }
             });
-        };
+        }, { root: null, rootMargin: '0px', threshold: 0.1 });
         
-        window.addEventListener('scroll', checkReveal);
-        checkReveal(); // Check immediately on render
+        revealElements.forEach(el => observer.observe(el));
 
         // 處理從首頁或其他頁面連過來的錨點跳轉 (Anchor Links)
         if (window.location.hash) {

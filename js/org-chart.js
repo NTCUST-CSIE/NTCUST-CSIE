@@ -69,17 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const revealElements = orgTree.querySelectorAll('.glass-card');
             revealElements.forEach(el => el.classList.add('reveal'));
             
-            const checkReveal = () => {
-                const windowHeight = window.innerHeight;
-                revealElements.forEach(el => {
-                    const elementTop = el.getBoundingClientRect().top;
-                    if (elementTop < windowHeight - 100) {
-                        el.classList.add('active');
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
                     }
                 });
-            };
-            window.addEventListener('scroll', checkReveal);
-            checkReveal(); // Initial check
+            }, { root: null, rootMargin: '0px', threshold: 0.1 });
+            
+            revealElements.forEach(el => observer.observe(el));
         })
         .catch(err => {
             console.error('載入首頁組織圖失敗:', err);
