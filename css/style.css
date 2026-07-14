@@ -1,9 +1,30 @@
 :root {
-    /* Brand Colors - Pastel Blue Theme */
-    --color-brand-primary: #1e3a8a; /* Deep blue for primary actions/text */
-    --color-brand-secondary: #3b82f6; /* Lighter blue for hover/accents */
-    --color-brand-light: #eff6ff; /* Very light pastel blue for backgrounds */
+    /* Background Colors (Dark Default) */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
     
+    /* Text Colors (Dark Default) */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    
+    /* Brand Colors (Dark Default) */
+    --color-brand-primary: #60a5fa;
+    --color-brand-secondary: #93c5fd;
+    --color-brand-light: rgba(59, 130, 246, 0.15);
+    
+    /* Shadows (Dark Default) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    
+    /* Particle Colors (Dark Default) */
+    --particle-color: 148, 163, 184; /* Slate 400 */
+    --particle-line-color: 71, 85, 105; /* Slate 600 */
+}
+
+[data-theme="light"] {
     /* Background Colors */
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc; /* Very light gray */
@@ -14,6 +35,11 @@
     --text-secondary: #475569; /* Slate 600 */
     --text-tertiary: #94a3b8; /* Slate 400 */
 
+    /* Brand Colors - Pastel Blue Theme */
+    --color-brand-primary: #1e3a8a; /* Deep blue for primary actions/text */
+    --color-brand-secondary: #3b82f6; /* Lighter blue for hover/accents */
+    --color-brand-light: #eff6ff; /* Very light pastel blue for backgrounds */
+    
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -22,28 +48,6 @@
     /* Particle Colors */
     --particle-color: 148, 163, 184; /* Slate 400 */
     --particle-line-color: 203, 213, 225; /* Slate 300 */
-}
-
-[data-theme="dark"] {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
-    
-    --color-brand-primary: #60a5fa;
-    --color-brand-secondary: #93c5fd;
-    --color-brand-light: rgba(59, 130, 246, 0.15);
-    
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    
-    /* Particle Colors */
-    --particle-color: 148, 163, 184; /* Slate 400 */
-    --particle-line-color: 71, 85, 105; /* Slate 600 */
 }
 
 * {
