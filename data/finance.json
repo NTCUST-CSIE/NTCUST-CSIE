@@ -3,7 +3,7 @@
         {
             "monthLabel": "2026年 7月",
             "records": [
-                { "date": "7/1", "desc": "上屆結餘", "income": 15810, "expense": null }
+                { "date": "7/1", "desc": "上屆結餘", "income": null, "expense": null }
             ]
         },
         {
