@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CurrencyCircleDollar } from '@phosphor-icons/react';
 import financeData from '../data/finance.json';
 
 interface FinanceRecord {
@@ -73,7 +74,13 @@ const Finance = () => {
       <main>
         <section id="finance" className="finance-section">
           <div className="container">
-            <h2 className="section-title">財務報表 <span className="highlight">Finance</span></h2>
+            <h2 className="section-title">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <CurrencyCircleDollar className="title-icon" weight="fill" />
+                財務報表
+              </span>
+              <span className="highlight">Finance</span>
+            </h2>
             
             <div className="finance-tabs-wrapper">
               <div className="finance-tabs" id="finance-tabs">

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { EnvelopeSimple, InstagramLogo, ChatCircleDots, GithubLogo, Link as LinkIcon } from '@phosphor-icons/react';
+import { EnvelopeSimple, InstagramLogo, ChatCircleDots, GithubLogo, Link as LinkIcon, Info, UsersThree } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import ParticleCanvas from '../components/ParticleCanvas';
 import OrgChart from '../components/OrgChart';
@@ -42,7 +42,13 @@ const Home = () => {
 
       <section id="about" className="about-section">
         <div className="container">
-          <h2 className="section-title">關於我們 <span className="highlight">About Us</span></h2>
+          <h2 className="section-title">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Info className="title-icon" weight="fill" />
+              關於我們
+            </span>
+            <span className="highlight">About Us</span>
+          </h2>
           <div className="about-grid">
             <div className="about-text glass-card">
               <p>我們是資訊工程科 科學會，<br />由一群充滿熱情與活力的學生組成。<br />科學會致力於舉辦各項活動，<br />促進同學間的情感交流，<br />協助大家在五專留下美好的回憶。</p>
@@ -65,7 +71,13 @@ const Home = () => {
 
       <section id="organization" className="org-section">
         <div className="container">
-          <h2 className="section-title">組織架構 <span className="highlight">Organization</span></h2>
+          <h2 className="section-title">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <UsersThree className="title-icon" weight="fill" />
+              組織架構
+            </span>
+            <span className="highlight">Organization</span>
+          </h2>
           <div className="org-tree" id="index-org-tree">
             <OrgChart />
           </div>

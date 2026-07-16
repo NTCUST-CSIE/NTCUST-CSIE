@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { ChatTeardropText } from '@phosphor-icons/react';
 
 const Feedback = () => {
   useEffect(() => {
@@ -17,7 +18,13 @@ const Feedback = () => {
       <div style={{ height: '100px' }}></div>
       <main>
         <section className="container" style={{ maxWidth: '800px', padding: '2rem 1rem' }}>
-          <h2 className="section-title">匿名意見箱 <span className="highlight">Feedback</span></h2>
+          <h2 className="section-title">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <ChatTeardropText className="title-icon" weight="fill" />
+              匿名意見箱
+            </span>
+            <span className="highlight">Feedback</span>
+          </h2>
           <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-text-light)' }}>
             對於我們有任何想法、建議或疑問嗎？歡迎透過下方的匿名表單告訴我們！
           </p>

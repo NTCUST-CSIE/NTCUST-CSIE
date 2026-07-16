@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import membersData from '../data/members.json';
 import MemberModal from '../components/MemberModal';
+import { Users } from '@phosphor-icons/react';
 
 interface Member {
   name: string;
@@ -44,16 +45,25 @@ const Members = () => {
       <main>
         <section id="members" className="members-section">
           <div className="container">
-            <h2 className="section-title">科會成員 <span className="highlight">Members</span></h2>
+            <h2 className="section-title">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Users className="title-icon" weight="fill" />
+                科會成員
+              </span>
+              <span className="highlight">Members</span>
+            </h2>
             <div id="members-container">
-              {(membersData as Department[]).map(dept => (
-                <div key={dept.id} className="department-group">
-                  <h3 className="department-title">{dept.departmentTitle}</h3>
-                  <div className="department-members">
-                    {dept.members.map((member, idx) => (
-                      <div 
-                        key={idx} 
-                        className="member-card glass-card"
+              {(membersData as Department[]).map(dept => {
+                return (
+                  <div key={dept.id} className="department">
+                    <h3 className="department-title">
+                      {dept.departmentTitle}
+                    </h3>
+                    <div className="members-grid">
+                      {dept.members.map((member, idx) => (
+                        <div 
+                          key={idx} 
+                          className="member-card glass-card clickable-card"
                         onClick={() => setSelectedMember(member)}
                       >
                         <div className="member-icon" style={{ backgroundImage: `url(${member.image})` }}></div>
@@ -61,11 +71,12 @@ const Members = () => {
                           <h4 className="member-name">{member.name}</h4>
                           <p className="member-title">{member.title}</p>
                         </div>
-                      </div>
-                    ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
