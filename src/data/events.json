@@ -4,7 +4,7 @@
         "desc": "剛踏入資工大家庭的各位想必對彼此都很陌生吧？沒關係，資工迎新宿營的第一個活動就是讓大家彼此認識的「新生茶會」！在這裡，你可以和同學們一起聊天、玩遊戲，甚至還有機會認識到未來的室友或是隊友！",
         "image": "./img/Noob&food.jpg",
         "links": [
-            { "text": "有連結的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "Basketball": {
@@ -12,10 +12,7 @@
         "desc": "學生不是只要學習就好，運動也是很重要的！在這裡，你可以和同學們一起打籃球，展現你的籃球實力！",
         "image": "./img/Basketball.png",
         "links": [
-            { "text": "有4個連結的樣子", "url": "https://example.com" },
-            { "text": "有4個連結的樣子", "url": "https://example.com" },
-            { "text": "有4個連結的樣子", "url": "https://example.com" },
-            { "text": "有4個連結的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "Volleyball": {
@@ -23,14 +20,7 @@
         "desc": "資工科裡有許多熱愛排球的同學，這個活動就是為了讓大家一起享受排球的樂趣！在這裡，你可以和同學們一起打排球，展現你的排球實力！",
         "image": "./img/Volleyball.jpg",
         "links": [
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" },
-            { "text": "有很多個連結的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "Theme_Courses": {
@@ -38,7 +28,7 @@
         "desc": "學校提供給各位的課程相對枯燥乏味，資工科的學長姐們特別為大家準備了許多有趣的主題課程，讓大家在學習之餘也能享受學習的樂趣！",
         "image": "./img/Theme_Courses.jpg",
         "links": [
-            { "text": "連結文字長度正常的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "Halloween": {
@@ -46,7 +36,7 @@
         "desc": "萬聖節即將到來，期中考也步步緊逼，科學會為大家提供歐趴糖果，讓大家在忙碌的學習之餘也能享受萬聖節的樂趣！",
         "image": "./img/Halloween.jpg",
         "links": [
-            { "text": "連結文字長度完全超過正常長度的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "School_anniversary": {
@@ -54,14 +44,7 @@
         "desc": "每年的例行公事！資工科的同學們都會在運動會上展現出他們的活力與熱情，這個活動就是為了讓大家一起享受運動會的樂趣！",
         "image": "./img/School_anniversary.jpg",
         "links": [
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" },
-            { "text": "連結文字長度完全超過正常長度的樣子，還很多個", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "Christmas": {
@@ -69,7 +52,7 @@
         "desc": "聖誕晚會！！準備好你的服裝，一起來參加聖誕晚會吧！",
         "image": "./img/Christmas.jpg",
         "links": [
-            { "text": "下一個是隱藏連結的樣子", "url": "https://example.com" }
+            { "text": null, "url": null }
         ]
     },
     "BBQ": {
