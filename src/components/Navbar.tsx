@@ -47,6 +47,7 @@ const Navbar = () => {
           <li><Link to="/events">近期活動</Link></li>
           <li><Link to="/finance">財務報表</Link></li>
           <li><Link to="/feedback">意見箱</Link></li>
+          <li><Link to="/custom">自訂表單</Link></li>
           <li>
             <button className="theme-toggle" aria-label="切換深色/淺色模式" onClick={toggleTheme}>
               {theme === 'dark' ? <Sun weight="fill" /> : <Moon weight="fill" />}
