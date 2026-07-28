@@ -6,7 +6,7 @@ import Members from './pages/Members';
 import Events from './pages/Events';
 import Finance from './pages/Finance';
 import Feedback from './pages/Feedback';
-import CustomIframe from './pages/CustomIframe';
+import AIChat from './pages/AIChat';
 import NotFound from './pages/NotFound';
 import './assets/style.css'; // Global styles
 
@@ -20,7 +20,7 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/feedback" element={<Feedback />} />
-        <Route path="/custom" element={<CustomIframe />} />
+        <Route path="/aichat" element={<AIChat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
