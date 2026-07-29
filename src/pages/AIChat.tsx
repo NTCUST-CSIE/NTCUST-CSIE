@@ -22,7 +22,7 @@ const AIChat = () => {
         <section className="container" style={{ maxWidth: '800px', padding: '2rem 1rem' }}>
           <h2 className="section-title">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              <Robot className="title-icon" weight="fill" />
+              <i class="ph-fill ph-robot"></i>
               AI 智能助理
             </span>
             <span className="highlight">AI Chat</span>
