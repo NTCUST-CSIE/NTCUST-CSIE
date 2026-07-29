@@ -29,8 +29,8 @@ const AIChat = () => {
           </h2>
           <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-text-light)' }}>
             請注意，由於這個 AI Chat 是由第三方服務提供，請勿在此輸入任何敏感資訊或個人資料。<br/>
-            由於各處室堆定略為不同，請自行判斷其可靠性與安全性。<br />
-            若有任何疑慮，請直接詢問科會或相關負責人。
+            由於各處室規定略為不同，請自行判斷其可靠性與安全性。<br/>
+            為了確保AI回答的穩定性，我們會儲存使用者的對話紀錄，並用於改善模型的訓練。<br/>
           </p>
           <div className="glass-card iframe-container reveal active">
             <iframe src="https://copilotstudio.microsoft.com/environments/Default-28d0fa75-f9f9-4024-9337-485d46e75257/bots/Default_bot_c3f96b/canvas?__version__=2&enableFileAttachment=false&cliAgent=true" frameborder="0" style="width: 100%; height: 100%;"></iframe>
