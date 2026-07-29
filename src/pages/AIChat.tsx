@@ -23,12 +23,14 @@ const AIChat = () => {
           <h2 className="section-title">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <i class="ph-fill ph-robot"></i>
-              AI 智能助理
+              新生 AI
             </span>
             <span className="highlight">AI Chat</span>
           </h2>
           <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-text-light)' }}>
-            這是我們的 AI 智能助理，您可以在這裡詢問任何關於資訊工程科系與科學會的問題。
+            請注意，由於這個 AI Chat 是由第三方服務提供，請勿在此輸入任何敏感資訊或個人資料。<br/>
+            由於各處室堆定略為不同，請自行判斷其可靠性與安全性。<br />
+            若有任何疑慮，請直接詢問科會或相關負責人。
           </p>
           <div className="glass-card iframe-container reveal active">
             <iframe 
