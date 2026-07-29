@@ -20,6 +20,7 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/feedback" element={<Feedback />} />
+        <Route path="/aichat" element={<AIChat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
