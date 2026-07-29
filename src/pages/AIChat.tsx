@@ -33,7 +33,7 @@ const AIChat = () => {
             為了確保AI回答的穩定性，我們會儲存使用者的對話紀錄，並用於改善模型的訓練。<br/>
           </p>
           <div className="glass-card iframe-container reveal active">
-            <iframe src="https://copilotstudio.microsoft.com/environments/Default-28d0fa75-f9f9-4024-9337-485d46e75257/bots/Default_bot_c3f96b/canvas?__version__=2&enableFileAttachment=false&cliAgent=true" frameBorder={0} style={{ width: '100%', height: '100%' }}></iframe>
+            <iframe src="https://copilotstudio.microsoft.com/environments/Default-28d0fa75-f9f9-4024-9337-485d46e75257/bots/Default_bot_c3f96b/canvas?__version__=2&enableFileAttachment=false&cliAgent=true" frameBorder={0} style={{ width: '100%', height: '100%' }}> </iframe>
           </div>
         </section>
       </main>
