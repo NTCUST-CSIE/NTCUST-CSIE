@@ -33,17 +33,7 @@ const AIChat = () => {
             若有任何疑慮，請直接詢問科會或相關負責人。
           </p>
           <div className="glass-card iframe-container reveal active">
-            <iframe 
-              // 替換下方的 data-tally-src 或 src 即可改變嵌入的內容
-              data-tally-src="https://tally.so/embed/RGaK24?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
-              loading="lazy" 
-              width="100%" 
-              height="200" 
-              frameBorder="0" 
-              marginHeight={0} 
-              marginWidth={0} 
-              title="AI Chat">
-            </iframe>
+            <iframe src="https://copilotstudio.microsoft.com/environments/Default-28d0fa75-f9f9-4024-9337-485d46e75257/bots/Default_bot_c3f96b/canvas?__version__=2&enableFileAttachment=false&cliAgent=true" frameborder="0" style="width: 100%; height: 100%;"></iframe>
           </div>
         </section>
       </main>
