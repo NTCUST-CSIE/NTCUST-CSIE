@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { PaperPlaneRight, Robot, User } from '@phosphor-icons/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   id: string;
@@ -87,7 +89,7 @@ const AIChat = () => {
                     {msg.role === 'assistant' ? <Robot weight="fill" /> : <User weight="fill" />}
                   </div>
                   <div className="chat-bubble">
-                    {msg.content}
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                   </div>
                 </div>
               ))}
