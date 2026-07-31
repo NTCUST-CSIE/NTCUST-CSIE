@@ -1,69 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
-import { PaperPlaneRight, Robot, User } from '@phosphor-icons/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { Robot } from '@phosphor-icons/react';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'search-bar-snippet': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        theme?: string;
+        'hide-branding'?: string;
+      };
+    }
+  }
 }
 
 const AIChat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: '你好！我是中科大資訊工程科的專屬 AI 助理。你可以問我關於註冊流程、處室公告或科會活動的問題。請問有什麼我可以幫忙的嗎？'
-    }
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: input.trim() };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg.content, history: messages })
-      });
-      const data = await response.json();
-      
-      const aiMsg: Message = { 
-        id: (Date.now() + 1).toString(), 
-        role: 'assistant', 
-        content: data.reply || '沒有收到回應'
-      };
-      setMessages(prev => [...prev, aiMsg]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      setMessages(prev => [...prev, { 
-        id: Date.now().toString(), 
-        role: 'assistant', 
-        content: '抱歉，系統目前遇到了一點問題，請稍後再試。' 
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <>
       <div style={{ height: '100px' }}></div>
@@ -72,182 +20,34 @@ const AIChat = () => {
           <h2 className="section-title">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <i className="ph-fill ph-robot" style={{ fontSize: '1.5rem', color: 'var(--color-brand-primary)' }}></i>
-              新生 AI 助理
+              網頁快速搜尋
             </span>
-            <span className="highlight">AI Assistant</span>
+            <span className="highlight">AI Search</span>
           </h2>
           <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-text-light)' }}>
-            歡迎使用！我會優先搜尋校內各處室公告來回答您的問題。<br/>
-            為了提升服務品質，我們的對話紀錄將會被妥善保存並用於改善模型。
+            快速搜尋中科大與科會相關資訊
           </p>
           
-          <div className="glass-card chat-container reveal active">
-<!-- Import the library -->
-<script type="module" src="https://fc1b84d9-7609-4c3d-a345-83e532d7fb85.search.ai.cloudflare.com/assets/v0.0.40/search-snippet.es.js"></script>
-
-<search-bar-snippet
-  theme="light"
-  hide-branding="true">
-</search-bar-snippet>
+          <div className="glass-card search-container reveal active" style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+            <search-bar-snippet
+              theme="light"
+              hide-branding="true"
+            ></search-bar-snippet>
+          </div>
         </section>
       </main>
       <style>{`
-        .chat-container {
+        .search-container {
+            min-height: 400px;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            padding: 1.5rem !important;
-            height: 600px;
-            max-height: 70vh;
-        }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* 隱藏捲軸但可滾動 */
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-messages::-webkit-scrollbar-thumb {
-            background-color: var(--bg-tertiary);
-            border-radius: 10px;
-        }
-
-        .chat-message-wrapper {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-end;
-            max-width: 85%;
-        }
-
-        .chat-message-wrapper.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .chat-message-wrapper.assistant {
-            align-self: flex-start;
-        }
-
-        .chat-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            flex-shrink: 0;
-            font-size: 1.2rem;
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
         }
-
-        .chat-message-wrapper.assistant .chat-avatar {
-            background-color: var(--color-brand-light);
-            color: var(--color-brand-primary);
-        }
-
-        .chat-bubble {
-            padding: 0.8rem 1.2rem;
-            border-radius: 18px;
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            box-shadow: var(--shadow-sm);
-            white-space: pre-wrap;
-        }
-
-        .chat-message-wrapper.user .chat-bubble {
-            background-color: var(--color-brand-primary);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-message-wrapper.assistant .chat-bubble {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-bottom-left-radius: 4px;
-            color: var(--text-primary);
-        }
-        
-        html[data-theme='dark'] .chat-message-wrapper.assistant .chat-bubble {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 0.8rem;
-            background-color: var(--bg-primary);
-            padding: 0.8rem;
-            border-radius: 20px;
-            border: 1px solid var(--bg-tertiary);
-        }
-
-        .chat-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-primary);
-            font-size: 1rem;
-            padding: 0 0.5rem;
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        .chat-send-btn {
-            background-color: var(--color-brand-primary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .chat-send-btn:disabled {
-            background-color: var(--bg-tertiary);
-            color: var(--text-tertiary);
-            cursor: not-allowed;
-        }
-
-        .chat-send-btn:not(:disabled):hover {
-            background-color: var(--color-brand-secondary);
-            transform: scale(1.05);
-        }
-
-        /* Loading Dots Animation */
-        .loading {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            height: 24px;
-        }
-        .dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--text-secondary);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        /* Make the search bar snippet take up full width if possible */
+        search-bar-snippet {
+            width: 100%;
+            max-width: 600px;
         }
       `}</style>
     </>
