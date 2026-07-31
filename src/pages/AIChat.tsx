@@ -1,4 +1,4 @@
-// Global declaration removed as it's not being picked up by tsc properly here.
+import React from 'react';
 
 const AIChat = () => {
   return (
@@ -18,11 +18,10 @@ const AIChat = () => {
           </p>
           
           <div className="glass-card search-container reveal active" style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
-            {/* @ts-ignore: Custom web component */}
-            <search-bar-snippet
-              theme="light"
-              hide-branding="true"
-            ></search-bar-snippet>
+            {React.createElement('search-bar-snippet', {
+              theme: 'light',
+              'hide-branding': 'true'
+            })}
           </div>
         </section>
       </main>
