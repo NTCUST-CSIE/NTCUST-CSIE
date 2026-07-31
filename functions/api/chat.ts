@@ -62,11 +62,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         functionDeclarations: [
           {
             name: "search_internal_kb",
-            description: "搜尋內部知識庫以獲取學校相關資訊。",
+            description: "搜尋內部知識庫，取得各校區單位之分機號碼。",
             parameters: {
               type: "OBJECT",
               properties: {
-                query: { type: "STRING", description: "要搜尋的關鍵字" }
+                query: { type: "STRING", description: "短搜尋關鍵字，請只提供「簡短的處室名稱」或「人名」（例如：資訊工程系、教務處、校長室），請勿輸入完整問句或包含「電話」等冗言贅字。" }
               },
               required: ["query"]
             }
