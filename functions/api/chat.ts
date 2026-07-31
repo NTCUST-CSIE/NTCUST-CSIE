@@ -15,6 +15,29 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(JSON.stringify({ error: "API Key not configured" }), { status: 500 });
     }
 
+    // 攔截日常對話，節省 API 成本
+    const msgLower = body.message.trim().toLowerCase();
+    
+    // 移除常見標點符號以利比對
+    const cleanMsg = msgLower.replace(/[，。！？、~！@#$%\^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g, '');
+
+    const greetings = ['你好', '哈囉', '嗨', 'hi', 'hello', '早安', '午安', '晚安', '安安'];
+    const thanks = ['謝謝', '感謝', '感恩', 'thanks', 'thank you', 'thx', '謝啦'];
+    const goodbyes = ['掰掰', '再見', '掰', 'bye', 'goodbye', 'see ya'];
+
+    // 判斷是否為超短對話，且完全命中這些關鍵字
+    if (cleanMsg.length <= 10) {
+      if (greetings.some(g => cleanMsg === g || cleanMsg.includes(g) && cleanMsg.length <= g.length + 2)) {
+        return new Response(JSON.stringify({ reply: "你好呀！我是中科大資訊工程科的專屬 AI 助理。請問有什麼我可以幫忙的嗎？" }), { headers: { 'Content-Type': 'application/json' }});
+      }
+      if (thanks.some(t => cleanMsg === t || cleanMsg.includes(t) && cleanMsg.length <= t.length + 2)) {
+        return new Response(JSON.stringify({ reply: "不客氣！如果還有其他關於學校或註冊的問題，隨時歡迎發問喔！" }), { headers: { 'Content-Type': 'application/json' }});
+      }
+      if (goodbyes.some(g => cleanMsg === g || cleanMsg.includes(g) && cleanMsg.length <= g.length + 2)) {
+        return new Response(JSON.stringify({ reply: "再見！祝你有個美好的一天，有問題隨時回來找我喔！" }), { headers: { 'Content-Type': 'application/json' }});
+      }
+    }
+
     const systemInstruction = `
 # 目的
 本代理程式旨在協助新生快速獲取正確資訊，優先使用內部知識庫，若無答案則進行聯網搜尋，並提供應詢處室及聯絡方式，確保資訊正確性與時效性。
