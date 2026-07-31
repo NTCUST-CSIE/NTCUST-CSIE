@@ -147,14 +147,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
               const key = env.GOOGLE_SEARCH_API_KEY;
               const q = encodeURIComponent(args.query);
               const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${q}`;
+              
+              // 取得真實的來源網址作為 Referer，若無則提供預設值
+              const reqOrigin = request.headers.get("Origin") || request.headers.get("Referer") || "https://nutccsie.org";
+              
               const searchRes = await fetch(searchUrl, {
                 headers: {
-                  "Referer": "https://nutccsie.org/"
+                  "Referer": reqOrigin
                 }
               });
               const searchData: any = await searchRes.json();
               
-              if (searchData.items) {
+              if (searchData.error) {
+                // 將 Google API 的錯誤訊息直接傳給 AI
+                functionResultData = { error: `Google Search API 錯誤 (${searchData.error.code}): ${searchData.error.message}。請告訴使用者 Google API Key 權限被阻擋。` };
+              } else if (searchData.items) {
                 functionResultData = searchData.items.map((item: any) => ({
                   title: item.title,
                   link: item.link,
