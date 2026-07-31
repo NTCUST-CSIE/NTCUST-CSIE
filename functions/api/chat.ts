@@ -144,7 +144,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const key = env.GOOGLE_SEARCH_API_KEY;
             const q = encodeURIComponent(args.query);
             const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${q}`;
-            const searchRes = await fetch(searchUrl);
+            const searchRes = await fetch(searchUrl, {
+              headers: {
+                "Referer": "https://nutccsie.org/"
+              }
+            });
             const searchData: any = await searchRes.json();
             
             if (searchData.items) {
