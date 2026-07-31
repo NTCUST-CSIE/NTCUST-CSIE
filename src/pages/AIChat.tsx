@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 const AIChat = () => {
   const [tokenInfo, setTokenInfo] = useState<{ token?: string, error?: string } | null>(null);
