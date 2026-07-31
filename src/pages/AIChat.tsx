@@ -1,15 +1,4 @@
-import { Robot } from '@phosphor-icons/react';
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'search-bar-snippet': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        theme?: string;
-        'hide-branding'?: string;
-      };
-    }
-  }
-}
+// Global declaration removed as it's not being picked up by tsc properly here.
 
 const AIChat = () => {
   return (
@@ -29,6 +18,7 @@ const AIChat = () => {
           </p>
           
           <div className="glass-card search-container reveal active" style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+            {/* @ts-ignore: Custom web component */}
             <search-bar-snippet
               theme="light"
               hide-branding="true"
