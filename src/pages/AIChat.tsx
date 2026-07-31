@@ -82,44 +82,13 @@ const AIChat = () => {
           </p>
           
           <div className="glass-card chat-container reveal active">
-            <div className="chat-messages">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`chat-message-wrapper ${msg.role}`}>
-                  <div className="chat-avatar">
-                    {msg.role === 'assistant' ? <Robot weight="fill" /> : <User weight="fill" />}
-                  </div>
-                  <div className="chat-bubble">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="chat-message-wrapper assistant">
-                  <div className="chat-avatar"><Robot weight="fill" /></div>
-                  <div className="chat-bubble loading">
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+<!-- Import the library -->
+<script type="module" src="https://fc1b84d9-7609-4c3d-a345-83e532d7fb85.search.ai.cloudflare.com/assets/v0.0.40/search-snippet.es.js"></script>
 
-            <form className="chat-input-area" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="輸入您的問題 (例如：請問註冊流程？)"
-                disabled={isLoading}
-                className="chat-input"
-              />
-              <button type="submit" className="chat-send-btn" disabled={!input.trim() || isLoading}>
-                <PaperPlaneRight weight="fill" />
-              </button>
-            </form>
-          </div>
+<search-bar-snippet
+  theme="light"
+  hide-branding="true">
+</search-bar-snippet>
         </section>
       </main>
       <style>{`
