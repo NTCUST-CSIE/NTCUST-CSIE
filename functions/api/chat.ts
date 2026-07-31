@@ -161,7 +161,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       
       // 將執行結果以 functionResponse 的形式傳回給 AI
       contents.push({
-        role: "function",
+        role: "user",
         parts: [{
           functionResponse: {
             name: callName,
