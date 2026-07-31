@@ -9,35 +9,39 @@ const AIChat = () => {
           <h2 className="section-title">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <i className="ph-fill ph-robot" style={{ fontSize: '1.5rem', color: 'var(--color-brand-primary)' }}></i>
-              網頁快速搜尋
+              新生 AI 助理
             </span>
-            <span className="highlight">AI Search</span>
+            <span className="highlight">AI Chat</span>
           </h2>
           <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-text-light)' }}>
-            快速搜尋中科大與科會相關資訊
+            請注意，由於這個 AI Chat 是由第三方服務提供，請勿在此輸入任何敏感資訊或個人資料。<br/>
+            由於各處室規定略為不同，請自行判斷其可靠性與安全性。<br/>
+            為了確保AI回答的穩定性，我們會儲存使用者的對話紀錄，並用於改善模型的訓練。<br/>
           </p>
-          
-          <div className="glass-card search-container reveal active" style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
-            {React.createElement('search-bar-snippet', {
-              theme: 'light',
-              'hide-branding': 'true',
-              'api-url': 'https://fc1b84d9-7609-4c3d-a345-83e532d7fb85.search.ai.cloudflare.com'
-            })}
+          <div className="glass-card iframe-container reveal active">
+            <iframe src="https://copilotstudio.microsoft.com/environments/Default-28d0fa75-f9f9-4024-9337-485d46e75257/bots/Default_bot_c3f96b/canvas?__version__=2&enableFileAttachment=false&cliAgent=true" frameBorder={0} style={{ width: '100%', height: '100%' }}></iframe>
           </div>
         </section>
       </main>
       <style>{`
-        .search-container {
-            min-height: 400px;
+        .iframe-container {
             width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 0;
+            min-height: 500px;
             display: flex;
-            align-items: flex-start;
-            justify-content: center;
         }
-        /* Make the search bar snippet take up full width if possible */
-        search-bar-snippet {
+        
+        .iframe-container iframe {
             width: 100%;
-            max-width: 600px;
+            min-height: 600px;
+            border: none;
+            background: transparent;
+        }
+
+        html[data-theme='dark'] .iframe-container {
+            background: rgba(255, 255, 255, 0.05);
         }
       `}</style>
     </>
