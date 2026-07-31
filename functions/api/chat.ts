@@ -190,7 +190,24 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             functionResultData = { error: "DB binding not found." };
           }
         } else if (callName === 'search_internal_kb') {
-           functionResultData = { message: "知識庫目前為空，請嘗試其他搜尋方式。" };
+          if (env.DB) {
+            try {
+              const q = `%${args.query}%`;
+              const res = await env.DB.prepare(
+                "SELECT campus, department, role_or_name, extension FROM phone_directory WHERE department LIKE ? OR role_or_name LIKE ? LIMIT 5"
+              ).bind(q, q).all();
+              
+              if (res.results && res.results.length > 0) {
+                functionResultData = { results: res.results };
+              } else {
+                functionResultData = { message: "內部知識庫中查無相關分機。" };
+              }
+            } catch(e: any) {
+              functionResultData = { error: e.message };
+            }
+          } else {
+             functionResultData = { message: "知識庫尚未設定完成。" };
+          }
         }
 
         // 將 AI 回傳的 functionCall 放進 contents
