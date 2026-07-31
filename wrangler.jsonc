@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ntcust-csie",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2024-07-29",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ntcust_agent_db",
+      "database_id": "aaff5b93-ea3e-42d8-995a-9dc975bdb4f8"
+    }
+  ],
+  "vectorize": [
+    {
+      "binding": "VECTORIZE_INDEX",
+      "index_name": "ntcust_kb_index"
+    }
+  ]
+}
