@@ -95,7 +95,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     
     contents.push({ role: "user", parts: [{ text: body.message }] });
 
-    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${env.GEMINI_API_KEY}`;
     
     const response = await fetch(geminiEndpoint, {
       method: 'POST',
