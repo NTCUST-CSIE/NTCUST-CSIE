@@ -20,7 +20,8 @@ const AIChat = () => {
           <div className="glass-card search-container reveal active" style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
             {React.createElement('search-bar-snippet', {
               theme: 'light',
-              'hide-branding': 'true'
+              'hide-branding': 'true',
+              'api-url': 'https://fc1b84d9-7609-4c3d-a345-83e532d7fb85.search.ai.cloudflare.com'
             })}
           </div>
         </section>
