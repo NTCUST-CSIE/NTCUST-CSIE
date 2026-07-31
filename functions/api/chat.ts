@@ -15,7 +15,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(JSON.stringify({ error: "API Key not configured" }), { status: 500 });
     }
 
-    // 系統提示詞
     const systemInstruction = `
 # 目的
 本代理程式旨在協助新生快速獲取正確資訊，優先使用內部知識庫，若無答案則進行聯網搜尋，並提供應詢處室及聯絡方式，確保資訊正確性與時效性。
@@ -43,7 +42,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 - 每次回覆結尾，提醒使用者可直接聯絡處室以獲取最新資訊。
     `.trim();
 
-    // 定義 Tools
     const tools = [
       {
         functionDeclarations: [
@@ -90,55 +88,102 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
     ];
 
-    // 格式化對話歷史供 Gemini 使用
     const contents = body.history.map(msg => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }]
     }));
     
-    // 加入目前使用者的問題
-    contents.push({
-      role: "user",
-      parts: [{ text: body.message }]
-    });
+    contents.push({ role: "user", parts: [{ text: body.message }] });
 
-    const geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
     
-    const response = await fetch(`${geminiEndpoint}?key=${env.GEMINI_API_KEY}`, {
+    const response = await fetch(geminiEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents,
-        tools
-      })
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: systemInstruction }] }, contents, tools })
     });
-
-    const result: any = await response.json();
+    let result: any = await response.json();
     
-    // 這裡我們實作初步的回應邏輯，未來可以擴充 Tool Call 處理循環
-    // 如果 LLM 決定呼叫 Tool，我們會在下一階段加上完整的 Function Execution 迴圈
-    let replyText = "這是一個開發中的預設回應。";
+    // Function Call Execution Loop
+    if (result.candidates && result.candidates[0].content.parts[0].functionCall) {
+      const call = result.candidates[0].content.parts[0].functionCall;
+      const callName = call.name;
+      const args = call.args;
+      
+      let functionResultData: any = { error: "Unknown function" };
+
+      if (callName === 'search_nutc_web') {
+        if (!env.GOOGLE_SEARCH_API_KEY || !env.GOOGLE_SEARCH_ENGINE_ID) {
+          functionResultData = { error: "搜尋失敗：管理員尚未設定 Google Search API Key。" };
+        } else {
+          try {
+            const cx = env.GOOGLE_SEARCH_ENGINE_ID;
+            const key = env.GOOGLE_SEARCH_API_KEY;
+            const q = encodeURIComponent(args.query);
+            const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${q}`;
+            const searchRes = await fetch(searchUrl);
+            const searchData: any = await searchRes.json();
+            
+            if (searchData.items) {
+              functionResultData = searchData.items.map((item: any) => ({
+                title: item.title,
+                link: item.link,
+                snippet: item.snippet
+              })).slice(0, 3);
+            } else {
+              functionResultData = { message: "No results found." };
+            }
+          } catch (e: any) {
+            functionResultData = { error: e.message };
+          }
+        }
+      } else if (callName === 'save_to_pending_db') {
+        if (env.DB) {
+          try {
+            await env.DB.prepare(
+              "INSERT INTO search_logs (url, department, contact_phone, title, content, published_date, publisher) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            ).bind(
+              args.url, args.department || '', args.contact_phone || '', args.title, args.content, args.published_date || '', args.publisher || ''
+            ).run();
+            functionResultData = { status: "Success", message: "資料已寫入資料庫待審核。" };
+          } catch(e: any) {
+            functionResultData = { error: e.message };
+          }
+        } else {
+          functionResultData = { error: "DB binding not found." };
+        }
+      } else if (callName === 'search_internal_kb') {
+         functionResultData = { message: "知識庫目前為空，請嘗試其他搜尋方式。" };
+      }
+
+      // 將 AI 回傳的 functionCall 放進 contents
+      contents.push(result.candidates[0].content);
+      
+      // 將執行結果以 functionResponse 的形式傳回給 AI
+      contents.push({
+        role: "function",
+        parts: [{
+          functionResponse: {
+            name: callName,
+            response: { name: callName, content: functionResultData }
+          }
+        }]
+      });
+
+      // 第二次呼叫 Gemini，讓它根據工具回傳的結果生成最終文字回覆
+      const response2 = await fetch(geminiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: systemInstruction }] }, contents, tools })
+      });
+      result = await response2.json();
+    }
+
+    let replyText = "抱歉，我目前無法回應，請稍後再試。";
     if (result.candidates && result.candidates[0].content.parts[0].text) {
       replyText = result.candidates[0].content.parts[0].text;
-    } else if (result.candidates && result.candidates[0].content.parts[0].functionCall) {
-      const call = result.candidates[0].content.parts[0].functionCall;
-      replyText = `(AI 正在嘗試呼叫工具：${call.name})\n這部分的功能還需要綁定搜尋引擎 API 才能完成。`;
-      
-      // 示範將資料寫入 D1
-      if (call.name === 'save_to_pending_db' && env.DB) {
-         try {
-           const args = call.args;
-           await env.DB.prepare(
-             "INSERT INTO search_logs (url, department, contact_phone, title, content, published_date, publisher) VALUES (?, ?, ?, ?, ?, ?, ?)"
-           ).bind(
-             args.url, args.department || '', args.contact_phone || '', args.title, args.content, args.published_date || '', args.publisher || ''
-           ).run();
-           replyText += "\n[系統訊息] 已經嘗試將資料寫入 D1 資料庫。";
-         } catch(e: any) {
-           replyText += `\n[系統訊息] 寫入 D1 失敗: ${e.message}`;
-         }
-      }
+    } else if (result.error) {
+      replyText = `API 錯誤: ${result.error.message}`;
     }
 
     return new Response(JSON.stringify({ reply: replyText }), {
