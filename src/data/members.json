@@ -31,7 +31,7 @@
         "name": "江龍泰",
         "title": "資訊部",
         "image": "./img/members/江龍泰.png",
-        "intro": "我只是一個在網頁裡藏彩蛋的人🙂‍↕️<br><a href=\"https://longtai.me\" target=\"_blank\" style=\"color:var(--color-brand-secondary)\">longtai.me</a>"
+        "intro": "<br><a href=\"https://longtai.me\" target=\"_blank\" style=\"color:var(--color-brand-secondary)\">longtai.me</a>"
       },
       {
         "name": "吳秉勳",
@@ -96,7 +96,7 @@
       {
         "name": "李員廣",
         "title": "活動部",
-        "image": "./img/members/李員廣.jpg",
+        "image": "./img/members/李原廣.jpg",
         "intro": "第八屆資工科活動長<br>兼資工系籃球隊隊長<br>擅長打籃球等運動有興趣可以找我打球<br>打遊戲也行"
       }
     ]
