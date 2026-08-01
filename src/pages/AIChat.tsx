@@ -18,7 +18,7 @@ const AIChat = () => {
             為了確保AI回答的穩定性，我們會儲存使用者的對話紀錄，並用於改善模型的訓練。<br/>
           </p>
           <div className="glass-card iframe-container reveal active">
-            <img src="./img/event_nopng.png" alt="Not Now" />
+            <img src="./img/event_nopng.png" alt="Not Now" width="100%" height="100%" />
           </div>
         </section>
       </main>
