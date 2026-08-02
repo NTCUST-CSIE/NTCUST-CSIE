@@ -55,7 +55,7 @@ const Members = () => {
             <div id="members-container">
               {(membersData as Department[]).map(dept => {
                 return (
-                  <div key={dept.id} className="department">
+                  <div key={dept.id} id={dept.id} className="department" style={{ scrollMarginTop: '120px' }}>
                     <h3 className="department-title">
                       {dept.departmentTitle}
                     </h3>
