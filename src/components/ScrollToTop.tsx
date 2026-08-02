@@ -1,20 +1,28 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (hash) {
-      // If there is a hash anchor, wait for DOM to render then scroll to element
-      setTimeout(() => {
-        const element = document.getElementById(hash.replace('#', ''));
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      const targetId = hash.replace('#', '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        // Immediately jump to the element without weird smooth scrolling from previous page's position
+        element.scrollIntoView({ behavior: 'auto' });
+      } else {
+        // Fallback if component renders asynchronously
+        const timer = setTimeout(() => {
+          const el = document.getElementById(targetId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto' });
+          }
+        }, 10);
+        return () => clearTimeout(timer);
+      }
     } else {
-      // If no hash, scroll to top of page
+      // If no hash, immediately reset scroll to top of page
       window.scrollTo(0, 0);
     }
   }, [pathname, hash]);
