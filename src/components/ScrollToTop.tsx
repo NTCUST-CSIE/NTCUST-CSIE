@@ -1,29 +1,28 @@
-import { useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (hash) {
       const targetId = hash.replace('#', '');
-      const element = document.getElementById(targetId);
-      if (element) {
-        // Immediately jump to the element without weird smooth scrolling from previous page's position
-        element.scrollIntoView({ behavior: 'auto' });
-      } else {
-        // Fallback if component renders asynchronously
-        const timer = setTimeout(() => {
-          const el = document.getElementById(targetId);
-          if (el) {
-            el.scrollIntoView({ behavior: 'auto' });
-          }
-        }, 10);
-        return () => clearTimeout(timer);
-      }
+      
+      // 1. 先瞬間回到最頂端 (scrollY = 0)
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+      // 2. 再從最頂端平滑滾動到目標部門
+      const timer = setTimeout(() => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
     } else {
-      // If no hash, immediately reset scroll to top of page
-      window.scrollTo(0, 0);
+      // 若沒有錨點，直接回到頂端
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
   }, [pathname, hash]);
 
