@@ -28,3 +28,10 @@ CREATE TABLE IF NOT EXISTS link_clicks (
     last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS page_views (
+    path TEXT PRIMARY KEY,
+    views INTEGER DEFAULT 0,
+    last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+

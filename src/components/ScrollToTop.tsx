@@ -26,6 +26,28 @@ const ScrollToTop = () => {
     }
   }, [pathname, hash]);
 
+  // Track page views on route change
+  useEffect(() => {
+    const knownPages = ['/', '/members', '/events', '/finance', '/feedback', '/aichat'];
+    if (knownPages.includes(pathname.toLowerCase())) {
+      try {
+        const payload = JSON.stringify({ type: 'pageview', path: pathname });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch('/api/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload,
+            keepalive: true
+          }).catch(() => {});
+        }
+      } catch {
+        // Silently ignore tracking errors
+      }
+    }
+  }, [pathname]);
+
   return null;
 };
 
