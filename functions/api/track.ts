@@ -20,12 +20,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   let path = '';
   let slug = '';
   let target = '';
+  let visitorId = '';
+  let isNewSession = false;
 
   const url = new URL(request.url);
   type = url.searchParams.get('type') || '';
   path = url.searchParams.get('path') || '';
   slug = url.searchParams.get('slug') || '';
   target = url.searchParams.get('target') || '';
+  visitorId = url.searchParams.get('visitor_id') || '';
+  isNewSession = url.searchParams.get('is_new_session') === 'true';
 
   if (request.method === 'POST') {
     try {
@@ -34,6 +38,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       if (body?.path) path = body.path;
       if (body?.slug) slug = body.slug;
       if (body?.target) target = body.target;
+      if (body?.visitor_id) visitorId = body.visitor_id;
+      if (typeof body?.is_new_session === 'boolean') isNewSession = body.is_new_session;
     } catch {
       // Body might be empty or form encoded
     }
@@ -47,11 +53,42 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // If tracking a normal Page View
+    // 1. Update Visitor Tracking if visitorId is present
+    if (visitorId) {
+      await env.DB.prepare(`
+        CREATE TABLE IF NOT EXISTS visitors (
+          visitor_id TEXT PRIMARY KEY,
+          first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          visit_count INTEGER DEFAULT 1,
+          page_views INTEGER DEFAULT 1
+        );
+      `).run();
+
+      if (isNewSession) {
+        await env.DB.prepare(`
+          INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at, visit_count, page_views)
+          VALUES (?1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1)
+          ON CONFLICT(visitor_id) DO UPDATE SET
+            visit_count = visit_count + 1,
+            page_views = page_views + 1,
+            last_seen_at = CURRENT_TIMESTAMP
+        `).bind(visitorId).run();
+      } else {
+        await env.DB.prepare(`
+          INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at, visit_count, page_views)
+          VALUES (?1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1)
+          ON CONFLICT(visitor_id) DO UPDATE SET
+            page_views = page_views + 1,
+            last_seen_at = CURRENT_TIMESTAMP
+        `).bind(visitorId).run();
+      }
+    }
+
+    // 2. If tracking a normal Page View
     if (type === 'pageview' || path) {
       const normalizedPath = (path || '/').trim().toLowerCase();
 
-      // Ensure page_views table exists
       await env.DB.prepare(`
         CREATE TABLE IF NOT EXISTS page_views (
           path TEXT PRIMARY KEY,
@@ -73,7 +110,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // If tracking a Shortlink Click
+    // 3. If tracking a Shortlink Click
     slug = (slug || '').trim().toLowerCase();
 
     if (!slug) {
@@ -83,7 +120,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Ensure link_clicks table exists
     await env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS link_clicks (
         slug TEXT PRIMARY KEY,

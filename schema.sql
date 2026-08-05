@@ -34,4 +34,13 @@ CREATE TABLE IF NOT EXISTS page_views (
     last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS visitors (
+    visitor_id TEXT PRIMARY KEY,
+    first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    visit_count INTEGER DEFAULT 1,
+    page_views INTEGER DEFAULT 1
+);
+
+
 

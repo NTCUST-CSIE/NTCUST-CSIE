@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { trackEvent } from '../utils/analytics';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
@@ -30,21 +31,7 @@ const ScrollToTop = () => {
   useEffect(() => {
     const knownPages = ['/', '/members', '/events', '/finance', '/feedback', '/aichat'];
     if (knownPages.includes(pathname.toLowerCase())) {
-      try {
-        const payload = JSON.stringify({ type: 'pageview', path: pathname });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
-        } else {
-          fetch('/api/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: payload,
-            keepalive: true
-          }).catch(() => {});
-        }
-      } catch {
-        // Silently ignore tracking errors
-      }
+      trackEvent({ type: 'pageview', path: pathname });
     }
   }, [pathname]);
 
@@ -52,3 +39,4 @@ const ScrollToTop = () => {
 };
 
 export default ScrollToTop;
+

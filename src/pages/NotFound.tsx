@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import linksData from '../data/404.json';
+import { trackEvent } from '../utils/analytics';
 
 const NotFound = () => {
   const location = useLocation();
@@ -23,21 +24,7 @@ const NotFound = () => {
       }
 
       // Background click tracking via Cloudflare D1
-      try {
-        const payload = JSON.stringify({ slug: path, target });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
-        } else {
-          fetch('/api/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: payload,
-            keepalive: true
-          }).catch(() => {});
-        }
-      } catch {
-        // Silently ignore tracking errors so redirect is never blocked
-      }
+      trackEvent({ type: 'shortlink', slug: path, target });
 
       window.location.replace(target);
     } else {
