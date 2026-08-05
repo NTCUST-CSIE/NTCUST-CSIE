@@ -385,7 +385,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       </div>
     </div>
 
-    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間造訪次數/div>
+    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間造訪次數</div>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘</div>
