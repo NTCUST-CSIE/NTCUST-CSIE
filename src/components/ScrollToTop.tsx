@@ -27,11 +27,11 @@ const ScrollToTop = () => {
     }
   }, [pathname, hash]);
 
-  // Track page views on route change
+  // Track page views on every route navigation & initial load
   useEffect(() => {
-    const knownPages = ['/', '/members', '/events', '/finance', '/feedback', '/aichat'];
-    if (knownPages.includes(pathname.toLowerCase())) {
-      trackEvent({ type: 'pageview', path: pathname });
+    const currentPath = pathname.toLowerCase() || '/';
+    if (!currentPath.startsWith('/api/')) {
+      trackEvent({ type: 'pageview', path: currentPath });
     }
   }, [pathname]);
 
@@ -39,4 +39,3 @@ const ScrollToTop = () => {
 };
 
 export default ScrollToTop;
-
