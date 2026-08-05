@@ -30,17 +30,26 @@ const Feedback = () => {
             對於我們有任何想法、建議或疑問嗎？歡迎透過下方的匿名表單告訴我們！
           </p>
 
+          {/* Tally Embedded Form */}
+          <div className="glass-card iframe-container reveal active">
+            <iframe 
+              data-tally-src="https://tally.so/embed/RGaK24?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
+              loading="lazy" 
+              width="100%" 
+              height="200" 
+              frameBorder="0" 
+              marginHeight={0} 
+              marginWidth={0} 
+              title="匿名意見箱">
+            </iframe>
+          </div>
+
+          
           {/* Unified Terms & Privacy Notice */}
           <div className="glass-card feedback-notice reveal active">
-            <div className="feedback-notice-header">
-              <ShieldCheck size={24} weight="duotone" className="notice-icon" />
-              <h3 className="notice-title">服務規範與隱私權聲明</h3>
-            </div>
-            
             <p className="notice-desc">
               本意見箱表單採用第三方平台 <strong>Tally</strong> 提供之嵌入式服務。為維護您的權益，使用前請詳閱並確認您已充分知悉相關服務規範與資料處理條款：
             </p>
-
             <div className="notice-links-grid">
               <a 
                 href="https://tally.so/help/gdpr" 
@@ -63,28 +72,8 @@ const Feedback = () => {
                 <ArrowSquareOut size={15} />
               </a>
             </div>
-
-            <div className="notice-disclaimer">
-              <WarningCircle size={20} weight="fill" className="disclaimer-icon" />
-              <div className="disclaimer-text">
-                <strong>重要提醒：</strong>本表單預設為匿名填寫，請勿輸入敏感個人資訊。<strong>若您不同意上述第三方平台之服務條款、隱私權規範或相關資料處理方式，請勿填寫或使用本意見箱。</strong>
-              </div>
-            </div>
           </div>
 
-          {/* Tally Embedded Form */}
-          <div className="glass-card iframe-container reveal active">
-            <iframe 
-              data-tally-src="https://tally.so/embed/RGaK24?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
-              loading="lazy" 
-              width="100%" 
-              height="200" 
-              frameBorder="0" 
-              marginHeight={0} 
-              marginWidth={0} 
-              title="匿名意見箱">
-            </iframe>
-          </div>
         </section>
       </main>
 
