@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ChatTeardropText, ShieldCheck, ArrowSquareOut, WarningCircle, FileText } from '@phosphor-icons/react';
+import { ChatTeardropText, ArrowSquareOut, FileText } from '@phosphor-icons/react';
 
 const Feedback = () => {
   useEffect(() => {
@@ -44,11 +44,10 @@ const Feedback = () => {
             </iframe>
           </div>
 
-          
           {/* Unified Terms & Privacy Notice */}
           <div className="glass-card feedback-notice reveal active">
             <p className="notice-desc">
-              本意見箱表單採用第三方平台 <strong>Tally</strong> 提供之嵌入式服務。為維護您的權益，使用前請詳閱並確認您已充分知悉相關服務規範與資料處理條款：
+              本意見箱表單採用第三方平台 <strong>Tally</strong> 提供之嵌入式服務。為維護您的權益，使用前請詳閱並確認您已充分知悉相關服務規範與資料處理條款（若不同意請勿使用本意見箱）：
             </p>
             <div className="notice-links-grid">
               <a 
@@ -73,57 +72,51 @@ const Feedback = () => {
               </a>
             </div>
           </div>
-
         </section>
       </main>
 
       <style>{`
-        .feedback-notice {
+        .iframe-container {
+          width: 100%;
+          border-radius: 16px;
+          overflow: hidden;
+          padding: 0;
+          min-height: 500px;
           margin-bottom: 2rem;
-          padding: 1.75rem 2rem;
+        }
+        
+        .iframe-container iframe {
+          width: 100%;
+          border: none;
+          background: transparent;
+        }
+
+        .feedback-notice {
+          padding: 1.5rem 1.75rem;
           border: 1px solid var(--bg-tertiary);
           border-radius: 16px;
         }
 
-        .feedback-notice-header {
-          display: flex;
-          align-items: center;
-          gap: 0.65rem;
-          margin-bottom: 0.85rem;
-        }
-
-        .notice-icon {
-          color: var(--color-brand-primary);
-        }
-
-        .notice-title {
-          font-size: 1.15rem;
-          font-weight: 700;
-          margin: 0;
-          color: var(--text-primary);
-        }
-
         .notice-desc {
-          font-size: 0.95rem;
+          font-size: 0.92rem;
           line-height: 1.65;
           color: var(--text-secondary);
-          margin-bottom: 1.25rem;
+          margin-bottom: 1rem;
         }
 
         .notice-links-grid {
           display: flex;
           flex-wrap: wrap;
           gap: 0.85rem;
-          margin-bottom: 1.25rem;
         }
 
         .notice-btn {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.6rem 1.1rem;
+          padding: 0.55rem 1rem;
           border-radius: 8px;
-          font-size: 0.9rem;
+          font-size: 0.88rem;
           font-weight: 500;
           color: var(--color-brand-primary);
           background-color: var(--color-brand-light);
@@ -142,43 +135,6 @@ const Feedback = () => {
         [data-theme="light"] .notice-btn:hover {
           background-color: var(--color-brand-secondary);
           color: #ffffff;
-        }
-
-        .notice-disclaimer {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.75rem;
-          padding: 0.85rem 1.1rem;
-          border-radius: 10px;
-          background-color: rgba(240, 136, 62, 0.08);
-          border-left: 4px solid #f0883e;
-          font-size: 0.9rem;
-          line-height: 1.6;
-          color: var(--text-primary);
-        }
-
-        .disclaimer-icon {
-          color: #f0883e;
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        .disclaimer-text {
-          flex: 1;
-        }
-
-        .iframe-container {
-          width: 100%;
-          border-radius: 16px;
-          overflow: hidden;
-          padding: 0;
-          min-height: 500px;
-        }
-        
-        .iframe-container iframe {
-          width: 100%;
-          border: none;
-          background: transparent;
         }
 
         @media (max-width: 768px) {
