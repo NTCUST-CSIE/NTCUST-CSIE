@@ -40,14 +40,35 @@ export function trackEvent(params: {
       is_new_session: isNewSession
     });
 
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
-    } else {
-      fetch('/api/track', {
+    const query = new URLSearchParams({
+      type: params.type || '',
+      path: params.path || '',
+      slug: params.slug || '',
+      target: params.target || '',
+      visitor_id: vid,
+      is_new_session: isNewSession ? 'true' : 'false',
+    }).toString();
+
+    const trackUrl = `/api/track?${query}`;
+
+    // 1. Try Beacon API
+    let sent = false;
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      try {
+        sent = navigator.sendBeacon(trackUrl, payload);
+      } catch {
+        sent = false;
+      }
+    }
+
+    // 2. Fallback to fetch with keepalive
+    if (!sent && typeof fetch !== 'undefined') {
+      fetch(trackUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload,
-        keepalive: true
+        keepalive: true,
+        mode: 'no-cors'
       }).catch(() => {});
     }
   } catch {

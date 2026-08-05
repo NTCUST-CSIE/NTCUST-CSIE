@@ -31,18 +31,19 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   visitorId = url.searchParams.get('visitor_id') || '';
   isNewSession = url.searchParams.get('is_new_session') === 'true';
 
-  if (request.method === 'POST') {
-    try {
-      const body = await request.json() as any;
+  try {
+    const rawText = await request.text();
+    if (rawText) {
+      const body = JSON.parse(rawText);
       if (body?.type) type = body.type;
       if (body?.path) path = body.path;
       if (body?.slug) slug = body.slug;
       if (body?.target) target = body.target;
       if (body?.visitor_id) visitorId = body.visitor_id;
       if (typeof body?.is_new_session === 'boolean') isNewSession = body.is_new_session;
-    } catch {
-      // Body might be empty or form encoded
     }
+  } catch {
+    // Fallback to URL searchParams
   }
 
   try {
@@ -118,7 +119,41 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       }
     }
 
-    // 2. If tracking a normal Page View
+    // 2. If tracking a Shortlink Click (Priority when slug is set or type is shortlink)
+    if (slug || type === 'shortlink') {
+      const normalizedSlug = (slug || path || '').trim().toLowerCase();
+
+      if (!normalizedSlug) {
+        return new Response(JSON.stringify({ error: 'Missing slug parameter' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        });
+      }
+
+      await env.DB.prepare(`
+        CREATE TABLE IF NOT EXISTS link_clicks (
+          slug TEXT PRIMARY KEY,
+          target TEXT,
+          clicks INTEGER DEFAULT 0,
+          last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+      `).run();
+
+      await env.DB.prepare(`
+        INSERT INTO link_clicks (slug, target, clicks, last_clicked_at)
+        VALUES (?1, ?2, 1, CURRENT_TIMESTAMP)
+        ON CONFLICT(slug) DO UPDATE SET
+          clicks = clicks + 1,
+          last_clicked_at = CURRENT_TIMESTAMP,
+          target = CASE WHEN ?2 IS NOT NULL AND ?2 != '' THEN ?2 ELSE target END
+      `).bind(normalizedSlug, target).run();
+
+      return new Response(JSON.stringify({ success: true, type: 'shortlink', slug: normalizedSlug }), {
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+
+    // 3. If tracking a normal Page View
     if (type === 'pageview' || path) {
       const normalizedPath = (path || '/').trim().toLowerCase();
 
@@ -143,35 +178,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // 3. If tracking a Shortlink Click
-    slug = (slug || '').trim().toLowerCase();
-
-    if (!slug) {
-      return new Response(JSON.stringify({ error: 'Missing slug or path parameter' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
-    }
-
-    await env.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS link_clicks (
-        slug TEXT PRIMARY KEY,
-        target TEXT,
-        clicks INTEGER DEFAULT 0,
-        last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `).run();
-
-    await env.DB.prepare(`
-      INSERT INTO link_clicks (slug, target, clicks, last_clicked_at)
-      VALUES (?1, ?2, 1, CURRENT_TIMESTAMP)
-      ON CONFLICT(slug) DO UPDATE SET
-        clicks = clicks + 1,
-        last_clicked_at = CURRENT_TIMESTAMP,
-        target = CASE WHEN ?2 IS NOT NULL AND ?2 != '' THEN ?2 ELSE target END
-    `).bind(slug, target).run();
-
-    return new Response(JSON.stringify({ success: true, type: 'shortlink', slug }), {
+    return new Response(JSON.stringify({ success: true, message: 'No action performed' }), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   } catch (err: any) {

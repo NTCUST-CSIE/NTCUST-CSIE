@@ -26,7 +26,12 @@ const NotFound = () => {
       // Background click tracking via Cloudflare D1
       trackEvent({ type: 'shortlink', slug: path, target });
 
-      window.location.replace(target);
+      // Small delay to ensure keepalive telemetry packet is reliably dispatched
+      const timer = setTimeout(() => {
+        window.location.replace(target);
+      }, 80);
+
+      return () => clearTimeout(timer);
     } else {
       setIsRedirecting(false);
     }
