@@ -13,18 +13,27 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Ensure table exists
+    // Ensure traffic_stats exists
     await env.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS link_clicks (
-        slug TEXT PRIMARY KEY,
-        target TEXT,
-        clicks INTEGER DEFAULT 0,
-        last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      CREATE TABLE IF NOT EXISTS traffic_stats (
+        path TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        target TEXT DEFAULT '',
+        hits INTEGER DEFAULT 0,
+        last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `).run();
 
     const { results } = await env.DB.prepare(
-      `SELECT slug, target, clicks, datetime(last_clicked_at, '+8 hours') as last_clicked_tw FROM link_clicks ORDER BY clicks DESC`
+      `SELECT 
+        path,
+        REPLACE(path, '/', '') as slug, 
+        target, 
+        hits as clicks, 
+        datetime(last_accessed_at, '+8 hours') as last_clicked_tw 
+      FROM traffic_stats 
+      WHERE type = 'shortlink'
+      ORDER BY hits DESC, last_accessed_at DESC`
     ).all();
 
     return new Response(JSON.stringify({ success: true, count: results.length, data: results }, null, 2), {

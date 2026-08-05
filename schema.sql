@@ -21,19 +21,20 @@ CREATE TABLE IF NOT EXISTS phone_directory (
     extension TEXT
 );
 
-CREATE TABLE IF NOT EXISTS link_clicks (
-    slug TEXT PRIMARY KEY,
-    target TEXT,
-    clicks INTEGER DEFAULT 0,
-    last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+-- ==========================================
+-- 3. Unified Website Traffic & Shortlink Analytics Table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS traffic_stats (
+    path TEXT PRIMARY KEY,       -- e.g. '/', '/members', '/115_ns', '/line'
+    type TEXT NOT NULL,          -- 'page' or 'shortlink'
+    target TEXT DEFAULT '',      -- target URL if shortlink
+    hits INTEGER DEFAULT 0,      -- views or clicks count
+    last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS page_views (
-    path TEXT PRIMARY KEY,
-    views INTEGER DEFAULT 0,
-    last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
+-- ==========================================
+-- 4. Unique Visitor & Time-Gap Returning Visitor Tracking Table
+-- ==========================================
 CREATE TABLE IF NOT EXISTS visitors (
     visitor_id TEXT PRIMARY KEY,
     first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -45,7 +46,3 @@ CREATE TABLE IF NOT EXISTS visitors (
     returns_after_24h INTEGER DEFAULT 0,
     returns_after_7d INTEGER DEFAULT 0
 );
-
-
-
-

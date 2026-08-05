@@ -79,7 +79,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         const now = Date.now();
         const diffSeconds = Math.max(0, Math.floor((now - lastSeenTime) / 1000));
 
-        // If it's a new session or more than 30 mins since last active
         const isSessionBreak = isNewSession || diffSeconds >= 1800;
 
         if (isSessionBreak) {
@@ -119,58 +118,47 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       }
     }
 
-    // 2. If tracking a Shortlink Click (Priority when slug is set or type is shortlink)
+    // Ensure unified traffic_stats table exists
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS traffic_stats (
+        path TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        target TEXT DEFAULT '',
+        hits INTEGER DEFAULT 0,
+        last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `).run();
+
+    // 2. If tracking a Shortlink Click
     if (slug || type === 'shortlink') {
-      const normalizedSlug = (slug || path || '').trim().toLowerCase();
-
-      if (!normalizedSlug) {
-        return new Response(JSON.stringify({ error: 'Missing slug parameter' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        });
-      }
+      let rawSlug = (slug || path || '').trim().toLowerCase();
+      if (!rawSlug.startsWith('/')) rawSlug = '/' + rawSlug;
 
       await env.DB.prepare(`
-        CREATE TABLE IF NOT EXISTS link_clicks (
-          slug TEXT PRIMARY KEY,
-          target TEXT,
-          clicks INTEGER DEFAULT 0,
-          last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-      `).run();
-
-      await env.DB.prepare(`
-        INSERT INTO link_clicks (slug, target, clicks, last_clicked_at)
-        VALUES (?1, ?2, 1, CURRENT_TIMESTAMP)
-        ON CONFLICT(slug) DO UPDATE SET
-          clicks = clicks + 1,
-          last_clicked_at = CURRENT_TIMESTAMP,
+        INSERT INTO traffic_stats (path, type, target, hits, last_accessed_at)
+        VALUES (?1, 'shortlink', ?2, 1, CURRENT_TIMESTAMP)
+        ON CONFLICT(path) DO UPDATE SET
+          hits = hits + 1,
+          last_accessed_at = CURRENT_TIMESTAMP,
           target = CASE WHEN ?2 IS NOT NULL AND ?2 != '' THEN ?2 ELSE target END
-      `).bind(normalizedSlug, target).run();
+      `).bind(rawSlug, target).run();
 
-      return new Response(JSON.stringify({ success: true, type: 'shortlink', slug: normalizedSlug }), {
+      return new Response(JSON.stringify({ success: true, type: 'shortlink', path: rawSlug }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
-    // 3. If tracking a normal Page View
+    // 3. If tracking a Page View
     if (type === 'pageview' || path) {
-      const normalizedPath = (path || '/').trim().toLowerCase();
+      let normalizedPath = (path || '/').trim().toLowerCase();
+      if (!normalizedPath.startsWith('/')) normalizedPath = '/' + normalizedPath;
 
       await env.DB.prepare(`
-        CREATE TABLE IF NOT EXISTS page_views (
-          path TEXT PRIMARY KEY,
-          views INTEGER DEFAULT 0,
-          last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-      `).run();
-
-      await env.DB.prepare(`
-        INSERT INTO page_views (path, views, last_viewed_at)
-        VALUES (?1, 1, CURRENT_TIMESTAMP)
+        INSERT INTO traffic_stats (path, type, target, hits, last_accessed_at)
+        VALUES (?1, 'page', '', 1, CURRENT_TIMESTAMP)
         ON CONFLICT(path) DO UPDATE SET
-          views = views + 1,
-          last_viewed_at = CURRENT_TIMESTAMP
+          hits = hits + 1,
+          last_accessed_at = CURRENT_TIMESTAMP
       `).bind(normalizedPath).run();
 
       return new Response(JSON.stringify({ success: true, type: 'pageview', path: normalizedPath }), {

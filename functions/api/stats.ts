@@ -8,7 +8,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const url = new URL(request.url);
   const wantsJson = url.searchParams.get('format') === 'json' || request.headers.get('accept')?.includes('application/json');
 
-  // Optional Secret Key check if STATS_KEY is set in environment
+  // Optional Secret Key check
   const providedKey = url.searchParams.get('key') || request.headers.get('x-admin-key');
   if (env.STATS_KEY && env.STATS_KEY !== providedKey) {
     return new Response(JSON.stringify({ error: 'Unauthorized: Invalid or missing secret key (?key=...)' }), {
@@ -25,21 +25,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Ensure all tables exist
+    // Ensure traffic_stats & visitors tables exist
     await env.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS page_views (
+      CREATE TABLE IF NOT EXISTS traffic_stats (
         path TEXT PRIMARY KEY,
-        views INTEGER DEFAULT 0,
-        last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `).run();
-
-    await env.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS link_clicks (
-        slug TEXT PRIMARY KEY,
-        target TEXT,
-        clicks INTEGER DEFAULT 0,
-        last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        type TEXT NOT NULL,
+        target TEXT DEFAULT '',
+        hits INTEGER DEFAULT 0,
+        last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `).run();
 
@@ -57,17 +50,19 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       );
     `).run();
 
-    // Query Page Views
-    const pageViewsQuery = await env.DB.prepare(
-      `SELECT path, views, datetime(last_viewed_at, '+8 hours') as last_viewed_tw FROM page_views ORDER BY views DESC`
-    ).all();
+    // Query Unified Traffic Stats
+    const trafficQuery = await env.DB.prepare(`
+      SELECT 
+        path, 
+        type, 
+        target, 
+        hits, 
+        datetime(last_accessed_at, '+8 hours') as last_time_tw 
+      FROM traffic_stats 
+      ORDER BY hits DESC, last_accessed_at DESC
+    `).all();
 
-    // Query Shortlink Clicks
-    const linkClicksQuery = await env.DB.prepare(
-      `SELECT slug, target, clicks, datetime(last_clicked_at, '+8 hours') as last_clicked_tw FROM link_clicks ORDER BY clicks DESC`
-    ).all();
-
-    // Query Visitors Summary including Time Gaps
+    // Query Visitors Summary
     const visitorsSummaryQuery = await env.DB.prepare(`
       SELECT 
         COUNT(*) as total_visitors,
@@ -80,11 +75,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       FROM visitors
     `).first() as any;
 
-    const pageViews = pageViewsQuery.results || [];
-    const linkClicks = linkClicksQuery.results || [];
+    const allTraffic = trafficQuery.results || [];
+    const pageTraffic = allTraffic.filter((item: any) => item.type === 'page');
+    const shortlinkTraffic = allTraffic.filter((item: any) => item.type === 'shortlink');
 
-    const totalViews = pageViews.reduce((acc, row: any) => acc + (row.views || 0), 0);
-    const totalClicks = linkClicks.reduce((acc, row: any) => acc + (row.clicks || 0), 0);
+    const totalViews = pageTraffic.reduce((acc, row: any) => acc + (row.hits || 0), 0);
+    const totalClicks = shortlinkTraffic.reduce((acc, row: any) => acc + (row.hits || 0), 0);
 
     const totalVisitors = visitorsSummaryQuery?.total_visitors || 0;
     const returningVisitors = visitorsSummaryQuery?.returning_visitors || 0;
@@ -93,7 +89,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const returnsAfter30m = visitorsSummaryQuery?.returns_after_30m || 0;
     const returnsAfter24h = visitorsSummaryQuery?.returns_after_24h || 0;
     const returnsAfter7d = visitorsSummaryQuery?.returns_after_7d || 0;
-
     const returningRate = totalVisitors > 0 ? ((returningVisitors / totalVisitors) * 100).toFixed(1) + '%' : '0%';
 
     if (wantsJson) {
@@ -102,6 +97,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
           success: true,
           summary: {
             totalPageViews: totalViews,
+            totalShortlinkClicks: totalClicks,
             totalUniqueVisitors: totalVisitors,
             newVisitors,
             returningVisitors,
@@ -110,10 +106,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             returnsAfter30m,
             returnsAfter24h,
             returnsAfter7d,
-            totalShortlinkClicks: totalClicks,
           },
-          pageViews,
-          shortlinkClicks: linkClicks,
+          traffic: allTraffic,
+          pages: pageTraffic,
+          shortlinks: shortlinkTraffic,
         }, null, 2),
         {
           headers: {
@@ -125,13 +121,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       );
     }
 
-    // Return visual HTML dashboard
+    // HTML Unified Dashboard
     const html = `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>網站流量與回訪統計 | NTCUST CSIE</title>
+  <title>網站整合流量統計 | NTCUST CSIE</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -206,6 +202,30 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       border-left: 4px solid var(--primary);
       padding-left: 0.75rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      color: #fff;
+      border-color: var(--primary);
+      background: rgba(0, 168, 240, 0.15);
     }
     table {
       width: 100%;
@@ -252,10 +272,23 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       background: rgba(57, 197, 187, 0.15);
       color: var(--cyan);
     }
+    .badge.green {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--green);
+    }
+    .type-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .type-tag.page { background: rgba(0, 168, 240, 0.15); color: var(--primary); }
+    .type-tag.shortlink { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
     .target-url {
       color: var(--muted);
       font-size: 0.85rem;
-      max-width: 320px;
+      max-width: 280px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -283,8 +316,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 </head>
 <body>
   <div class="container">
-    <h1>📊 網站流量與回訪分析統計</h1>
-    <div class="subtitle">國立臺中科技大學 資訊工程科 科學會 • 即時數據後台</div>
+    <h1>📊 網站整合流量與回訪統計</h1>
+    <div class="subtitle">國立臺中科技大學 資訊工程科 科學會 • Cloudflare D1 整合資料庫</div>
 
     <div class="section-title" style="margin-top:0;">👥 訪客總覽指標</div>
     <div class="stats-grid">
@@ -301,8 +334,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 0.95rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">新訪客人數</div>
-        <div class="stat-value orange">${newVisitors.toLocaleString()}</div>
+        <div class="stat-label">短網址總點擊數</div>
+        <div class="stat-value cyan">${totalClicks.toLocaleString()}</div>
       </div>
     </div>
 
@@ -321,57 +354,63 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         <div class="stat-value green">${returnsAfter7d.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">短網址總點擊數</div>
-        <div class="stat-value">${totalClicks.toLocaleString()}</div>
+        <div class="stat-label">初次造訪新訪客</div>
+        <div class="stat-value orange">${newVisitors.toLocaleString()}</div>
       </div>
     </div>
 
-    <div class="section-title">📄 各頁面瀏覽次數 (Page Views)</div>
+    <div class="section-title">
+      <span>🚀 整合流量排行 (traffic_stats)</span>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-btn active" onclick="filterTable('all', this)">全部清單 (${allTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('page', this)">📄 頁面瀏覽 (${pageTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('shortlink', this)">🔗 短網址點擊 (${shortlinkTraffic.length})</button>
+    </div>
+
     <table>
       <thead>
         <tr>
-          <th>頁面路徑</th>
-          <th>瀏覽次數</th>
+          <th>路徑 / 代稱</th>
+          <th>類型</th>
+          <th>訪問 / 點擊次數</th>
+          <th>跳轉目標網址</th>
           <th>最後造訪時間 (台灣時間)</th>
         </tr>
       </thead>
-      <tbody>
-        ${pageViews.length > 0 ? pageViews.map((row: any) => `
-          <tr>
+      <tbody id="traffic-body">
+        ${allTraffic.length > 0 ? allTraffic.map((row: any) => `
+          <tr data-type="${row.type}">
             <td><code>${row.path}</code></td>
-            <td><span class="badge">${row.views}</span></td>
-            <td class="time">${row.last_viewed_tw || '-'}</td>
+            <td><span class="type-tag ${row.type}">${row.type === 'page' ? '頁面' : '短網址'}</span></td>
+            <td><span class="badge ${row.type === 'page' ? '' : 'cyan'}">${row.hits}</span></td>
+            <td><span class="target-url" title="${row.target}">${row.target ? row.target : '-'}</span></td>
+            <td class="time">${row.last_time_tw || '-'}</td>
           </tr>
-        `).join('') : '<tr><td colspan="3" style="text-align: center; color: var(--muted);">尚無頁面造訪紀錄</td></tr>'}
-      </tbody>
-    </table>
-
-    <div class="section-title">🔗 短網址點擊次數 (Shortlink Clicks)</div>
-    <table>
-      <thead>
-        <tr>
-          <th>短網址代稱</th>
-          <th>目標網址</th>
-          <th>點擊次數</th>
-          <th>最後點擊時間 (台灣時間)</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${linkClicks.length > 0 ? linkClicks.map((row: any) => `
-          <tr>
-            <td><code>/${row.slug}</code></td>
-            <td><span class="target-url" title="${row.target}">${row.target || '-'}</span></td>
-            <td><span class="badge cyan">${row.clicks}</span></td>
-            <td class="time">${row.last_clicked_tw || '-'}</td>
-          </tr>
-        `).join('') : '<tr><td colspan="4" style="text-align: center; color: var(--muted);">尚無短網址點擊紀錄</td></tr>'}
+        `).join('') : '<tr><td colspan="5" style="text-align: center; color: var(--muted);">尚無流量紀錄</td></tr>'}
       </tbody>
     </table>
 
     <div class="footer-links">
-      <a href="?format=json">檢視純 JSON 格式</a> • <a href="/">回到網站首頁</a>
+      <a href="?format=json">檢視純 JSON 格式</a> • <a href="/api/clicks">短網址專用 API</a> • <a href="/">回到網站首頁</a>
     </div>
   </div>
+
+  <script>
+    function filterTable(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const rows = document.querySelectorAll('#traffic-body tr');
+      rows.forEach(r => {
+        if (type === 'all' || r.getAttribute('data-type') === type) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>`;
 
