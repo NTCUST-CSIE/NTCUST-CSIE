@@ -79,9 +79,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         const now = Date.now();
         const diffSeconds = Math.max(0, Math.floor((now - lastSeenTime) / 1000));
 
-        const isSessionBreak = isNewSession || diffSeconds >= 1800;
+        // Only count as a distinct return/session if at least 30 minutes (1800s) have passed
+        const isTimeBreak = diffSeconds >= 1800;
 
-        if (isSessionBreak) {
+        if (isTimeBreak) {
           const add30m = diffSeconds >= 1800 ? 1 : 0;
           const add24h = diffSeconds >= 86400 ? 1 : 0;
           const add7d = diffSeconds >= 604800 ? 1 : 0;
@@ -98,6 +99,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
             WHERE visitor_id = ?1
           `).bind(visitorId, add30m, add24h, add7d).run();
         } else {
+          // Within same session (rapid browsing/clicking): increment page_views only
           await env.DB.prepare(`
             UPDATE visitors SET
               page_views = page_views + 1,

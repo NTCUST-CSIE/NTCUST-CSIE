@@ -52,11 +52,20 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       );
     `).run();
 
-    // Auto-sync shortlinks from 404.json into traffic_stats if not present
+    // Auto-sync standard website pages into traffic_stats
+    const standardPages = ['/', '/members', '/events', '/finance', '/feedback', '/aichat'];
+    for (const pagePath of standardPages) {
+      await env.DB.prepare(`
+        INSERT INTO traffic_stats (path, type, target, hits, last_accessed_at)
+        VALUES (?1, 'page', '', 0, CURRENT_TIMESTAMP)
+        ON CONFLICT(path) DO NOTHING;
+      `).bind(pagePath).run();
+    }
+
+    // Auto-sync shortlinks from 404.json into traffic_stats
     if (shortlinksConfig && typeof shortlinksConfig === 'object') {
       for (const [key, target] of Object.entries(shortlinksConfig as Record<string, string>)) {
         if (!key || typeof target !== 'string') continue;
-        // Only treat external HTTP(S) links as shortlinks
         if (target.startsWith('http://') || target.startsWith('https://')) {
           const normalizedPath = '/' + key.trim().toLowerCase();
           await env.DB.prepare(`
@@ -85,8 +94,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const visitorsSummaryQuery = await env.DB.prepare(`
       SELECT 
         COUNT(*) as total_visitors,
-        SUM(CASE WHEN visit_count > 1 THEN 1 ELSE 0 END) as returning_visitors,
-        SUM(CASE WHEN visit_count = 1 THEN 1 ELSE 0 END) as new_visitors,
+        SUM(CASE WHEN returns_after_30m > 0 THEN 1 ELSE 0 END) as returning_visitors,
+        SUM(CASE WHEN returns_after_30m = 0 THEN 1 ELSE 0 END) as new_visitors,
         SUM(visit_count) as total_sessions,
         SUM(returns_after_30m) as returns_after_30m,
         SUM(returns_after_24h) as returns_after_24h,
@@ -363,7 +372,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 <body>
   <div class="container">
     <h1><i class="ph ph-chart-bar"></i> 網站整合流量與回訪統計</h1>
-    <div class="subtitle"><i class="ph ph-database"></i> 國立臺中科技大學 資訊工程科 科學會 網頁瀏覽次數</div>
+    <div class="subtitle"><i class="ph ph-database"></i> 國立臺中科技大學 資訊工程科 科學會 • Cloudflare D1 整合資料庫</div>
 
     <div class="section-title" style="margin-top:0;"><i class="ph ph-users"></i> 訪客總覽指標</div>
     <div class="stats-grid">
@@ -376,7 +385,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         <div class="stat-value green">${totalVisitors.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-arrows-clockwise"></i> 累積回訪訪客</div>
+        <div class="stat-label"><i class="ph ph-arrows-clockwise"></i> 累積回訪訪客 (回訪率)</div>
         <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 0.95rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
       </div>
       <div class="stat-card">
@@ -385,18 +394,18 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       </div>
     </div>
 
-    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間造訪次數</div>
+    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間回頭客次數（間隔造訪）</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘</div>
+        <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘 重新回訪</div>
         <div class="stat-value cyan">${returnsAfter30m.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-calendar"></i> 超過 24 小時</div>
+        <div class="stat-label"><i class="ph ph-calendar"></i> 超過 24 小時 (隔日) 回頭客</div>
         <div class="stat-value purple">${returnsAfter24h.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-calendar-check"></i> 超過 7 天</div>
+        <div class="stat-label"><i class="ph ph-calendar-check"></i> 超過 7 天 (跨週) 長期回頭客</div>
         <div class="stat-value green">${returnsAfter7d.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
