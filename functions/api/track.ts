@@ -53,31 +53,64 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // 1. Update Visitor Tracking if visitorId is present
+    // 1. Update Visitor Tracking with Time-Gap Recognition
     if (visitorId) {
       await env.DB.prepare(`
         CREATE TABLE IF NOT EXISTS visitors (
           visitor_id TEXT PRIMARY KEY,
           first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          last_visit_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           visit_count INTEGER DEFAULT 1,
-          page_views INTEGER DEFAULT 1
+          page_views INTEGER DEFAULT 1,
+          returns_after_30m INTEGER DEFAULT 0,
+          returns_after_24h INTEGER DEFAULT 0,
+          returns_after_7d INTEGER DEFAULT 0
         );
       `).run();
 
-      if (isNewSession) {
-        await env.DB.prepare(`
-          INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at, visit_count, page_views)
-          VALUES (?1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1)
-          ON CONFLICT(visitor_id) DO UPDATE SET
-            visit_count = visit_count + 1,
-            page_views = page_views + 1,
-            last_seen_at = CURRENT_TIMESTAMP
-        `).bind(visitorId).run();
+      const existing = await env.DB.prepare(
+        `SELECT visitor_id, last_seen_at FROM visitors WHERE visitor_id = ?1`
+      ).bind(visitorId).first() as { visitor_id: string; last_seen_at: string } | null;
+
+      if (existing && existing.last_seen_at) {
+        const lastSeenTime = new Date(existing.last_seen_at + (existing.last_seen_at.includes('Z') ? '' : 'Z')).getTime();
+        const now = Date.now();
+        const diffSeconds = Math.max(0, Math.floor((now - lastSeenTime) / 1000));
+
+        // If it's a new session or more than 30 mins since last active
+        const isSessionBreak = isNewSession || diffSeconds >= 1800;
+
+        if (isSessionBreak) {
+          const add30m = diffSeconds >= 1800 ? 1 : 0;
+          const add24h = diffSeconds >= 86400 ? 1 : 0;
+          const add7d = diffSeconds >= 604800 ? 1 : 0;
+
+          await env.DB.prepare(`
+            UPDATE visitors SET
+              visit_count = visit_count + 1,
+              page_views = page_views + 1,
+              last_visit_at = last_seen_at,
+              last_seen_at = CURRENT_TIMESTAMP,
+              returns_after_30m = returns_after_30m + ?2,
+              returns_after_24h = returns_after_24h + ?3,
+              returns_after_7d = returns_after_7d + ?4
+            WHERE visitor_id = ?1
+          `).bind(visitorId, add30m, add24h, add7d).run();
+        } else {
+          await env.DB.prepare(`
+            UPDATE visitors SET
+              page_views = page_views + 1,
+              last_seen_at = CURRENT_TIMESTAMP
+            WHERE visitor_id = ?1
+          `).bind(visitorId).run();
+        }
       } else {
         await env.DB.prepare(`
-          INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at, visit_count, page_views)
-          VALUES (?1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1)
+          INSERT INTO visitors (
+            visitor_id, first_seen_at, last_seen_at, last_visit_at,
+            visit_count, page_views, returns_after_30m, returns_after_24h, returns_after_7d
+          ) VALUES (?1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 0, 0, 0)
           ON CONFLICT(visitor_id) DO UPDATE SET
             page_views = page_views + 1,
             last_seen_at = CURRENT_TIMESTAMP

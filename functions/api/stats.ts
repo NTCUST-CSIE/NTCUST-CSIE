@@ -1,11 +1,21 @@
 interface Env {
   DB: D1Database;
+  STATS_KEY?: string;
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
   const url = new URL(request.url);
   const wantsJson = url.searchParams.get('format') === 'json' || request.headers.get('accept')?.includes('application/json');
+
+  // Optional Secret Key check if STATS_KEY is set in environment
+  const providedKey = url.searchParams.get('key') || request.headers.get('x-admin-key');
+  if (env.STATS_KEY && env.STATS_KEY !== providedKey) {
+    return new Response(JSON.stringify({ error: 'Unauthorized: Invalid or missing secret key (?key=...)' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    });
+  }
 
   try {
     if (!env.DB) {
@@ -38,8 +48,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         visitor_id TEXT PRIMARY KEY,
         first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_visit_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         visit_count INTEGER DEFAULT 1,
-        page_views INTEGER DEFAULT 1
+        page_views INTEGER DEFAULT 1,
+        returns_after_30m INTEGER DEFAULT 0,
+        returns_after_24h INTEGER DEFAULT 0,
+        returns_after_7d INTEGER DEFAULT 0
       );
     `).run();
 
@@ -53,13 +67,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       `SELECT slug, target, clicks, datetime(last_clicked_at, '+8 hours') as last_clicked_tw FROM link_clicks ORDER BY clicks DESC`
     ).all();
 
-    // Query Visitors Summary
+    // Query Visitors Summary including Time Gaps
     const visitorsSummaryQuery = await env.DB.prepare(`
       SELECT 
         COUNT(*) as total_visitors,
         SUM(CASE WHEN visit_count > 1 THEN 1 ELSE 0 END) as returning_visitors,
         SUM(CASE WHEN visit_count = 1 THEN 1 ELSE 0 END) as new_visitors,
-        SUM(visit_count) as total_sessions
+        SUM(visit_count) as total_sessions,
+        SUM(returns_after_30m) as returns_after_30m,
+        SUM(returns_after_24h) as returns_after_24h,
+        SUM(returns_after_7d) as returns_after_7d
       FROM visitors
     `).first() as any;
 
@@ -73,6 +90,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const returningVisitors = visitorsSummaryQuery?.returning_visitors || 0;
     const newVisitors = visitorsSummaryQuery?.new_visitors || 0;
     const totalSessions = visitorsSummaryQuery?.total_sessions || 0;
+    const returnsAfter30m = visitorsSummaryQuery?.returns_after_30m || 0;
+    const returnsAfter24h = visitorsSummaryQuery?.returns_after_24h || 0;
+    const returnsAfter7d = visitorsSummaryQuery?.returns_after_7d || 0;
+
     const returningRate = totalVisitors > 0 ? ((returningVisitors / totalVisitors) * 100).toFixed(1) + '%' : '0%';
 
     if (wantsJson) {
@@ -86,6 +107,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             returningVisitors,
             returningRate,
             totalSessions,
+            returnsAfter30m,
+            returnsAfter24h,
+            returnsAfter7d,
             totalShortlinkClicks: totalClicks,
           },
           pageViews,
@@ -107,7 +131,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>網站流量與訪客統計 | NTCUST CSIE</title>
+  <title>網站流量與回訪統計 | NTCUST CSIE</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -117,6 +141,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       --green: #3fb950;
       --purple: #bc8cff;
       --orange: #f0883e;
+      --cyan: #39c5bb;
       --text: #f0f6fc;
       --muted: #8b949e;
     }
@@ -131,7 +156,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     }
     .container {
       width: 100%;
-      max-width: 950px;
+      max-width: 960px;
     }
     h1 {
       font-size: 1.85rem;
@@ -149,7 +174,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
     .stat-card {
       background: var(--card-bg);
@@ -173,6 +198,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     .stat-value.green { color: var(--green); }
     .stat-value.purple { color: var(--purple); }
     .stat-value.orange { color: var(--orange); }
+    .stat-value.cyan { color: var(--cyan); }
     
     .section-title {
       font-size: 1.25rem;
@@ -218,6 +244,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       font-weight: 600;
       font-size: 0.85rem;
     }
+    .badge.purple {
+      background: rgba(188, 140, 255, 0.15);
+      color: var(--purple);
+    }
+    .badge.cyan {
+      background: rgba(57, 197, 187, 0.15);
+      color: var(--cyan);
+    }
     .target-url {
       color: var(--muted);
       font-size: 0.85rem;
@@ -249,9 +283,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 </head>
 <body>
   <div class="container">
-    <h1>📊 網站流量與訪客統計</h1>
+    <h1>📊 網站流量與回訪分析統計</h1>
     <div class="subtitle">國立臺中科技大學 資訊工程科 科學會 • 即時數據後台</div>
 
+    <div class="section-title" style="margin-top:0;">👥 訪客總覽指標</div>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">總頁面瀏覽量 (PV)</div>
@@ -262,15 +297,31 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         <div class="stat-value green">${totalVisitors.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">重複訪客 (回訪人數)</div>
-        <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 1rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
+        <div class="stat-label">累積回訪訪客 (回訪率)</div>
+        <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 0.95rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-label">新訪客人數</div>
         <div class="stat-value orange">${newVisitors.toLocaleString()}</div>
       </div>
+    </div>
+
+    <div class="section-title">⏳ 時間區間回頭客次數（間隔造訪）</div>
+    <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">短網址總點擊</div>
+        <div class="stat-label">超過 30 分鐘 重新回訪</div>
+        <div class="stat-value cyan">${returnsAfter30m.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">超過 24 小時 (隔日) 回頭客</div>
+        <div class="stat-value purple">${returnsAfter24h.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">超過 7 天 (跨週) 長期回頭客</div>
+        <div class="stat-value green">${returnsAfter7d.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">短網址總點擊數</div>
         <div class="stat-value">${totalClicks.toLocaleString()}</div>
       </div>
     </div>
@@ -310,7 +361,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
           <tr>
             <td><code>/${row.slug}</code></td>
             <td><span class="target-url" title="${row.target}">${row.target || '-'}</span></td>
-            <td><span class="badge">${row.clicks}</span></td>
+            <td><span class="badge cyan">${row.clicks}</span></td>
             <td class="time">${row.last_clicked_tw || '-'}</td>
           </tr>
         `).join('') : '<tr><td colspan="4" style="text-align: center; color: var(--muted);">尚無短網址點擊紀錄</td></tr>'}

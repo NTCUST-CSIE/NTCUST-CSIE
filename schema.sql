@@ -38,9 +38,14 @@ CREATE TABLE IF NOT EXISTS visitors (
     visitor_id TEXT PRIMARY KEY,
     first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_visit_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     visit_count INTEGER DEFAULT 1,
-    page_views INTEGER DEFAULT 1
+    page_views INTEGER DEFAULT 1,
+    returns_after_30m INTEGER DEFAULT 0,
+    returns_after_24h INTEGER DEFAULT 0,
+    returns_after_7d INTEGER DEFAULT 0
 );
+
 
 
 
