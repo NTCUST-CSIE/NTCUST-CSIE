@@ -372,7 +372,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 <body>
   <div class="container">
     <h1><i class="ph ph-chart-bar"></i> 網站整合流量與回訪統計</h1>
-    <div class="subtitle"><i class="ph ph-database"></i> 國立臺中科技大學 資訊工程科 科學會 • Cloudflare D1 整合資料庫</div>
+    <div class="subtitle"><i class="ph ph-database"></i> 國立臺中科技大學 資訊工程科 科學會 網頁瀏覽統計</div>
 
     <div class="section-title" style="margin-top:0;"><i class="ph ph-users"></i> 訪客總覽指標</div>
     <div class="stats-grid">
@@ -385,7 +385,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         <div class="stat-value green">${totalVisitors.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-arrows-clockwise"></i> 累積回訪訪客 (回訪率)</div>
+        <div class="stat-label"><i class="ph ph-arrows-clockwise"></i> 累積回訪訪客</div>
         <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 0.95rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
       </div>
       <div class="stat-card">
@@ -394,22 +394,22 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       </div>
     </div>
 
-    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間回頭客次數（間隔造訪）</div>
+    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘 重新回訪</div>
+        <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘</div>
         <div class="stat-value cyan">${returnsAfter30m.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-calendar"></i> 超過 24 小時 (隔日) 回頭客</div>
+        <div class="stat-label"><i class="ph ph-calendar"></i> 超過 24 小時</div>
         <div class="stat-value purple">${returnsAfter24h.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-calendar-check"></i> 超過 7 天 (跨週) 長期回頭客</div>
+        <div class="stat-label"><i class="ph ph-calendar-check"></i> 超過 7 天</div>
         <div class="stat-value green">${returnsAfter7d.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="ph ph-user-plus"></i> 初次造訪新訪客</div>
+        <div class="stat-label"><i class="ph ph-user-plus"></i> 初次造訪</div>
         <div class="stat-value orange">${newVisitors.toLocaleString()}</div>
       </div>
     </div>
@@ -420,19 +420,19 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     </div>
 
     <div class="filter-tabs">
-      <button class="filter-btn active" onclick="filterTable('all', this)"><i class="ph ph-list-dashes"></i> 全部清單 (${allTraffic.length})</button>
-      <button class="filter-btn" onclick="filterTable('page', this)"><i class="ph ph-file-text"></i> 頁面瀏覽 (${pageTraffic.length})</button>
-      <button class="filter-btn" onclick="filterTable('shortlink', this)"><i class="ph ph-link-simple"></i> 短網址點擊 (${shortlinkTraffic.length})</button>
+      <button class="filter-btn active" onclick="filterTable('all', this)"><i class="ph ph-list-dashes"></i> 全部 (${allTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('page', this)"><i class="ph ph-file-text"></i> 頁面 (${pageTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('shortlink', this)"><i class="ph ph-link-simple"></i> 短網址 (${shortlinkTraffic.length})</button>
     </div>
 
     <table>
       <thead>
         <tr>
-          <th>路徑 / 代稱</th>
+          <th>路徑</th>
           <th>類型</th>
-          <th>訪問 / 點擊次數</th>
-          <th>跳轉目標網址</th>
-          <th>最後造訪時間 (台灣時間)</th>
+          <th>訪問次數</th>
+          <th>目標網址</th>
+          <th>最後造訪時間</th>
         </tr>
       </thead>
       <tbody id="traffic-body">
