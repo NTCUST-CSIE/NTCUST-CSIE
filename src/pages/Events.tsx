@@ -36,7 +36,7 @@ const Events = () => {
             <h2 className="section-title">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                 <CalendarStar className="title-icon" weight="fill" />
-                活動花絮
+                近期活動
               </span>
               <span className="highlight">Events</span>
             </h2>
