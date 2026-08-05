@@ -97,7 +97,7 @@ const Home = () => {
             <a href="https://www.instagram.com/ntcust_csie" target="_blank" rel="noopener noreferrer" className="icon-link" aria-label="Instagram">
               <InstagramLogo />
             </a>
-            <a href="https://page.line.me/797hsgke" target="_blank" rel="noopener noreferrer" className="icon-link" aria-label="LINE">
+            <a href="https://line.me/ti/g2/ISzaO-wc9BvFLmqHydqeoL_wRf7sPNUro3MY4A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer" className="icon-link" aria-label="LINE">
               <ChatCircleDots />
             </a>
             <a href="https://github.com/NTCUST-CSIE/NTCUST-CSIE" target="_blank" rel="noopener noreferrer" className="icon-link github-link-tooltip" aria-label="GitHub">
