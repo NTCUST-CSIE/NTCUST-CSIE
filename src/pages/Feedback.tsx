@@ -17,7 +17,7 @@ const Feedback = () => {
     <>
       <div style={{ height: '100px' }}></div>
       <main>
-        <section className="container" style={{ maxWidth: '800px', padding: '2rem 1rem' }}>
+        <section className="container" style={{ maxWidth: '860px', padding: '2rem 1rem' }}>
           <h2 className="section-title">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <ChatTeardropText className="title-icon" weight="fill" />
@@ -25,52 +25,54 @@ const Feedback = () => {
             </span>
             <span className="highlight">Feedback</span>
           </h2>
-          <p style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+          
+          <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.7' }}>
             對於我們有任何想法、建議或疑問嗎？歡迎透過下方的匿名表單告訴我們！
           </p>
 
-          {/* Tally Terms & Privacy Notice Card */}
-          <div className="glass-card feedback-notice-card reveal active">
-            <div className="notice-header">
-              <ShieldCheck size={22} weight="duotone" className="notice-icon" />
+          {/* Unified Terms & Privacy Notice */}
+          <div className="glass-card feedback-notice reveal active">
+            <div className="feedback-notice-header">
+              <ShieldCheck size={24} weight="duotone" className="notice-icon" />
               <h3 className="notice-title">服務規範與隱私權聲明</h3>
             </div>
             
-            <p className="notice-text">
-              本意見箱表單採用第三方平台 <strong>Tally</strong> 作為資料收集與處理工具。使用本服務前，請詳閱並確認您已同意 Tally 之相關服務條款與隱私政策：
+            <p className="notice-desc">
+              本意見箱表單採用第三方平台 <strong>Tally</strong> 提供之嵌入式服務。為維護您的權益，使用前請詳閱並確認您已充分知悉相關服務規範與資料處理條款：
             </p>
 
-            <div className="notice-links">
+            <div className="notice-links-grid">
               <a 
                 href="https://tally.so/help/gdpr" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="notice-link-btn"
+                className="notice-btn"
               >
-                <FileText size={16} weight="bold" />
+                <FileText size={18} weight="bold" />
                 <span>Tally GDPR 資料保護規範</span>
-                <ArrowSquareOut size={14} />
+                <ArrowSquareOut size={15} />
               </a>
               <a 
                 href="https://tally.so/help/terms-and-privacy" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="notice-link-btn"
+                className="notice-btn"
               >
-                <FileText size={16} weight="bold" />
+                <FileText size={18} weight="bold" />
                 <span>Tally 服務條款與隱私權政策</span>
-                <ArrowSquareOut size={14} />
+                <ArrowSquareOut size={15} />
               </a>
             </div>
 
-            <div className="notice-warning">
-              <WarningCircle size={18} weight="fill" className="warning-icon" />
-              <span>
-                <strong>重要提醒：</strong>若您<strong>不同意</strong>上述第三方服務條款、隱私權規範或相關資料處理方式，<strong>請勿填寫或使用本意見箱</strong>。
-              </span>
+            <div className="notice-disclaimer">
+              <WarningCircle size={20} weight="fill" className="disclaimer-icon" />
+              <div className="disclaimer-text">
+                <strong>重要提醒：</strong>本表單預設為匿名填寫，請勿輸入敏感個人資訊。<strong>若您不同意上述第三方平台之服務條款、隱私權規範或相關資料處理方式，請勿填寫或使用本意見箱。</strong>
+              </div>
             </div>
           </div>
 
+          {/* Tally Embedded Form */}
           <div className="glass-card iframe-container reveal active">
             <iframe 
               data-tally-src="https://tally.so/embed/RGaK24?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
@@ -87,90 +89,98 @@ const Feedback = () => {
       </main>
 
       <style>{`
-        .feedback-notice-card {
+        .feedback-notice {
           margin-bottom: 2rem;
-          padding: 1.5rem 1.75rem;
+          padding: 1.75rem 2rem;
+          border: 1px solid var(--bg-tertiary);
           border-radius: 16px;
-          border: 1px solid rgba(0, 168, 240, 0.2);
-          background: rgba(0, 168, 240, 0.03);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
-        .notice-header {
+        .feedback-notice-header {
           display: flex;
           align-items: center;
-          gap: 0.6rem;
+          gap: 0.65rem;
           margin-bottom: 0.85rem;
         }
 
         .notice-icon {
-          color: var(--color-primary, #00a8f0);
+          color: var(--color-brand-primary);
         }
 
         .notice-title {
-          font-size: 1.1rem;
-          font-weight: 600;
+          font-size: 1.15rem;
+          font-weight: 700;
           margin: 0;
-          color: var(--color-text, #f0f6fc);
+          color: var(--text-primary);
         }
 
-        .notice-text {
-          font-size: 0.92rem;
-          line-height: 1.6;
-          color: var(--color-text-light, #8b949e);
-          margin-bottom: 1rem;
-        }
-
-        .notice-links {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
+        .notice-desc {
+          font-size: 0.95rem;
+          line-height: 1.65;
+          color: var(--text-secondary);
           margin-bottom: 1.25rem;
         }
 
-        .notice-link-btn {
+        .notice-links-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.85rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .notice-btn {
           display: inline-flex;
           align-items: center;
-          gap: 0.45rem;
-          padding: 0.45rem 0.9rem;
+          gap: 0.5rem;
+          padding: 0.6rem 1.1rem;
           border-radius: 8px;
-          font-size: 0.85rem;
+          font-size: 0.9rem;
           font-weight: 500;
-          color: var(--color-primary, #00a8f0);
-          background: rgba(0, 168, 240, 0.08);
-          border: 1px solid rgba(0, 168, 240, 0.25);
+          color: var(--color-brand-primary);
+          background-color: var(--color-brand-light);
+          border: 1px solid transparent;
           text-decoration: none;
           transition: all 0.2s ease;
         }
 
-        .notice-link-btn:hover {
-          background: rgba(0, 168, 240, 0.18);
-          border-color: var(--color-primary, #00a8f0);
-          transform: translateY(-1px);
+        .notice-btn:hover {
+          color: #ffffff;
+          background-color: var(--color-brand-primary);
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-sm);
         }
 
-        .notice-warning {
+        [data-theme="light"] .notice-btn:hover {
+          background-color: var(--color-brand-secondary);
+          color: #ffffff;
+        }
+
+        .notice-disclaimer {
           display: flex;
           align-items: flex-start;
-          gap: 0.6rem;
-          padding: 0.75rem 1rem;
+          gap: 0.75rem;
+          padding: 0.85rem 1.1rem;
           border-radius: 10px;
-          background: rgba(240, 136, 62, 0.1);
-          border-left: 3px solid #f0883e;
-          font-size: 0.88rem;
-          line-height: 1.5;
-          color: var(--color-text, #f0f6fc);
+          background-color: rgba(240, 136, 62, 0.08);
+          border-left: 4px solid #f0883e;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          color: var(--text-primary);
         }
 
-        .warning-icon {
+        .disclaimer-icon {
           color: #f0883e;
           flex-shrink: 0;
           margin-top: 2px;
         }
 
+        .disclaimer-text {
+          flex: 1;
+        }
+
         .iframe-container {
           width: 100%;
-          border-radius: 20px;
+          border-radius: 16px;
           overflow: hidden;
           padding: 0;
           min-height: 500px;
@@ -182,13 +192,19 @@ const Feedback = () => {
           background: transparent;
         }
 
-        html[data-theme='dark'] .iframe-container {
-          background: rgba(255, 255, 255, 0.05);
-        }
+        @media (max-width: 768px) {
+          .feedback-notice {
+            padding: 1.25rem 1.5rem;
+          }
 
-        html[data-theme='dark'] .feedback-notice-card {
-          background: rgba(22, 27, 34, 0.65);
-          border-color: rgba(0, 168, 240, 0.3);
+          .notice-links-grid {
+            flex-direction: column;
+          }
+
+          .notice-btn {
+            width: 100%;
+            justify-content: center;
+          }
         }
       `}</style>
     </>
