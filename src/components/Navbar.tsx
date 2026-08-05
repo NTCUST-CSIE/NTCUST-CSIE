@@ -47,7 +47,6 @@ const Navbar = () => {
           <li><Link to="/events">近期活動</Link></li>
           <li><Link to="/finance">財務報表</Link></li>
           <li><Link to="/feedback">意見箱</Link></li>
-          <li><Link to="/aichat">AI 助理</Link></li>
           <li><Link to="https://line.me/ti/g2/ISzaO-wc9BvFLmqHydqeoL_wRf7sPNUro3MY4A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default">新生社群</Link></li>
           <li>
             <button className="theme-toggle" aria-label="切換深色/淺色模式" onClick={toggleTheme}>
