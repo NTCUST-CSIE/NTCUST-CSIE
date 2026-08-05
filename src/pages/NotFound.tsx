@@ -11,9 +11,13 @@ const NotFound = () => {
     const path = decodeURIComponent(rawPath).toLowerCase();
 
     const links = linksData as Record<string, string>;
+    const normalizedLinks: Record<string, string> = {};
+    for (const [key, value] of Object.entries(links)) {
+      normalizedLinks[key.toLowerCase()] = value;
+    }
 
-    if (links[path]) {
-      let target = links[path];
+    if (normalizedLinks[path]) {
+      let target = normalizedLinks[path];
       if (target.startsWith('./')) {
         target = target.replace('./', '/').replace('.html', '');
       }
