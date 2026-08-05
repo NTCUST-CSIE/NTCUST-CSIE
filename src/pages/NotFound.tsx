@@ -21,6 +21,24 @@ const NotFound = () => {
       if (target.startsWith('./')) {
         target = target.replace('./', '/').replace('.html', '');
       }
+
+      // Background click tracking via Cloudflare D1
+      try {
+        const payload = JSON.stringify({ slug: path, target });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch('/api/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload,
+            keepalive: true
+          }).catch(() => {});
+        }
+      } catch {
+        // Silently ignore tracking errors so redirect is never blocked
+      }
+
       window.location.replace(target);
     } else {
       setIsRedirecting(false);

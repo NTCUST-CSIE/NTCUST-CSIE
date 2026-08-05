@@ -20,3 +20,11 @@ CREATE TABLE IF NOT EXISTS phone_directory (
     role_or_name TEXT,
     extension TEXT
 );
+
+CREATE TABLE IF NOT EXISTS link_clicks (
+    slug TEXT PRIMARY KEY,
+    target TEXT,
+    clicks INTEGER DEFAULT 0,
+    last_clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
