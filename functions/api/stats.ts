@@ -121,13 +121,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       );
     }
 
-    // HTML Unified Dashboard
+    // HTML Unified Dashboard using strictly Phosphor Icons (no emojis)
     const html = `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>網站整合流量統計 | NTCUST CSIE</title>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.2"></script>
   <style>
     :root {
       --bg: #0d1117;
@@ -161,10 +162,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       align-items: center;
       gap: 0.6rem;
     }
+    h1 i {
+      color: var(--primary);
+    }
     .subtitle {
       color: var(--muted);
       margin-bottom: 2rem;
       font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
     .stats-grid {
       display: grid;
@@ -185,6 +192,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       font-size: 0.85rem;
       margin-bottom: 0.4rem;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .stat-label i {
+      font-size: 1.1rem;
     }
     .stat-value {
       font-size: 1.85rem;
@@ -204,12 +217,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       font-weight: 600;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.5rem;
     }
     .filter-tabs {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
     .filter-btn {
       background: var(--card-bg);
@@ -221,6 +235,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       font-size: 0.85rem;
       font-weight: 600;
       transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
     .filter-btn:hover, .filter-btn.active {
       color: #fff;
@@ -282,6 +299,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       border-radius: 6px;
       font-weight: 600;
       text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
     }
     .type-tag.page { background: rgba(0, 168, 240, 0.15); color: var(--primary); }
     .type-tag.shortlink { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
@@ -303,11 +323,18 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       margin-top: 3rem;
       color: var(--muted);
       font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
     .footer-links a {
       color: var(--primary);
       text-decoration: none;
-      margin: 0 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
     }
     .footer-links a:hover {
       text-decoration: underline;
@@ -316,57 +343,58 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 </head>
 <body>
   <div class="container">
-    <h1>📊 網站整合流量與回訪統計</h1>
-    <div class="subtitle">國立臺中科技大學 資訊工程科 科學會 • Cloudflare D1 整合資料庫</div>
+    <h1><i class="ph ph-chart-bar"></i> 網站整合流量與回訪統計</h1>
+    <div class="subtitle"><i class="ph ph-database"></i> 國立臺中科技大學 資訊工程科 科學會 • Cloudflare D1 整合資料庫</div>
 
-    <div class="section-title" style="margin-top:0;">👥 訪客總覽指標</div>
+    <div class="section-title" style="margin-top:0;"><i class="ph ph-users"></i> 訪客總覽指標</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">總頁面瀏覽量 (PV)</div>
+        <div class="stat-label"><i class="ph ph-eye"></i> 總頁面瀏覽量 (PV)</div>
         <div class="stat-value">${totalViews.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">獨立訪客人數 (UV)</div>
+        <div class="stat-label"><i class="ph ph-user"></i> 獨立訪客人數 (UV)</div>
         <div class="stat-value green">${totalVisitors.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">累積回訪訪客 (回訪率)</div>
+        <div class="stat-label"><i class="ph ph-arrows-clockwise"></i> 累積回訪訪客 (回訪率)</div>
         <div class="stat-value purple">${returningVisitors.toLocaleString()} <span style="font-size: 0.95rem; font-weight: normal; color: var(--muted);">(${returningRate})</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">短網址總點擊數</div>
+        <div class="stat-label"><i class="ph ph-link"></i> 短網址總點擊數</div>
         <div class="stat-value cyan">${totalClicks.toLocaleString()}</div>
       </div>
     </div>
 
-    <div class="section-title">⏳ 時間區間回頭客次數（間隔造訪）</div>
+    <div class="section-title"><i class="ph ph-clock-counter-clockwise"></i> 時間區間回頭客次數（間隔造訪）</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">超過 30 分鐘 重新回訪</div>
+        <div class="stat-label"><i class="ph ph-clock-countdown"></i> 超過 30 分鐘 重新回訪</div>
         <div class="stat-value cyan">${returnsAfter30m.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">超過 24 小時 (隔日) 回頭客</div>
+        <div class="stat-label"><i class="ph ph-calendar"></i> 超過 24 小時 (隔日) 回頭客</div>
         <div class="stat-value purple">${returnsAfter24h.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">超過 7 天 (跨週) 長期回頭客</div>
+        <div class="stat-label"><i class="ph ph-calendar-check"></i> 超過 7 天 (跨週) 長期回頭客</div>
         <div class="stat-value green">${returnsAfter7d.toLocaleString()} <span style="font-size: 0.9rem; font-weight: normal; color: var(--muted);">次</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">初次造訪新訪客</div>
+        <div class="stat-label"><i class="ph ph-user-plus"></i> 初次造訪新訪客</div>
         <div class="stat-value orange">${newVisitors.toLocaleString()}</div>
       </div>
     </div>
 
     <div class="section-title">
-      <span>🚀 整合流量排行 (traffic_stats)</span>
+      <i class="ph ph-chart-line-up"></i>
+      <span>整合流量排行 (traffic_stats)</span>
     </div>
 
     <div class="filter-tabs">
-      <button class="filter-btn active" onclick="filterTable('all', this)">全部清單 (${allTraffic.length})</button>
-      <button class="filter-btn" onclick="filterTable('page', this)">📄 頁面瀏覽 (${pageTraffic.length})</button>
-      <button class="filter-btn" onclick="filterTable('shortlink', this)">🔗 短網址點擊 (${shortlinkTraffic.length})</button>
+      <button class="filter-btn active" onclick="filterTable('all', this)"><i class="ph ph-list-dashes"></i> 全部清單 (${allTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('page', this)"><i class="ph ph-file-text"></i> 頁面瀏覽 (${pageTraffic.length})</button>
+      <button class="filter-btn" onclick="filterTable('shortlink', this)"><i class="ph ph-link-simple"></i> 短網址點擊 (${shortlinkTraffic.length})</button>
     </div>
 
     <table>
@@ -383,7 +411,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         ${allTraffic.length > 0 ? allTraffic.map((row: any) => `
           <tr data-type="${row.type}">
             <td><code>${row.path}</code></td>
-            <td><span class="type-tag ${row.type}">${row.type === 'page' ? '頁面' : '短網址'}</span></td>
+            <td>
+              <span class="type-tag ${row.type}">
+                <i class="${row.type === 'page' ? 'ph ph-file-text' : 'ph ph-arrow-square-out'}"></i>
+                ${row.type === 'page' ? '頁面' : '短網址'}
+              </span>
+            </td>
             <td><span class="badge ${row.type === 'page' ? '' : 'cyan'}">${row.hits}</span></td>
             <td><span class="target-url" title="${row.target}">${row.target ? row.target : '-'}</span></td>
             <td class="time">${row.last_time_tw || '-'}</td>
@@ -393,7 +426,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     </table>
 
     <div class="footer-links">
-      <a href="?format=json">檢視純 JSON 格式</a> • <a href="/api/clicks">短網址專用 API</a> • <a href="/">回到網站首頁</a>
+      <a href="?format=json"><i class="ph ph-code"></i> 檢視純 JSON 格式</a>
+      <a href="/api/clicks"><i class="ph ph-link"></i> 短網址專用 API</a>
+      <a href="/"><i class="ph ph-house"></i> 回到網站首頁</a>
     </div>
   </div>
 
