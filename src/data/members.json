@@ -29,15 +29,21 @@
     "members": [
       {
         "name": "江龍泰",
-        "title": "資訊部",
+        "title": "資訊部長",
         "image": "./img/members/江龍泰.webp",
         "intro": "身為資訊，但討厭資訊是一件很合理的事情 :(<br><a href=\"https://longtai.me\" target=\"_blank\" style=\"color:var(--color-brand-secondary)\">longtai.me</a>"
       },
       {
         "name": "吳秉勳",
-        "title": "資訊部",
+        "title": "資訊部長",
         "image": "./img/members/吳秉勳.webp",
         "intro": "嗨<br>我是第八屆科會的資訊長秉乾（ㄍㄢ）<br>被推進攝影的坑之後會了一點攝影<br>偶爾閒的發慌就跟AI聊天做網站"
+      },
+      {
+        "name": "許博程",
+        "title": "資訊部員",
+        "image": "./img/members/許博程.jpg",
+        "intro": ""
       }
     ]
   },
@@ -47,15 +53,21 @@
     "members": [
       {
         "name": "湯子儀",
-        "title": "財務部",
+        "title": "財務部長",
         "image": "./img/members/湯子儀.webp",
         "intro": "大家好！<br>我是第八屆資工科會的財務長٩( ᐛ )و<br>可以叫我小熙<br>是一個喜歡cos而破產的宅宅(｡ì _ í｡)<br>興趣：模型、漫畫、考斯普雷<br>可能平時看起來神經神經的…<br>再請大家多多指教><"
       },
       {
         "name": "林芷妍",
-        "title": "財務部",
+        "title": "財務部長",
         "image": "./img/members/林芷妍.webp",
         "intro": "大家好<br>我是三乙的塩巴<br>很榮幸能擔任財務長為大家服務<br>如果在學業或是其他上面遇到問題都可以來找我<br>我喜歡幫助別人(´▽｀)<br>未來一年請大家多多指教和擔待"
+      },
+      {
+        "name": "賴愉昀",
+        "title": "財務部員",
+        "image": "./img/members/賴愉昀.jpg",
+        "intro": "不熟是微社恐<br>熟的時候有點社牛…"
       }
     ]
   },
@@ -65,15 +77,21 @@
     "members": [
       {
         "name": "黃宇鈴",
-        "title": "公關部",
+        "title": "公關部長",
         "image": "./img/members/黃宇鈴.webp",
         "intro": "這個人很懶，什麼都沒留下"
       },
       {
         "name": "王妤萱",
-        "title": "公關部",
-        "intro": "愛追星🎶看動漫、看劇🎦（超級雜食🍽️）<br>很好聊💬熟了很吵(￣∇￣)",
-        "image": "./img/members/王妤萱.webp"
+        "title": "公關部長",
+        "image": "./img/members/王妤萱.webp",
+        "intro": "愛追星🎶看動漫、看劇🎦（超級雜食🍽️）<br>很好聊💬熟了很吵(￣∇￣)"
+      },
+      {
+        "name": "張耘碩",
+        "title": "公關部員",
+        "image": "./img/members/張耘碩.jpg",
+        "intro": "比較慢熟，熟了之後會變很吵"
       }
     ]
   },
@@ -95,9 +113,15 @@
     "members": [
       {
         "name": "李員廣",
-        "title": "活動部",
+        "title": "活動部長",
         "image": "./img/members/李原廣.webp",
         "intro": "第八屆資工科活動長<br>兼資工系籃球隊隊長<br>擅長打籃球等運動有興趣可以找我打球<br>打遊戲也行"
+      },
+      {
+        "name": "林永宏",
+        "title": "活動部員",
+        "image": "./img/members/林永宏.webp",
+        "intro": ""
       }
     ]
   },
@@ -107,15 +131,21 @@
     "members": [
       {
         "name": "林彥呈",
-        "title": "總務部",
+        "title": "總務部長",
         "image": "./img/members/林彥呈.webp",
         "intro": "大家好<br>我是這屆科會的總務長 是個I人<br>喜歡和朋友一起打籃球、打羽球<br>平時除了運動之外不是在打遊戲就是在看小說<br>很多人都說我打遊戲跟平常的樣子差很多 XDDD<br>如果有什麼問題或疑問 歡迎來詢問<br>再請大家多多指教！"
       },
       {
         "name": "紀佩筠",
-        "title": "總務部",
+        "title": "總務部長",
         "image": "./img/members/紀佩筠.webp",
         "intro": "嗨大家，我是魚魚<br>平常看到我可以直接叫我魚<br>我喜歡嘗試有趣的新事物、打傳說、聽音樂<br>希望能把總務的工作做好<br>有需要幫忙的地方可以找我<br>很高興為大家服務！o(≧v≦)o"
+      },
+      {
+        "name": "林采靚",
+        "title": "總務部員",
+        "image": "./img/members/林采靚.webp",
+        "intro": "大家好，我是林洛<br>我是個I人<br>我喜歡國樂、聽音樂<br>希望能做好總務的工作<br>我會加油的！(*ˊᗜˋ*)"
       }
     ]
   },
@@ -125,9 +155,15 @@
     "members": [
       {
         "name": "吳家恩",
-        "title": "行銷媒體部",
+        "title": "行銷媒體部長",
         "image": "./img/members/吳家恩.webp",
         "intro": "這個人很懶，什麼都沒留下"
+      },
+      {
+        "name": "李彥蓁",
+        "title": "行銷媒體部員",
+        "image": "./img/members/李彥蓁.webp",
+        "intro": "我是鋰電池 叫電池就好<br>平常有點抽象 很話癆"
       }
     ]
   }
