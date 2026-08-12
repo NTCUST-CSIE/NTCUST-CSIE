@@ -67,14 +67,21 @@ const OrgChart = () => {
               .join('・');
 
             return (
-              <div key={dept.id} className="org-node-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Link to={`/members#${dept.id}`} className="org-node glass-card reveal active" style={{ width: '100%', height: 'auto', flex: 'none' }}>
+              <div key={dept.id} className="org-node-wrapper">
+                <Link to={`/members#${dept.id}`} className="org-node glass-card reveal active">
                   <span className="node-title" style={{ marginBottom: '1rem' }}>{dept.departmentTitle}</span>
                   
                   {headsStr && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: normalMembersStr ? '0.8rem' : '0' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem', letterSpacing: '1px' }}>部長</span>
                       <span className="node-name">{headsStr}</span>
+                    </div>
+                  )}
+                  
+                  {normalMembersStr && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem', letterSpacing: '1px' }}>部員</span>
+                      <span className="node-name">{normalMembersStr}</span>
                     </div>
                   )}
                   
@@ -82,16 +89,6 @@ const OrgChart = () => {
                     <span className="node-name">{dept.members.map(m => m.name).join('・')}</span>
                   )}
                 </Link>
-
-                {normalMembersStr && (
-                  <>
-                    <div style={{ width: '2px', height: '1.5rem', backgroundColor: 'var(--color-brand-primary)', opacity: 0.5 }}></div>
-                    <Link to={`/members#${dept.id}`} className="org-node glass-card reveal active" style={{ width: '100%', height: 'auto', flex: 'none', padding: '1rem 0.5rem' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginBottom: '0.5rem', letterSpacing: '1px', fontWeight: 600 }}>部員</span>
-                      <span className="node-name">{normalMembersStr}</span>
-                    </Link>
-                  </>
-                )}
               </div>
             );
           })}
