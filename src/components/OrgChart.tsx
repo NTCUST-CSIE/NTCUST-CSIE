@@ -40,14 +40,14 @@ const OrgChart = () => {
           <div className="top-level-wrapper">
             <div className="org-node-wrapper">
               <Link to="/members#dept-president" className="org-node glass-card reveal active">
-                <span className="node-title">會長 / 副會長</span>
+                <span className="node-title" style={{ marginBottom: '0.8rem' }}>會長 / 副會長</span>
                 <span className="node-name">{presVp}</span>
               </Link>
             </div>
             <div className="side-connector"></div>
             <div className="org-node-wrapper side-node-wrapper">
               <Link to="/members#dept-president" className="org-node glass-card side-node reveal active">
-                <span className="node-title">執行秘書</span>
+                <span className="node-title" style={{ marginBottom: '0.8rem' }}>執行秘書</span>
                 <span className="node-name">{execSec}</span>
               </Link>
             </div>
@@ -57,12 +57,37 @@ const OrgChart = () => {
       {otherDepts.length > 0 && (
         <div className="org-level bottom-level">
           {otherDepts.map(dept => {
-            const membersStr = dept.members.map(m => m.name).join('・');
+            const headsStr = dept.members
+              .filter(m => m.title.includes('長') || m.title === dept.departmentTitle)
+              .map(m => m.name)
+              .join('・');
+            const normalMembersStr = dept.members
+              .filter(m => !m.title.includes('長') && m.title !== dept.departmentTitle)
+              .map(m => m.name)
+              .join('・');
+
             return (
               <div key={dept.id} className="org-node-wrapper">
                 <Link to={`/members#${dept.id}`} className="org-node glass-card reveal active">
-                  <span className="node-title">{dept.departmentTitle}</span>
-                  <span className="node-name">{membersStr}</span>
+                  <span className="node-title" style={{ marginBottom: '1rem' }}>{dept.departmentTitle}</span>
+                  
+                  {headsStr && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: normalMembersStr ? '0.8rem' : '0' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem', letterSpacing: '1px' }}>部長</span>
+                      <span className="node-name">{headsStr}</span>
+                    </div>
+                  )}
+                  
+                  {normalMembersStr && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem', letterSpacing: '1px' }}>部員</span>
+                      <span className="node-name">{normalMembersStr}</span>
+                    </div>
+                  )}
+                  
+                  {!headsStr && !normalMembersStr && (
+                    <span className="node-name">{dept.members.map(m => m.name).join('・')}</span>
+                  )}
                 </Link>
               </div>
             );
