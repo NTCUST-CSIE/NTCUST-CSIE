@@ -84,8 +84,8 @@ const Finance = () => {
             
             <div className="finance-tabs-wrapper">
               <div className="finance-tabs" id="finance-tabs">
-                <button className={`finance-tab ${activeTab === '116-1' ? 'active' : ''}`} onClick={() => handleTabClick('116-1', '116學年度上學期')}>116學年度上學期</button>
-                <button className={`finance-tab ${activeTab === '116-2' ? 'active' : ''}`} onClick={() => handleTabClick('116-2', '116學年度下學期')}>116學年度下學期</button>
+                <button className={`finance-tab ${activeTab === '115-1' ? 'active' : ''}`} onClick={() => handleTabClick('115-1', '115學年度上學期')}>115學年度上學期</button>
+                <button className={`finance-tab ${activeTab === '115-2' ? 'active' : ''}`} onClick={() => handleTabClick('115-2', '115學年度下學期')}>115學年度下學期</button>
                 <a href="https://drive.google.com/drive/folders/1HmuAC7US5h5TlW69jyF5_AyKgMIkrXcK?usp=sharing" target="_blank" rel="noopener noreferrer" className="finance-tab">財務資料</a>
               </div>
             </div>
