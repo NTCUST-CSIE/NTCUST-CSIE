@@ -21,8 +21,8 @@ const formatCurrency = (num: number | null | undefined) => {
 };
 
 const Finance = () => {
-  const [activeTab, setActiveTab] = useState<string>('116-1');
-  const [tabTitle, setTabTitle] = useState<string>('116學年度上學期');
+  const [activeTab, setActiveTab] = useState<string>('115-1');
+  const [tabTitle, setTabTitle] = useState<string>('115學年度上學期');
 
   useEffect(() => {
     // Reveal elements on scroll
