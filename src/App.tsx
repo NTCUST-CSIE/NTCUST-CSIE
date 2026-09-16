@@ -7,7 +7,6 @@ import Members from './pages/Members';
 import Events from './pages/Events';
 import Finance from './pages/Finance';
 import Feedback from './pages/Feedback';
-import AIChat from './pages/AIChat';
 import NotFound from './pages/NotFound';
 import './assets/style.css'; // Global styles
 
