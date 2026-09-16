@@ -53,7 +53,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     `).run();
 
     // Auto-sync standard website pages into traffic_stats
-    const standardPages = ['/', '/members', '/events', '/finance', '/feedback', '/aichat'];
+    const standardPages = ['/', '/members', '/events', '/finance', '/feedback'];
     for (const pagePath of standardPages) {
       await env.DB.prepare(`
         INSERT INTO traffic_stats (path, type, target, hits, last_accessed_at)
