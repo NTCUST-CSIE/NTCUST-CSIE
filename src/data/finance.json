@@ -11,13 +11,22 @@
             {
                 "monthLabel": "2026年 8月",
                 "records": [
-                    { "date": "8/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
+                    { "date": "8/1", "desc": "上期結餘", "income": 15900, "expense": null, "balance": null },
+                    { "date": "8/1", "desc": "存簿更換印鑑", "income": null, "expense": 50, "balance": null },
+                    { "date": "8/1", "desc": "幹服+匯費", "income": null, "expense": 4630, "balance": null }
                 ]
             },
             {
                 "monthLabel": "2026年 9月",
                 "records": [
-                    { "date": "9/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
+                    { "date": "9/1", "desc": "上期結餘", "income": 11220, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "新生科會費", "income": 91000, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "二年級補繳科會費", "income": 4800, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "三年級補繳科會費", "income": 9000, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "科會會員衣服", "income": 600, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "非科會會員衣服", "income": 350, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "匿名贊助", "income": 2500, "expense": null, "balance": null },
+                    { "date": "9/1", "desc": "廠商贊助", "income": 2000, "expense": null, "balance": null }
                 ]
             },
             {
