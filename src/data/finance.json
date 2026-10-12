@@ -3,37 +3,37 @@
         {
             "monthLabel": "2026年 7月",
             "records": [
-                { "date": "7/1", "desc": "上屆結餘", "income": 15900, "expense": null }
+                { "date": "7/1", "desc": "上屆結餘", "income": 15900, "expense": null, "balance": 15900 }
             ]
         },
         {
             "monthLabel": "2026年 8月",
             "records": [
-                { "date": "8/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "8/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2026年 9月",
             "records": [
-                { "date": "9/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "9/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2026年 10月",
             "records": [
-                { "date": "10/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "10/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2026年 11月",
             "records": [
-                { "date": "11/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "11/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2026年 12月",
             "records": [
-                { "date": "12/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "12/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         }
     ],
@@ -41,43 +41,43 @@
         {
             "monthLabel": "2027年 1月",
             "records": [
-                { "date": "1/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "1/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },  
         {
             "monthLabel": "2027年 2月",
             "records": [
-                { "date": "2/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "2/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2027年 3月",
             "records": [
-                { "date": "3/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "3/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2027年 4月",
             "records": [
-                { "date": "4/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "4/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2027年 5月",
             "records": [
-                { "date": "5/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "5/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2027年 6月",
             "records": [
-                { "date": "6/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "6/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         },
         {
             "monthLabel": "2027年 7月",
             "records": [
-                { "date": "7/1", "desc": "上期結餘", "income": null, "expense": null }
+                { "date": "7/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
             ]
         }
     ]

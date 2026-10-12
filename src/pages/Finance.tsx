@@ -7,7 +7,7 @@ interface FinanceRecord {
   desc: string;
   income: number | null;
   expense: number | null;
-  balance?: number;
+  balance?: number | null;
 }
 
 interface MonthData {
@@ -53,19 +53,17 @@ const Finance = () => {
 
   let totalIncome = 0;
   let totalExpense = 0;
-  let currentBalance = 0;
-  let finalBalance = 0;
+  // 結餘由 finance.json 手動填寫，總計列顯示本學期最後一筆有填的結餘
+  let finalBalance: number | null = null;
 
   if (currentData) {
     currentData.forEach(month => {
       month.records.forEach(record => {
         if (record.income) totalIncome += record.income;
         if (record.expense) totalExpense += record.expense;
-        currentBalance += (record.income || 0) - (record.expense || 0);
-        record.balance = currentBalance;
+        if (record.balance !== null && record.balance !== undefined) finalBalance = record.balance;
       });
     });
-    finalBalance = totalIncome - totalExpense;
   }
 
   return (
