@@ -15,6 +15,15 @@ interface MonthData {
   records: FinanceRecord[];
 }
 
+interface SemesterData {
+  total: {
+    income: number | null;
+    expense: number | null;
+    balance: number | null;
+  };
+  months: MonthData[];
+}
+
 const formatCurrency = (num: number | null | undefined) => {
   if (num === null || num === undefined) return "-";
   return num.toLocaleString('en-US');
@@ -49,22 +58,8 @@ const Finance = () => {
     setTabTitle(title);
   };
 
-  const currentData = (financeData as globalThis.Record<string, MonthData[]>)[activeTab];
-
-  let totalIncome = 0;
-  let totalExpense = 0;
-  // 結餘由 finance.json 手動填寫，總計列顯示本學期最後一筆有填的結餘
-  let finalBalance: number | null = null;
-
-  if (currentData) {
-    currentData.forEach(month => {
-      month.records.forEach(record => {
-        if (record.income) totalIncome += record.income;
-        if (record.expense) totalExpense += record.expense;
-        if (record.balance !== null && record.balance !== undefined) finalBalance = record.balance;
-      });
-    });
-  }
+  // 所有金額（含結餘與總計）皆由 finance.json 手動填寫，頁面不做任何計算
+  const currentData = (financeData as globalThis.Record<string, SemesterData>)[activeTab];
 
   return (
     <>
@@ -107,7 +102,7 @@ const Finance = () => {
                   <tbody>
                     {currentData ? (
                       <>
-                        {currentData.map((month, mIdx) => (
+                        {currentData.months.map((month, mIdx) => (
                           <React.Fragment key={mIdx}>
                             <tr className="month-divider">
                               <td colSpan={5}>{month.monthLabel}</td>
@@ -125,9 +120,9 @@ const Finance = () => {
                         ))}
                         <tr className="total-row">
                           <td colSpan={2} style={{ textAlign: 'right', fontWeight: 'bold' }}>本學期結餘總計</td>
-                          <td className="amount-col income">{formatCurrency(totalIncome)}</td>
-                          <td className="amount-col expense">{formatCurrency(totalExpense)}</td>
-                          <td className="amount-col balance highlight-amount">{formatCurrency(finalBalance)}</td>
+                          <td className="amount-col income">{formatCurrency(currentData.total.income)}</td>
+                          <td className="amount-col expense">{formatCurrency(currentData.total.expense)}</td>
+                          <td className="amount-col balance highlight-amount">{formatCurrency(currentData.total.balance)}</td>
                         </tr>
                       </>
                     ) : (
