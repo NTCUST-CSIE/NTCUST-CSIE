@@ -13,11 +13,11 @@
         "desc": "學校提供給各位的課程相對枯燥乏味，資工科的學長姐們特別為大家準備了許多有趣的課程，讓大家在學習之餘也能享受學習的樂趣！",
         "image": "./img/Theme_Courses.jpg",
         "links": [
-            { "text": "新手的第一堂課 - 報名表單", "url": "https://forms.gle/AVAvHdxqD9itdfWr8" },
-            { "text": "新手的第一堂課 - 回饋表單", "url": "https://forms.gle/g8eZgJEVgpRBXU7Q6" },
-            { "text": "Init:CTF — 從 Linux 到 Web 的資安初探 - 報名表單", "url": "https://forms.gle/z9omixA6GucmdXzYA" },
-            { "text": "Init:CTF — 從 Linux 到 Web 的資安初探 - 回饋表單", "url": "https://forms.gle/rtwh9UsCm9F5PwFg8" },
-            { "text": "課程主機由 NCSE Network 贊助", "url": "https://ncse.tw/" }
+            { "text": "新手的第一堂課 - 報名", "url": "https://forms.gle/AVAvHdxqD9itdfWr8" },
+            { "text": "新手的第一堂課 - 回饋", "url": "https://forms.gle/g8eZgJEVgpRBXU7Q6" },
+            { "text": "Init: CTF - 資安初探 - 報名", "url": "https://forms.gle/z9omixA6GucmdXzYA" },
+            { "text": "Init: CTF - 資安初探 - 回饋", "url": "https://forms.gle/rtwh9UsCm9F5PwFg8" },
+            { "text": "由 NCSE Network 贊助", "url": "https://ncse.tw/" }
         ]
     },
     "Basketball": {
