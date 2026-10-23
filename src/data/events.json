@@ -14,7 +14,10 @@
         "image": "./img/Theme_Courses.jpg",
         "links": [
             { "text": "新手的第一堂課 - 報名表單", "url": "https://forms.gle/AVAvHdxqD9itdfWr8" },
-            { "text": "新手的第一堂課 - 回饋表單", "url": "https://forms.gle/g8eZgJEVgpRBXU7Q6" }
+            { "text": "新手的第一堂課 - 回饋表單", "url": "https://forms.gle/g8eZgJEVgpRBXU7Q6" },
+            { "text": "Init:CTF — 從 Linux 到 Web 的資安初探 - 報名表單", "url": "https://forms.gle/z9omixA6GucmdXzYA" },
+            { "text": "Init:CTF — 從 Linux 到 Web 的資安初探 - 回饋表單", "url": "https://forms.gle/rtwh9UsCm9F5PwFg8" },
+            { "text": "課程主機由 NCSE Network 贊助", "url": "https://ncse.tw/" }
         ]
     },
     "Basketball": {
