@@ -204,11 +204,6 @@ const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) 
     api.print('把五片按照順序拼起來，到 /flag 提交吧！');
     return;
   }
-  if (cmd === 'rm' && isDangerousRm(args)) {
-    api.print('就算你是 root，我也不會讓你刪的 😤', 'error');
-    discoverEgg('rmrf');
-    return;
-  }
   if (command === 'make me a sandwich') {
     api.print('Okay. 🥪');
     return;
@@ -392,6 +387,12 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
     case 'sudo':
       if (args.length === 0) {
         api.print('usage: sudo <command>', 'error');
+        return;
+      }
+      // 亂用 root 權限：sudo rm -rf / 連密碼都不用問
+      if (args[0] === 'rm' && isDangerousRm(args.slice(1))) {
+        api.print('guest is not in the sudoers file. This incident will be reported. 🚨', 'error');
+        discoverEgg('sudo');
         return;
       }
       session.sudoCommand = args.join(' ');
