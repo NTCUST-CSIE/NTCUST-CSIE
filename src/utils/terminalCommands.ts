@@ -441,7 +441,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       } else if (args.join(' ') === 'me a sandwich') {
         api.print('What? Make it yourself.');
       } else {
-        api.print('make: *** No targets specified and no makefile found. Stop.', 'error');
+        api.print('make: *** No targets specified and no makefile found.  Stop.', 'error');
       }
       return;
     case 'brew':

@@ -100,7 +100,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     if (e.ctrlKey && e.key === 'c' && e.currentTarget.selectionStart === e.currentTarget.selectionEnd) {
       e.preventDefault();
       if (mode === 'vim') {
-        print('Type :qa! and press <Enter> to abandon all changes and exit Vim', 'error');
+        print('Type  :qa!  and press <Enter> to abandon all changes and exit Vim', 'error');
         return;
       }
       print(mode === 'shell' ? `${PROMPT} ${input}^C` : '^C', 'input');
