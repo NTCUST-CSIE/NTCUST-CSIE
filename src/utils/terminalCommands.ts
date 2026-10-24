@@ -178,8 +178,8 @@ const neofetch = () => {
   const memberCount = departments.reduce((n, d) => n + d.members.length, 0);
   const theme = document.documentElement.getAttribute('data-theme') || 'dark';
   const info = [
-    'guest@nutccsie.org',
-    '------------------',
+    'guest@csie',
+    '----------',
     'OS: CSIE OS',
     'Host: 國立臺中科技大學 資訊工程科',
     'Kernel: React 19 + Vite',
@@ -193,10 +193,10 @@ const neofetch = () => {
   return info.map((line, i) => `${(logoLines[i] ?? '').padEnd(24)}${line}`).join('\n');
 };
 
-const isDangerousRm = (args: string[]) => {
+// rm -rf / 或 rm -rf /* 才是刪整台機器；家目錄裡的檔案跟單獨 rm 一樣是唯讀的
+const wipesWholeSystem = (args: string[]) => {
   const flags = args.filter(a => a.startsWith('-')).join('');
-  const targets = args.filter(a => !a.startsWith('-'));
-  return flags.includes('r') && flags.includes('f') && targets.some(t => ['/', '/*', '~', '~/', '*', '.'].includes(t));
+  return flags.includes('r') && flags.includes('f') && args.some(a => a === '/' || a === '/*');
 };
 
 const showEggs = (api: TerminalApi) => {
@@ -241,9 +241,14 @@ const wipeSystem = (api: TerminalApi) => {
   api.printTimeline(wipeTimeline, crashSite, 1600);
 };
 
+const serveCoffee = (api: TerminalApi) => {
+  api.print(teapot);
+  discoverEgg('coffee');
+};
+
 const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) => {
   const [cmd, ...args] = command.split(/\s+/);
-  if (cmd === 'rm' && isDangerousRm(args)) {
+  if (cmd === 'rm' && wipesWholeSystem(args)) {
     discoverEgg('sudo');
     wipeSystem(api);
     return;
@@ -284,7 +289,7 @@ export const handleInput = (raw: string, api: TerminalApi, session: TerminalSess
       session.sudoFails = 0;
       api.setMode('shell');
       api.print('sudo: 3 incorrect password attempts', 'error');
-      api.print('guest is not in the sudoers file. This incident will be reported. 🚨', 'error');
+      api.print('This incident will be reported. 🚨', 'error');
       discoverEgg('sudo');
       return;
     }
@@ -387,7 +392,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print(`up ${Math.floor(performance.now() / 60000)} 分鐘 —— 你已經在這個網站待這麼久了 👀`);
       return;
     case 'uname':
-      api.print(args.includes('-a') ? 'CSIE-OS nutccsie.org 8.0.0 #1 SMP React19 Vite x86_64 GNU/Linux' : 'CSIE-OS');
+      api.print(args.includes('-a') ? 'CSIE-OS csie 8.0.0 #1 SMP React19 Vite x86_64 GNU/Linux' : 'CSIE-OS');
       return;
     case 'history':
       api.print(session.history.map((h, i) => `${String(i + 1).padStart(4)}  ${h}`).join('\n'));
@@ -450,14 +455,13 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print('su: Authentication failure（試試 sudo？）', 'error');
       return;
     case 'rm':
-      if (isDangerousRm(args)) {
-        // 沒有 root 就刪不了：rm -rf / 會先被 GNU rm 的 preserve-root 擋下
-        const targets = args.filter(a => !a.startsWith('-'));
-        if (targets.includes('/')) {
+      if (wipesWholeSystem(args)) {
+        // 沒有 root 就刪不了：rm -rf / 會先被 GNU rm 的 preserve-root 擋下，硬關掉保護也只會權限不足
+        if (args.includes('/') && !args.includes('--no-preserve-root')) {
           api.print("rm: it is dangerous to operate recursively on '/'", 'error');
           api.print('rm: use --no-preserve-root to override this failsafe', 'error');
         } else {
-          api.print(`rm: cannot remove '${targets[0]}': Permission denied`, 'error');
+          api.print(`rm: cannot remove '${args.includes('/') ? '/' : '/bin'}': Permission denied`, 'error');
         }
       } else if (args.length === 0) {
         api.print('rm: missing operand', 'error');
@@ -485,13 +489,11 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print('nano 是個好編輯器……可惜這裡只有 vim。輸入 vim 試試？');
       return;
     case 'coffee':
-      api.print(teapot);
-      discoverEgg('coffee');
+      serveCoffee(api);
       return;
     case 'make':
       if (args.join(' ') === 'coffee') {
-        api.print(teapot);
-        discoverEgg('coffee');
+        serveCoffee(api);
       } else if (args.join(' ') === 'me a sandwich') {
         api.print('What? Make it yourself.');
       } else {
@@ -500,8 +502,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       return;
     case 'brew':
       if (args[0] === 'coffee') {
-        api.print(teapot);
-        discoverEgg('coffee');
+        serveCoffee(api);
       } else {
         api.print('brew: 我不是 macOS 我是CSIE OS', 'error');
       }

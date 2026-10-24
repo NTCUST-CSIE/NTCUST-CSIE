@@ -222,7 +222,9 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(183, 0, '+', COLOR.green);
 
   c.graph(3, 2, 66, 11, s.cpu);
-  c.put(3, 14, 'up 61d 22:14', COLOR.label);
+  // 跟 uptime、neofetch 一樣，算的是你待在網站上的時間
+  const mins = Math.floor(performance.now() / 60000);
+  c.put(3, 14, `up 0d ${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`, COLOR.label);
 
   // 右側的 CPU 面板
   c.box(72, 1, 117, 14, COLOR.border.cpu);

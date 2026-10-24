@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Terminal from './Terminal';
 import SeasonalDecor from './SeasonalDecor';
 import ServerDown from './ServerDown';
-import { CRASH_EVENT, discoverEgg, recoveredFromCrash, showToast, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
+import { CRASH_EVENT, discoverEgg, isCrashed, recoveredFromCrash, showToast, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
 
 const AWAY_TITLE = '回來好嗎 :)';
 const BACK_TITLE = '歡迎回來！';
@@ -46,6 +46,8 @@ const EasterEggs = () => {
     let originalTitle = document.title;
     let restoreTimer: ReturnType<typeof setTimeout> | undefined;
     const handleVisibility = () => {
+      // 假當機時不換標題，免得穿幫
+      if (isCrashed()) return;
       clearTimeout(restoreTimer);
       if (document.hidden) {
         if (document.title !== BACK_TITLE) originalTitle = document.title;
@@ -66,7 +68,7 @@ const EasterEggs = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isTyping(e.target)) return;
+      if (isTyping(e.target) || isCrashed()) return;
 
       if (e.code === 'Backquote' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
@@ -78,7 +80,9 @@ const EasterEggs = () => {
   }, []);
 
   useEffect(() => {
-    const handleTerminal = () => setTerminalOpen(true);
+    const handleTerminal = () => {
+      if (!isCrashed()) setTerminalOpen(true);
+    };
     const handleCrash = () => {
       setTerminalOpen(false);
       setCrashed(true);

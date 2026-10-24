@@ -76,7 +76,13 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      // 關掉終端機就像關掉視窗：輸到一半的 sudo 密碼、vim、btop 都一起結束
+      if (session.current.mode !== 'shell') setMode('shell');
+      session.current.sudoFails = 0;
+      setInput('');
+      return;
+    }
     discoverEgg('terminal');
     inputRef.current?.focus();
   }, [open]);

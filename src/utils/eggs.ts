@@ -81,8 +81,15 @@ export const startDisco = () => {
   discoTimer = setTimeout(() => root.classList.remove('disco'), 6000);
 };
 
+let crashed = false;
+
+export const isCrashed = () => crashed;
+
 // rm -rf / 之後的假當機：只記在這個分頁，重新整理後才揭曉是開玩笑的
 export const crashSite = () => {
+  crashed = true;
+  clearTimeout(discoTimer);
+  document.documentElement.classList.remove('disco');
   try {
     sessionStorage.setItem(CRASH_KEY, '1');
   } catch {
