@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CopySimple, Minus, Square, X } from '@phosphor-icons/react';
-import { complete, handleInput } from '../utils/terminalCommands';
+import { complete, formatCandidates, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
 import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
@@ -44,6 +44,8 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const [mode, setModeState] = useState<TerminalMode>('shell');
   const session = useRef<TerminalSession>({ mode: 'shell', history: [], sudoCommand: '', sudoFails: 0, vimTries: 0 });
   const historyCursor = useRef(-1);
+  // 上一次按 Tab 時的輸入；連按兩下 Tab 才列出候選，跟 bash 一樣
+  const lastTab = useRef<string | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   }, [mode, open]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Tab') lastTab.current = null;
     if (mode === 'btop') {
       e.preventDefault();
       const state = btopRef.current;
@@ -206,7 +209,18 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     }
     if (e.key === 'Tab') {
       e.preventDefault();
-      if (mode === 'shell') setInput(complete(input));
+      if (mode !== 'shell') return;
+      const { value, candidates } = complete(input);
+      if (value !== input) {
+        setInput(value);
+        lastTab.current = candidates.length > 1 ? value : null;
+      } else if (candidates.length > 1 && lastTab.current === input) {
+        print(`${PROMPT} ${input}`, 'input');
+        print(formatCandidates(candidates));
+        lastTab.current = null;
+      } else {
+        lastTab.current = input;
+      }
       return;
     }
     if (mode !== 'shell') return;

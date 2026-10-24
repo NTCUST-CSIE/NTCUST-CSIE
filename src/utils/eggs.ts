@@ -59,7 +59,8 @@ const saveFoundEggs = (ids: string[]) => {
   }
 };
 
-// 只清掉這台瀏覽器的紀錄；伺服器上的發現名次不動，之後重新找到還是原本的名次
+// 只清掉彩蛋紀錄（csie_eggs）；訪客 ID、主題設定都不動，所以統計不會把你算成新訪客
+// 伺服器上的發現名次也不動，之後重新找到還是原本的名次
 const resetFoundEggs = (keep: string[]) => {
   memoryFound.clear();
   saveFoundEggs(keep);

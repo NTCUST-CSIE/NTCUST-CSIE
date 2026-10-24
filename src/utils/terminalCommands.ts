@@ -33,8 +33,53 @@ export interface TerminalSession {
 
 interface Department {
   departmentTitle: string;
-  members: { name: string; title: string }[];
+  members: { name: string; title: string; intro: string }[];
 }
+
+interface EventItem {
+  title: string;
+  desc: string;
+  links: { text: string | null; url: string | null }[];
+}
+
+const departments = membersData as Department[];
+const eventEntries = Object.entries(eventsData as Record<string, EventItem>);
+const memberNames = [...new Set(departments.flatMap(d => d.members.map(m => m.name)))];
+
+// 同一個人可能在兩個部門（例如兼任），職位要一起列出來
+const rolesOf = (name: string) =>
+  departments.flatMap(d => d.members.filter(m => m.name === name).map(m => ({ ...m, dept: d.departmentTitle })));
+
+// members.json 的自我介紹是 HTML，終端機只顯示純文字
+const htmlToText = (html: string) =>
+  html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .trim();
+
+// events/ 資料夾：檔名用 events.json 的 key，也可以直接打活動名稱
+const findEvent = (name: string) => {
+  const key = name.replace(/^(\.\/)?events\//, '').replace(/\/$/, '').toLowerCase();
+  return eventEntries.find(([id, e]) => id.toLowerCase() === key || e.title === key);
+};
+
+const showEvent = ([id, e]: [string, EventItem]) => {
+  const links = e.links.filter(l => l.text && l.url).map(l => `  • ${l.text}：${l.url}`);
+  return [
+    `# ${e.title}（events/${id}）`,
+    e.desc,
+    '',
+    links.length > 0 ? `相關連結：\n${links.join('\n')}` : '相關連結：目前沒有',
+    '',
+    '在網站上看：cd events',
+  ].join('\n');
+};
+
+const isEventsDir = (path: string) => /^(\.\/)?events\/?$/.test(path);
 
 interface Semester {
   total: { income: number | null; expense: number | null; balance: number | null };
@@ -93,25 +138,108 @@ const fortunes = [
   '別擔心，你的 code 沒有 bug，只是有一些沒寫進文件的 feature。',
 ];
 
-const visibleCommands: [string, string][] = [
-  ['help', '顯示這份說明'],
-  ['ls [-a] [-l]', '列出檔案'],
-  ['cat <檔案>', '讀取檔案'],
-  ['cd <頁面>', '前往頁面：members / events / finance / feedback / flag / ~'],
-  ['pwd / whoami / date', '基本資訊'],
-  ['history / clear', '指令紀錄 / 清除畫面'],
-  ['neofetch', '系統資訊'],
-  ['btop', '看看伺服器現在多忙（q 離開）'],
-  ['fortune', '來點工程師語錄'],
-  ['cowsay <文字>', '讓牛幫你說話'],
-  ['theme [dark|light]', '切換主題'],
-  ['eggs', '彩蛋收集進度'],
-  ['ctf', 'CSIE CTF 說明'],
-  ['exit', '離開終端機'],
-];
+// 公開指令的說明，help 和 man 都從這裡產生；隱藏指令（彩蛋）不放進來，所以也查不到
+interface CommandDoc {
+  synopsis: string;
+  summary: string;
+  details?: string[];
+}
 
-const completions = ['help', 'ls', 'cat', 'cd', 'pwd', 'whoami', 'date', 'history', 'clear', 'neofetch', 'btop',
-  'fortune', 'cowsay', 'theme', 'eggs', 'ctf', 'exit', 'echo', 'uptime', 'uname'];
+const firstMember = memberNames[0] ?? '';
+
+const docs: Record<string, CommandDoc> = {
+  btop: { synopsis: 'btop', summary: '即時監看伺服器的 CPU、記憶體和行程。', details: ['↑↓ 選擇行程，Enter 或 t 結束行程，k 強制結束，s 選擇要送出的訊號，q 或 Esc 離開。'] },
+  cat: { synopsis: 'cat file', summary: '印出檔案內容。', details: ['例：cat about.txt、cat events/Theme_Courses'] },
+  cd: { synopsis: 'cd [page]', summary: '前往網站上的頁面。', details: ['page 可以是 members、events、finance、feedback、flag；不加參數或 cd ~ 回首頁。'] },
+  clear: { synopsis: 'clear', summary: '清除畫面。' },
+  cowsay: { synopsis: 'cowsay [text]', summary: '讓一頭牛幫你說話。' },
+  ctf: { synopsis: 'ctf', summary: '顯示 CSIE CTF 的規則和起點。' },
+  date: { synopsis: 'date', summary: '顯示現在的臺灣時間。' },
+  echo: { synopsis: 'echo [arg ...]', summary: '把參數原封不動印出來。' },
+  eggs: { synopsis: 'eggs', summary: '顯示彩蛋收集進度和提示。' },
+  exit: { synopsis: 'exit', summary: '離開終端機。' },
+  finger: { synopsis: 'finger [name]', summary: '顯示科會成員的職位和自我介紹。', details: ['不加名字會列出所有成員。', `例：finger ${firstMember}`] },
+  fortune: { synopsis: 'fortune', summary: '隨機印出一句工程師語錄。' },
+  help: { synopsis: 'help [name]', summary: '顯示內建指令的說明。', details: ['不加參數會列出所有指令；加上指令名稱會顯示該指令的詳細用法。'] },
+  history: { synopsis: 'history', summary: '列出輸入過的指令。' },
+  id: { synopsis: 'id', summary: '顯示使用者編號和所屬群組。' },
+  ls: { synopsis: 'ls [-a] [-l] [dir]', summary: '列出檔案。', details: ['-a    連隱藏檔（. 開頭）一起列出', '-l    顯示權限和擁有者', '例：ls -la、ls events/'] },
+  man: { synopsis: 'man name', summary: '顯示指令的使用手冊。' },
+  members: { synopsis: 'members', summary: '列出科會各部門的成員。' },
+  meow: { synopsis: 'meow', summary: '召喚一隻貓。' },
+  neofetch: { synopsis: 'neofetch', summary: '顯示系統資訊。' },
+  pwd: { synopsis: 'pwd', summary: '顯示目前所在的資料夾。' },
+  theme: { synopsis: 'theme [dark|light]', summary: '切換網站的深色 / 淺色主題。', details: ['不加參數會顯示目前的主題。'] },
+  uname: { synopsis: 'uname [-a]', summary: '顯示系統名稱。', details: ['-a    顯示完整的系統資訊'] },
+  uptime: { synopsis: 'uptime', summary: '顯示你在這個網站待了多久。' },
+  whoami: { synopsis: 'whoami', summary: '顯示目前的使用者名稱。' },
+};
+
+const docNames = Object.keys(docs).sort();
+
+// 仿 bash 的 help：開頭幾行說明，接著兩欄、依字母直向排列的指令
+const helpList = () => {
+  const rows = Math.ceil(docNames.length / 2);
+  const lines = Array.from({ length: rows }, (_, r) => {
+    const left = docs[docNames[r]].synopsis;
+    const right = docNames[r + rows] ? docs[docNames[r + rows]].synopsis : '';
+    return ` ${left.padEnd(40)}${right}`.trimEnd();
+  });
+  return [
+    'csie-sh，版本 8.0.0(1)-release (x86_64-csie-linux-gnu)',
+    '這些 shell 命令是內部定義的。輸入「help」以取得本列表。',
+    '輸入「help 名稱」以取得有關命令「名稱」的更多資訊。',
+    '使用「man 名稱」來閱讀命令的使用手冊。',
+    '',
+    ...lines,
+  ].join('\n');
+};
+
+const showHelp = (api: TerminalApi, topic?: string) => {
+  if (!topic) {
+    api.print(helpList());
+    api.print('（還有一些不能給你看的指令，自己找找看 👀）', 'accent');
+    return;
+  }
+  const doc = docs[topic];
+  if (!doc) {
+    api.print(`csie-sh: help: 沒有與「${topic}」相符的說明主題。請試試「help help」。`, 'error');
+    return;
+  }
+  const body = [doc.summary, ...(doc.details ? ['', ...doc.details] : [])];
+  api.print(`${topic}: ${doc.synopsis}\n${body.map(line => (line ? `    ${line}` : '')).join('\n')}`);
+};
+
+// 仿 man page：標題列、NAME、SYNOPSIS、DESCRIPTION
+const showMan = (api: TerminalApi, topic?: string) => {
+  if (!topic) {
+    api.print("What manual page do you want?\nFor example, try 'man man'.");
+    return;
+  }
+  const doc = docs[topic];
+  if (!doc) {
+    api.print(`No manual entry for ${topic}`, 'error');
+    return;
+  }
+  const tag = `${topic.toUpperCase()}(1)`;
+  const title = 'CSIE Terminal Manual';
+  const gap = Math.max(1, Math.floor((78 - tag.length * 2 - title.length) / 2));
+  const indent = (lines: string[]) => lines.map(line => `       ${line}`).join('\n');
+  api.print([
+    `${tag}${' '.repeat(gap)}${title}${' '.repeat(gap)}${tag}`,
+    '',
+    'NAME',
+    indent([`${topic} - ${doc.summary.replace(/。$/, '')}`]),
+    '',
+    'SYNOPSIS',
+    indent([doc.synopsis]),
+    '',
+    'DESCRIPTION',
+    indent(doc.details ?? [doc.summary]),
+  ].join('\n'));
+};
+
+const completions = docNames;
 
 const pages: Record<string, string> = {
   '': '/', '~': '/', '/': '/', '..': '/', home: '/',
@@ -130,7 +258,7 @@ const readFile = (name: string): string | null => {
     case 'about.txt':
       return '我們是國立臺中科技大學 資訊工程科 科學會。\n由一群充滿熱情與活力的學生組成，致力於舉辦各項活動，\n協助大家在五專留下美好的回憶。';
     case 'members.json':
-      return (membersData as Department[])
+      return departments
         .map(d => `${d.departmentTitle}：${d.members.map(m => `${m.name}（${m.title}）`).join('、')}`)
         .join('\n');
     case 'events.json':
@@ -154,6 +282,7 @@ const listFiles = (showAll: boolean, long: boolean) => {
       ['.bash_history', '-rw-------', 'guest'],
       ['.flag', '-r--------', 'root'],
     ] as [string, string, string][] : []),
+    ['events/', 'drwxr-xr-x', 'guest'],
     ...publicFiles.map(f => [f, '-rw-r--r--', 'guest'] as [string, string, string]),
   ];
   if (!long) return entries.map(e => e[0]).join('  ');
@@ -179,7 +308,6 @@ const cowsay = (text: string) => {
 };
 
 const neofetch = () => {
-  const departments = membersData as Department[];
   const memberCount = departments.reduce((n, d) => n + d.members.length, 0);
   const theme = document.documentElement.getAttribute('data-theme') || 'dark';
   const info = [
@@ -342,13 +470,19 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
 
   switch (lower) {
     case 'help':
-      api.print(visibleCommands.map(([name, desc]) => `  ${name.padEnd(20)}${desc}`).join('\n'));
-      api.print('（還有一些不能給你看的指令，自己找找看 👀）', 'accent');
+      showHelp(api, args[0]);
       return;
     case 'ls':
     case 'dir': {
       const opts = args.filter(a => a.startsWith('-')).join('');
-      api.print(listFiles(opts.includes('a'), opts.includes('l')));
+      const target = args.find(a => !a.startsWith('-'));
+      if (target && isEventsDir(target)) {
+        api.print(eventEntries.map(([id]) => id).join('  '));
+      } else if (!target || ['.', './', '~', '~/'].includes(target)) {
+        api.print(listFiles(opts.includes('a'), opts.includes('l')));
+      } else {
+        api.print(`ls: cannot access '${target}': No such file or directory`, 'error');
+      }
       return;
     }
     case 'sl':
@@ -364,6 +498,16 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       }
       if (file === '.flag') {
         api.print('cat: .flag: Permission denied', 'error');
+        return;
+      }
+      if (isEventsDir(file)) {
+        api.print(`cat: ${file}: Is a directory（試試 ls events/）`, 'error');
+        return;
+      }
+      if (/^(\.\/)?events\//.test(file)) {
+        const event = findEvent(file);
+        if (event) api.print(showEvent(event));
+        else api.print(`cat: ${file}: No such file or directory`, 'error');
         return;
       }
       if (file === '/etc/passwd') {
@@ -390,8 +534,32 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print('/home/guest');
       return;
     case 'whoami':
-      api.print('guest');
+      api.print(args.includes('--real') ? '一個好奇心很強的訪客 :)' : 'guest');
       return;
+    case 'members':
+      api.print(departments.map(d => `${d.departmentTitle}\n${d.members.map(m => `  ${m.name}（${m.title}）`).join('\n')}`).join('\n\n'));
+      api.print('（finger <名字> 看自我介紹、cd members 看成員頁）', 'accent');
+      return;
+    case 'finger': {
+      const name = args.join(' ').trim();
+      if (!name) {
+        const rows = memberNames.map(n => `${n.padEnd(4, '　')}  ${rolesOf(n).map(r => r.title).join('、')}`);
+        api.print(`${'Login'.padEnd(10)}Title\n${rows.join('\n')}`);
+        return;
+      }
+      const roles = rolesOf(name);
+      if (roles.length === 0) {
+        api.print(`finger: ${name}: no such user.`, 'error');
+        return;
+      }
+      api.print([
+        `Login: ${name}`,
+        `Title: ${roles.map(r => `${r.dept} ${r.title}`).join('、')}`,
+        'Plan:',
+        htmlToText(roles[0].intro),
+      ].join('\n'));
+      return;
+    }
     case 'id':
       api.print('uid=1000(guest) gid=1000(csie) groups=1000(csie),27(想當sudo)');
       return;
@@ -544,7 +712,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print('你沒有權限關掉我 😤', 'error');
       return;
     case 'man':
-      api.print('What manual page do you want?（試試 help）');
+      showMan(api, args[0]);
       return;
     case 'ping':
       api.print('pong 🏓');
@@ -564,20 +732,49 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
   }
 };
 
-// Tab 自動補完：指令名稱、檔名或頁面名稱
-export const complete = (input: string) => {
+const commonPrefix = (items: string[]) =>
+  items.reduce((prefix, item) => {
+    let i = 0;
+    while (i < prefix.length && prefix[i] === item[i]) i += 1;
+    return prefix.slice(0, i);
+  });
+
+// Tab 自動補完：跟 bash 一樣，唯一符合就補完；多個符合先補到共同的部分，候選清單交給呼叫端決定要不要列
+export const complete = (input: string): { value: string; candidates: string[] } => {
   const parts = input.split(' ');
-  if (parts.length === 1) {
-    const matches = completions.filter(c => c.startsWith(parts[0]));
-    return matches.length === 1 ? `${matches[0]} ` : input;
-  }
   const last = parts[parts.length - 1];
-  const pool = parts[0] === 'cd'
-    ? Object.keys(pages).filter(p => /^[a-z]+$/.test(p))
-    : parts[0] === 'cat'
-      ? [...publicFiles, ...(last.startsWith('.') ? hiddenFiles : [])]
-      : [];
-  const matches = pool.filter(p => p.startsWith(last));
-  if (matches.length !== 1) return input;
-  return [...parts.slice(0, -1), matches[0]].join(' ');
+  const eventFiles = eventEntries.map(([id]) => `events/${id}`);
+  const pools: Record<string, string[]> = {
+    cd: Object.keys(pages).filter(p => /^[a-z]+$/.test(p)),
+    // 跟真的 shell 一樣：只補目前這一層，打到 events/ 才補資料夾裡的檔案
+    cat: last.startsWith('events/') ? eventFiles : [...publicFiles, 'events/', ...(last.startsWith('.') ? hiddenFiles : [])],
+    ls: ['events/'],
+    finger: memberNames,
+    help: docNames,
+    man: docNames,
+  };
+  const pool = parts.length === 1 ? completions : pools[parts[0]] ?? [];
+  const matches = pool.filter(p => p.startsWith(last) && p !== last).sort((a, b) => a.localeCompare(b));
+  if (matches.length === 0) return { value: input, candidates: [] };
+  if (matches.length === 1) {
+    // 指令名稱補完後加空格，方便接著打參數
+    const value = [...parts.slice(0, -1), matches[0]].join(' ') + (parts.length === 1 ? ' ' : '');
+    return { value, candidates: [] };
+  }
+  return { value: [...parts.slice(0, -1), commonPrefix(matches)].join(' '), candidates: matches };
+};
+
+// 連按兩下 Tab 時，候選清單照 bash 的樣子直向分欄排；資料夾裡的檔案只顯示檔名
+export const formatCandidates = (paths: string[]) => {
+  const items = paths.map(p => (p.endsWith('/') ? p : p.slice(p.lastIndexOf('/') + 1)));
+  const width = Math.max(...items.map(displayWidth)) + 2;
+  const cols = Math.max(1, Math.floor(80 / width));
+  const rows = Math.ceil(items.length / cols);
+  return Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => items[r + c * rows])
+      .filter((item): item is string => item !== undefined)
+      .map(item => item + ' '.repeat(width - displayWidth(item)))
+      .join('')
+      .trimEnd(),
+  ).join('\n');
 };
