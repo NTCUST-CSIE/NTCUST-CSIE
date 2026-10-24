@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { List, X, Moon, Sun } from '@phosphor-icons/react';
-import { discoverEgg, showToast, startDisco, THEME_EVENT, toggleMatrix } from '../utils/eggs';
+import { startDisco, THEME_EVENT } from '../utils/eggs';
 import { getActiveSeason } from '../utils/seasonal';
 
 const navItems = [
@@ -29,7 +29,6 @@ const Navbar = () => {
   // 愚人節限定：導覽列順序打亂
   const [items] = useState(() => (getActiveSeason()?.id === 'aprilfools' ? shuffle(navItems) : navItems));
   const themeClicks = useRef<number[]>([]);
-  const logoTaps = useRef<number[]>([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -69,24 +68,10 @@ const Navbar = () => {
     }
   };
 
-  // 彩蛋：3 秒內連點 logo 7 次進入 Matrix（手機版的 Konami Code）
-  const handleLogoClick = () => {
-    const now = Date.now();
-    logoTaps.current = [...logoTaps.current.filter(t => now - t < 3000), now];
-    const remaining = 7 - logoTaps.current.length;
-    if (remaining === 0) {
-      logoTaps.current = [];
-      discoverEgg('konami');
-      toggleMatrix();
-    } else if (remaining <= 3) {
-      showToast(`再點 ${remaining} 下就能進入駭客模式`);
-    }
-  };
-
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
-        <Link to="/" className="logo" onClick={handleLogoClick}>
+        <Link to="/" className="logo">
           <span className="logo-text">NTCUST <span className="highlight">CSIE</span></span>
           <img src="/img/logo.png" alt="NTCUST CSIE Logo" className="nav-logo" width="141" height="70" />
           <span className="logo-subtext">國立臺中科技大學 資訊工程科 科學會</span>
