@@ -43,6 +43,10 @@ interface Semester {
 // CTF 第 3 關的 dev-notes.txt 裡寫著這個密碼
 const SUDO_PASSWORD = 'hunter2';
 
+// 「' or …」或是註解符號 --、分號接指令，這些都是 SQL 注入常見的寫法
+const looksLikeSqlInjection = (text: string) =>
+  /'\s*or\s/i.test(text) || /--\s*$/.test(text) || /;\s*(drop|select|delete|insert|update)\b/i.test(text);
+
 const logo = String.raw`  ____ ____ ___ _____
  / ___/ ___|_ _| ____|
 | |   \___ \| ||  _|
@@ -285,6 +289,13 @@ export const handleInput = (raw: string, api: TerminalApi, session: TerminalSess
       session.sudoFails = 0;
       api.setMode('shell');
       runAsRoot(session.sudoCommand, api, session);
+      return;
+    }
+    // 密碼欄位輸入 SQL 注入的寫法：不計入錯誤次數，回一句這裡不是資料庫
+    if (looksLikeSqlInjection(raw)) {
+      discoverEgg('sqli');
+      api.print('sudo: 這裡不是資料庫。密碼欄位只做字串比對，不會替你執行 SQL。', 'error');
+      api.print('[sudo] password for guest:');
       return;
     }
     session.sudoFails += 1;

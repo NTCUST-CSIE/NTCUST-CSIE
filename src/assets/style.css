@@ -1722,6 +1722,26 @@ html.disco {
     line-height: 1.5;
 }
 
+/* 左上角的寵物：浮在最前面，文字會繞著它排；點一下跳舞 */
+.terminal-pet {
+    float: left;
+    margin: 0 1rem 0.5rem 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #4ade80;
+    cursor: pointer;
+    font: inherit;
+    user-select: none;
+}
+
+.terminal-pet pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 13px;
+    line-height: 1.15;
+}
+
 /* 右下角的拉伸把手：拖它可以把終端機拉大或縮小 */
 .terminal-resize {
     position: absolute;
