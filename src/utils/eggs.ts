@@ -59,6 +59,12 @@ const saveFoundEggs = (ids: string[]) => {
   }
 };
 
+// 只清掉這台瀏覽器的紀錄；伺服器上的發現名次不動，之後重新找到還是原本的名次
+const resetFoundEggs = (keep: string[]) => {
+  memoryFound.clear();
+  saveFoundEggs(keep);
+};
+
 // 第一次發現才記錄並跳通知；回傳伺服器給的名次（本機開發或離線時為 null）
 export const discoverEgg = async (id: string, flag?: string) => {
   const egg = eggs.find(e => e.id === id);
@@ -95,15 +101,17 @@ let crashed = false;
 
 export const isCrashed = () => crashed;
 
-// rm -rf / 之後的假當機：只記在這個分頁，重新整理後才揭曉是開玩笑的
+// sudo rm -rf / 刪完之後：網站假當機，彩蛋紀錄也真的被刪光，只留「刪庫跑路」
+// 當機狀態只記在這個分頁，重新整理後才揭曉是開玩笑的
 export const crashSite = () => {
   crashed = true;
   clearTimeout(discoTimer);
   document.documentElement.classList.remove('disco');
+  resetFoundEggs(['rmrf']);
   try {
     sessionStorage.setItem(CRASH_KEY, '1');
   } catch {
-    discoverEgg('rmrf');
+    // ignore
   }
   window.dispatchEvent(new Event(CRASH_EVENT));
 };

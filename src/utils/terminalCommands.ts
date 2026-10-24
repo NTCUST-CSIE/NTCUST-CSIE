@@ -251,7 +251,8 @@ const serveCoffee = (api: TerminalApi) => {
 const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) => {
   const [cmd, ...args] = command.split(/\s+/);
   if (cmd === 'rm' && wipesWholeSystem(args)) {
-    discoverEgg('sudo');
+    // 先拿到「刪庫跑路」再開始刪；刪完彩蛋紀錄會被清空（只留這顆），F5 回來後才被通報
+    discoverEgg('rmrf');
     wipeSystem(api);
     return;
   }

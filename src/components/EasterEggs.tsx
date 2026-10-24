@@ -95,12 +95,13 @@ const EasterEggs = () => {
     };
   }, []);
 
-  // 按 F5 回來之後才揭曉 rm -rf / 是開玩笑的
+  // 按 F5 回來之後才揭曉 rm -rf / 是開玩笑的，這時候才被「通報」
   useEffect(() => {
     if (!recoveredFromCrash) return;
     const timer = setTimeout(() => {
       showToast('😎 開玩笑的啦，網站還在（千萬別在自己的電腦上試）');
-      discoverEgg('rmrf');
+      showToast('🗑️ 不過你的彩蛋紀錄真的被刪光了，只剩下「刪庫跑路」');
+      discoverEgg('sudo');
     }, 800);
     return () => clearTimeout(timer);
   }, []);
