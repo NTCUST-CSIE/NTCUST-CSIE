@@ -460,8 +460,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
         '[*] 破解管理員密碼…    ██████████ 100%',
         '[*] 下載 期末考答案.zip… ███████░░░  70%',
         '[!] ACCESS DENIED',
-        '……開玩笑的。真正的駭客會把技術用在正途 😇',
-        '想學真本事？輸入 ctf 試試看。',
+        '……開玩笑的。請把技術用在正途 😇',
       ], 500, () => discoverEgg('hack'));
       return;
     case 'git': {
@@ -471,17 +470,6 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       else api.print('fatal: not a git repository\n真正的 repo 在這：https://github.com/NTCUST-CSIE/NTCUST-CSIE', 'error');
       return;
     }
-    case 'python':
-    case 'python3':
-    case 'node':
-      api.print('這裡沒有直譯器，不過科會的主題課程有教 😉');
-      return;
-    case 'apt':
-    case 'apt-get':
-    case 'npm':
-    case 'pip':
-      api.print('正在安裝……node_modules 已佔用 99% 的硬碟空間 💀', 'error');
-      return;
     case 'reboot':
     case 'shutdown':
     case 'poweroff':
