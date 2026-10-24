@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { discoverEgg } from '../utils/eggs';
+import { playPetSound } from '../utils/petSound';
 
 // 終端機角落的小寵物：原創角色，每格 7 欄 × 5 列。點一下會跳一小段舞。
 const IDLE = [
@@ -67,6 +68,7 @@ const TerminalPet = () => {
       onClick={() => {
         // 寵物是彩蛋：第一次點擊就發現，之後每次點擊都會再跳一段舞
         discoverEgg('pet');
+        playPetSound();
         setBeat(b => b + 1);
       }}
     >

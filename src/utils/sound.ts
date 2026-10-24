@@ -13,13 +13,18 @@ const PROGRESSION = [
 
 const BEAT = 0.5;
 
-export const playRickrollSound = (seconds = 8) => {
+// 共用的 AudioContext：第一次要出聲時才建立；瀏覽器規定要在使用者操作之後才能播放
+export const getAudioContext = (): AudioContext | null => {
   const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!Ctor) return;
-
+  if (!Ctor) return null;
   audio ??= new Ctor();
-  const ctx = audio;
-  if (ctx.state === 'suspended') void ctx.resume();
+  if (audio.state === 'suspended') void audio.resume();
+  return audio;
+};
+
+export const playRickrollSound = (seconds = 8) => {
+  const ctx = getAudioContext();
+  if (!ctx) return;
 
   const tone = (freq: number, start: number, dur: number, type: OscillatorType, gain: number) => {
     const osc = ctx.createOscillator();
