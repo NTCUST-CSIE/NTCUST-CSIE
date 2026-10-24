@@ -142,7 +142,7 @@ interface LiveProc extends Proc {
 
 // 行程表照截圖排列
 const PROCS: Proc[] = [
-  { pid: 3426753, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '3T', base: 0.4 },
+  { pid: 3426753, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '486G', base: 0.4 },
   { pid: 2012235, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 56, user: 'guest', memB: '2.3G', base: 0.8 },
   { pid: 3420079, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 129, user: 'guest', memB: '1.6G', base: 9.9 },
   { pid: 3422005, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 92, user: 'guest', memB: '1.5G', base: 0 },
@@ -207,6 +207,13 @@ export interface BtopState {
   tempHist: number[][];
   down: number[];
   up: number[];
+  // 網路速率 = 曲線值 × 6 GiB/s；累計流量與峰值單位是 GiB
+  downTotal: number;
+  upTotal: number;
+  downTop: number;
+  upTop: number;
+  // mem 面板 Used / Available / Cached / Free 各自的曲線
+  memHist: number[][];
   procs: LiveProc[];
   selected: number;
   modal: Modal | null;
@@ -221,7 +228,12 @@ export const createBtop = (): BtopState => ({
   coreHist: Array.from({ length: CORE_COUNT }, () => filled(CORE_HIST, 2)),
   tempHist: Array.from({ length: CORE_COUNT }, () => filled(CORE_HIST, 22)),
   down: filled(NET_HIST, 10),
-  up: filled(NET_HIST, 6),
+  up: filled(NET_HIST, 28),
+  downTotal: 39526,
+  upTotal: 22426,
+  downTop: 512,
+  upTop: 344,
+  memHist: [30, 70, 26, 42].map(v => filled(32, v)),
   procs: PROCS.map(p => ({ ...p, cpu: p.base })),
   selected: 0,
   modal: null,
@@ -242,8 +254,17 @@ export const stepBtop = (s: BtopState) => {
   s.cores = s.cores.map(c => drift(c, 6, 24));
   s.cores.forEach((c, i) => push(s.coreHist[i], c));
   s.tempHist.forEach(h => push(h, clamp(h[h.length - 1] + (Math.random() - 0.5) * 2, 10, 40)));
-  push(s.down, drift(s.down[s.down.length - 1], 14, 30));
-  push(s.up, drift(s.up[s.up.length - 1], 8, 20));
+  // 100ms 內流過的量：速率 × 0.1 秒，累加到總量
+  push(s.down, drift(s.down[s.down.length - 1], 50, 40));
+  push(s.up, drift(s.up[s.up.length - 1], 28, 30));
+  const downRate = s.down[s.down.length - 1] * 6;
+  const upRate = s.up[s.up.length - 1] * 6;
+  s.downTotal += downRate * 0.1;
+  s.upTotal += upRate * 0.1;
+  s.downTop = Math.max(s.downTop, downRate);
+  s.upTop = Math.max(s.upTop, upRate);
+  // mem 曲線在各自的百分比附近小幅起伏
+  [30, 70, 26, 42].forEach((target, i) => push(s.memHist[i], drift(s.memHist[i][s.memHist[i].length - 1], target, 12)));
   s.procs.forEach(p => {
     p.cpu = p.base > 0
       ? clamp(p.base * (0.4 + Math.random() * 1.2), 0, 100)
@@ -352,8 +373,8 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
 
   // 右側的 CPU 面板
   c.box(72, 1, 117, 14, COLOR.border.cpu);
-  c.put(75, 1, 'E5-2660', COLOR.text);
-  c.right(186, 1, '1.6 GHz', COLOR.text);
+  c.put(75, 1, 'AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
+  c.right(186, 1, '5.4 GHz', COLOR.text);
 
   c.put(74, 3, 'CPU', COLOR.label);
   c.bar(78, 3, 88, cpuNow, COLOR.green);
@@ -374,30 +395,31 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
     c.put(x0 + 28, y, `${temp}°C`, COLOR.blue);
   }
 
-  c.put(150, 13, 'Load AVG:', COLOR.label);
-  c.put(164, 13, '1.23', COLOR.text);
-  c.put(171, 13, '1.06', COLOR.text);
-  c.put(177, 13, '1.04', COLOR.text);
+  // 96 核的機器，load 也跟著高一些
+  c.put(146, 13, 'Load AVG:', COLOR.label);
+  c.put(157, 13, '14.82', COLOR.text);
+  c.put(164, 13, '12.37', COLOR.text);
+  c.put(171, 13, '9.61', COLOR.text);
 
   // ── mem ──────────────────────────────────────────────
   c.box(1, 16, 42, 20, COLOR.border.mem);
   c.put(2, 16, '²', COLOR.red);
   c.put(3, 16, 'mem', COLOR.text);
+  c.put(8, 16, 'DDR5-5600', COLOR.label);
   const memRows: [number, string, string, string, string][] = [
-    [18, 'Total:', '62.6 GiB', '', ''],
-    [19, 'Used:', '18.7 GiB', '30%', COLOR.red],
-    [23, 'Available:', '43.9 GiB', '70%', COLOR.orange],
-    [27, 'Cached:', '16.1 GiB', '26%', COLOR.cyan],
-    [31, 'Free:', '26.2 GiB', '42%', COLOR.green],
+    [18, 'Total:', '2.00 TiB', '', ''],
+    [19, 'Used:', '614 GiB', '30%', COLOR.red],
+    [23, 'Available:', '1.39 TiB', '70%', COLOR.orange],
+    [27, 'Cached:', '532 GiB', '26%', COLOR.cyan],
+    [31, 'Free:', '860 GiB', '42%', COLOR.green],
   ];
   memRows.forEach(([y, label, size, pct, color], i) => {
     c.put(2, y, label, COLOR.text);
     c.right(40, y, size, COLOR.text);
     if (!pct) return;
     c.put(3, y + 1, pct, COLOR.text);
-    // 每一項的小曲線：用 cpu 歷史做出不同的起伏
-    const hist = s.cpu.map(v => clamp(v * (1 + i * 0.5), 0, 100));
-    c.graph(31, y, 10, 2, hist, color);
+    // 每一項自己的曲線：放在百分比那一行的右邊，三列高，在百分比附近起伏
+    c.graph(8, y + 1, 32, 3, s.memHist[i - 1], color);
   });
 
   // ── disks ────────────────────────────────────────────
@@ -406,8 +428,8 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(44, 16, 'disks', COLOR.text);
   c.put(79, 16, 'io', COLOR.text);
   const disks: [number, string, string, [string, number, string][]][] = [
-    [18, 'root', '1.78 TiB', [['IO%', 0, ''], ['Used:', 18, '330 GiB'], ['Free:', 82, '1.46 TiB']]],
-    [23, 'swap', '135 GiB', [['Used:', 1, '1.76 GiB'], ['Free:', 99, '134 GiB']]],
+    [18, 'Micron 6600 ION', '245.76 TB', [['IO%', 0, ''], ['Used:', 18, '44.2 TB'], ['Free:', 82, '201.5 TB']]],
+    [23, 'swap', '64 GiB', [['Used:', 1, '0.6 GiB'], ['Free:', 99, '63.4 GiB']]],
     [27, 'boot', '1.90 GiB', [['IO%', 0, ''], ['Used:', 19, '378 MiB'], ['Free:', 81, '1.53 GiB']]],
     [32, 'efi', '1.04 GiB', [['IO%', 0, ''], ['Used:', 1, '6.08 MiB']]],
   ];
@@ -442,21 +464,23 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(76, 36, 'n', COLOR.red);
   c.put(77, 36, '>', COLOR.red);
 
-  c.put(1, 37, '23K', COLOR.label);
-  c.put(1, 47, '372K', COLOR.label);
+  c.put(1, 37, '600G', COLOR.label);
+  c.put(1, 47, '0', COLOR.label);
   c.graph(5, 37, 44, 10, s.down, COLOR.blue);
 
   c.box(52, 37, 33, 12, COLOR.border.net);
   c.put(54, 37, 'download', COLOR.text);
-  const kib = (v: number) => Math.round(v * 1.2);
-  const down = kib(s.down[s.down.length - 1]);
-  const up = kib(s.up[s.up.length - 1]);
-  c.put(54, 39, `▼ ${down} KiB/s (${Math.round(down * 8.2)} Kbps)`, COLOR.text);
-  c.put(54, 40, '▼ Top: (525 Kbps)', COLOR.text);
-  c.put(54, 41, '▼ Total: 501 GiB', COLOR.text);
-  c.put(54, 43, `▲ ${up} KiB/s (${(up * 8.2 / 1000).toFixed(2)} Mibps)`, COLOR.text);
-  c.put(54, 44, '▲ Top: (3.14 Mibps)', COLOR.text);
-  c.put(54, 45, '▲ Total: 760 GiB', COLOR.text);
+  // 速率格式：GiB/s，後面附 Tbps；累計超過 1024 GiB 就換成 TiB
+  const gibps = (r: number) => `${r.toFixed(1)} GiB/s (${(r * 8.59 / 1000).toFixed(2)} Tbps)`;
+  const total = (g: number) => (g >= 1024 ? `${(g / 1024).toFixed(1)} TiB` : `${g.toFixed(0)} GiB`);
+  const downRate = s.down[s.down.length - 1] * 6;
+  const upRate = s.up[s.up.length - 1] * 6;
+  c.put(54, 39, `▼ ${gibps(downRate)}`, COLOR.text);
+  c.put(54, 40, `▼ Top: (${s.downTop.toFixed(1)} GiB/s)`, COLOR.text);
+  c.put(54, 41, `▼ Total: ${total(s.downTotal)}`, COLOR.text);
+  c.put(54, 43, `▲ ${gibps(upRate)}`, COLOR.text);
+  c.put(54, 44, `▲ Top: (${s.upTop.toFixed(1)} GiB/s)`, COLOR.text);
+  c.put(54, 45, `▲ Total: ${total(s.upTotal)}`, COLOR.text);
   c.put(54, 48, 'upload', COLOR.text);
 
   // ── proc ─────────────────────────────────────────────
