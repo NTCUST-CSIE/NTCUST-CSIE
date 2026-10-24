@@ -1,7 +1,7 @@
 import membersData from '../data/members.json';
 import eventsData from '../data/events.json';
 import financeData from '../data/finance.json';
-import { discoverEgg, eggs, getFoundEggs, requestTheme, toggleMatrix } from './eggs';
+import { discoverEgg, eggs, getFoundEggs, requestTheme } from './eggs';
 
 export type LineKind = 'input' | 'output' | 'error' | 'accent' | 'train';
 export type TerminalMode = 'shell' | 'password' | 'vim';
@@ -92,14 +92,13 @@ const visibleCommands: [string, string][] = [
   ['fortune', '來點工程師語錄'],
   ['cowsay <文字>', '讓牛幫你說話'],
   ['theme [dark|light]', '切換主題'],
-  ['matrix', '進入 / 離開 Matrix'],
   ['eggs', '彩蛋收集進度'],
   ['ctf', 'CSIE CTF 說明'],
   ['exit', '離開終端機（或按 Esc）'],
 ];
 
 const completions = ['help', 'ls', 'cat', 'cd', 'pwd', 'whoami', 'date', 'history', 'clear', 'neofetch',
-  'fortune', 'cowsay', 'theme', 'matrix', 'eggs', 'ctf', 'exit', 'echo', 'uptime', 'uname'];
+  'fortune', 'cowsay', 'theme', 'eggs', 'ctf', 'exit', 'echo', 'uptime', 'uname'];
 
 const pages: Record<string, string> = {
   '': '/', '~': '/', '/': '/', '..': '/', home: '/',
@@ -387,9 +386,6 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       }
       return;
     }
-    case 'matrix':
-      api.print(toggleMatrix() ? '🐇 Follow the white rabbit…' : '💊 回到現實世界');
-      return;
     case 'eggs':
       showEggs(api);
       return;

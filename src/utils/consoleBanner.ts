@@ -1,4 +1,4 @@
-import { discoverEgg, eggs, getFoundEggs, openTerminal, toggleMatrix } from './eggs';
+import { discoverEgg, eggs, getFoundEggs, openTerminal } from './eggs';
 
 declare global {
   interface Window {
@@ -30,15 +30,12 @@ export const printConsoleBanner = () => {
 
   window.csie = {
     help: withEgg(() => {
-      console.log('csie.hello()     打聲招呼\ncsie.terminal()  打開終端機\ncsie.matrix()    進入 / 離開 Matrix\ncsie.eggs()      查看彩蛋收集進度');
+      console.log('csie.hello()     打聲招呼\ncsie.terminal()  打開終端機\ncsie.eggs()      查看彩蛋收集進度');
     }),
     hello: withEgg(() => {
       console.log('哈囉！你解鎖了 Console 彩蛋 🥚');
     }),
     terminal: withEgg(openTerminal),
-    matrix: withEgg(() => {
-      toggleMatrix();
-    }),
     eggs: withEgg(() => {
       const found = getFoundEggs();
       console.table(eggs.map(e => ({

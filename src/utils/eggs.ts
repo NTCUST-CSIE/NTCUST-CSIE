@@ -11,12 +11,10 @@ export const eggs = eggsData as Egg[];
 
 // 彩蛋之間用 window 事件溝通，元件不用互相傳 props
 export const TOAST_EVENT = 'csie:toast';
-export const MATRIX_EVENT = 'csie:matrix';
 export const TERMINAL_EVENT = 'csie:terminal';
 export const THEME_EVENT = 'csie:theme';
 
 const FOUND_KEY = 'csie_eggs';
-const MATRIX_KEY = 'csie_matrix';
 
 export const prefersReducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -66,28 +64,6 @@ export const discoverEgg = async (id: string, flag?: string) => {
   const rankText = report ? `・你是第 ${report.rank} 位發現者` : '';
   showToast(`🥚 發現彩蛋「${egg.name}」${rankText}（${found.length + 1}/${eggs.length}）`);
   return report;
-};
-
-let matrixOn = false;
-try {
-  matrixOn = sessionStorage.getItem(MATRIX_KEY) === '1';
-} catch {
-  // ignore
-}
-
-export const isMatrixOn = () => matrixOn;
-
-export const toggleMatrix = () => {
-  matrixOn = !matrixOn;
-  try {
-    if (matrixOn) sessionStorage.setItem(MATRIX_KEY, '1');
-    else sessionStorage.removeItem(MATRIX_KEY);
-  } catch {
-    // ignore
-  }
-  window.dispatchEvent(new CustomEvent<boolean>(MATRIX_EVENT, { detail: matrixOn }));
-  showToast(matrixOn ? '🐇 Wake up, Neo… 歡迎進入 Matrix' : '💊 你吞下了藍色藥丸，回到現實世界');
-  return matrixOn;
 };
 
 let discoTimer: ReturnType<typeof setTimeout> | undefined;

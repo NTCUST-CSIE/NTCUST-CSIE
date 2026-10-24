@@ -2,7 +2,6 @@
   { "id": "console", "name": "Console 探險家", "hint": "工程師的第一個快捷鍵：F12" },
   { "id": "tab", "name": "別走啊", "hint": "切到別的分頁，再切回來" },
   { "id": "disco", "name": "電燈開關", "hint": "有個按鈕，按太多次會怎樣？" },
-  { "id": "konami", "name": "↑↑↓↓←→←→BA", "hint": "經典遊戲密技（手機版：連點 logo）" },
   { "id": "meow", "name": "喵～", "hint": "在某隻章魚貓身上多停留一下" },
   { "id": "terminal", "name": "Hello, Terminal", "hint": "鍵盤左上角，數字 1 的左邊" },
   { "id": "sudo", "name": "This incident will be reported", "hint": "在終端機裡亂用 root 權限" },
