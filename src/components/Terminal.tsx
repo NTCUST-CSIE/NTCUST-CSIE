@@ -8,7 +8,6 @@ import { discoverEgg } from '../utils/eggs';
 import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
 import type { BtopRow } from '../utils/btop';
 import BtopCanvas from './BtopCanvas';
-import TerminalPet from './TerminalPet';
 import type { BtopState } from '../utils/btop';
 import { detectWindowStyle } from '../utils/platform';
 import { playRickrollSound } from '../utils/sound';
@@ -377,7 +376,6 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
           )}
         </div>
         <div className={`terminal-body${mode === 'btop' ? ' is-btop' : ''}`} ref={bodyRef}>
-          {mode !== 'btop' && <TerminalPet />}
           {mode === 'btop' ? (
             <BtopCanvas rows={btopRows} />
           ) : (

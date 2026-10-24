@@ -13,6 +13,5 @@
   { "id": "season", "name": "期間限定", "hint": "節日時首頁會多出一個按鈕", "hidden": true },
   { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" },
   { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "在 btop 裡把迷因 kill 掉" },
-  { "id": "pet", "name": "同好見面", "hint": "終端機左上角那個小傢伙……你也用 Claude Code 嗎？" },
   { "id": "sqli", "name": "SQL Injection 未遂", "hint": "密碼欄位不是只能打密碼……吧？" }
 ]
