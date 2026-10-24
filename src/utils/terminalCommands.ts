@@ -1,7 +1,7 @@
 import membersData from '../data/members.json';
 import eventsData from '../data/events.json';
 import financeData from '../data/finance.json';
-import { discoverEgg, eggs, getFoundEggs, requestTheme } from './eggs';
+import { crashSite, discoverEgg, eggs, getFoundEggs, requestTheme } from './eggs';
 
 export type LineKind = 'input' | 'output' | 'error' | 'accent' | 'train';
 export type TerminalMode = 'shell' | 'password' | 'vim';
@@ -411,9 +411,8 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
           'removing /var/www/nutccsie.org…',
           'removing /usr/lib/node_modules…（這個要刪很久）',
           'removing /bin/bash…',
-          '……',
-          '開玩笑的啦，網站還在 😎（千萬別在自己的電腦上試）',
-        ], 450, () => discoverEgg('rmrf'));
+          'Connection to nutccsie.org closed.',
+        ], 450, crashSite);
       } else if (args.length === 0) {
         api.print('rm: missing operand', 'error');
       } else {

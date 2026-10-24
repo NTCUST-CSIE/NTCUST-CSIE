@@ -1889,3 +1889,102 @@ html.disco {
         flex-direction: column;
     }
 }
+
+/* rm -rf / 之後的假當機畫面（故意長得像瀏覽器的錯誤頁，不跟網站主題） */
+.server-down {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+.server-down.panic {
+    background: #000;
+    color: #d4d4d4;
+    padding: 1.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.server-down.panic pre {
+    margin: 0;
+    font: inherit;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.server-down.offline {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 18vh 1.5rem 2rem;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #202124;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 'Noto Sans TC', sans-serif;
+}
+
+.server-down-box {
+    width: 100%;
+    max-width: 560px;
+}
+
+.server-down-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.server-down h1 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.server-down p,
+.server-down li {
+    color: #5f6368;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.server-down ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.server-down code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.server-down .server-down-code {
+    font-size: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.server-down button {
+    background: #1a73e8;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.5rem;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .server-down.offline {
+        background: #202124;
+        color: #e8eaed;
+    }
+
+    .server-down p,
+    .server-down li {
+        color: #9aa0a6;
+    }
+
+    .server-down button {
+        background: #8ab4f8;
+        color: #202124;
+    }
+}

@@ -13,8 +13,10 @@ export const eggs = eggsData as Egg[];
 export const TOAST_EVENT = 'csie:toast';
 export const TERMINAL_EVENT = 'csie:terminal';
 export const THEME_EVENT = 'csie:theme';
+export const CRASH_EVENT = 'csie:crash';
 
 const FOUND_KEY = 'csie_eggs';
+const CRASH_KEY = 'csie_crashed';
 
 export const prefersReducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -78,3 +80,23 @@ export const startDisco = () => {
   clearTimeout(discoTimer);
   discoTimer = setTimeout(() => root.classList.remove('disco'), 6000);
 };
+
+// rm -rf / 之後的假當機：只記在這個分頁，重新整理後才揭曉是開玩笑的
+export const crashSite = () => {
+  try {
+    sessionStorage.setItem(CRASH_KEY, '1');
+  } catch {
+    discoverEgg('rmrf');
+  }
+  window.dispatchEvent(new Event(CRASH_EVENT));
+};
+
+let recovered = false;
+try {
+  recovered = sessionStorage.getItem(CRASH_KEY) === '1';
+  sessionStorage.removeItem(CRASH_KEY);
+} catch {
+  // ignore
+}
+
+export const recoveredFromCrash = recovered;

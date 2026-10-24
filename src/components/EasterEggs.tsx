@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Terminal from './Terminal';
 import SeasonalDecor from './SeasonalDecor';
-import { discoverEgg, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
+import ServerDown from './ServerDown';
+import { CRASH_EVENT, discoverEgg, recoveredFromCrash, showToast, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
 
 const AWAY_TITLE = '回來好嗎 :)';
 const BACK_TITLE = '歡迎回來！';
@@ -21,6 +22,7 @@ const EasterEggs = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [crashed, setCrashed] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextToastId = useRef(0);
 
@@ -77,8 +79,26 @@ const EasterEggs = () => {
 
   useEffect(() => {
     const handleTerminal = () => setTerminalOpen(true);
+    const handleCrash = () => {
+      setTerminalOpen(false);
+      setCrashed(true);
+    };
     window.addEventListener(TERMINAL_EVENT, handleTerminal);
-    return () => window.removeEventListener(TERMINAL_EVENT, handleTerminal);
+    window.addEventListener(CRASH_EVENT, handleCrash);
+    return () => {
+      window.removeEventListener(TERMINAL_EVENT, handleTerminal);
+      window.removeEventListener(CRASH_EVENT, handleCrash);
+    };
+  }, []);
+
+  // 按 F5 回來之後才揭曉 rm -rf / 是開玩笑的
+  useEffect(() => {
+    if (!recoveredFromCrash) return;
+    const timer = setTimeout(() => {
+      showToast('😎 開玩笑的啦，網站還在（千萬別在自己的電腦上試）');
+      discoverEgg('rmrf');
+    }, 800);
+    return () => clearTimeout(timer);
   }, []);
 
   // 手機沒有 ` 鍵，可以直接打開 /terminal
@@ -95,6 +115,7 @@ const EasterEggs = () => {
     <>
       <SeasonalDecor />
       <Terminal open={terminalOpen} onClose={closeTerminal} />
+      {crashed && <ServerDown />}
       <div className="egg-toasts" aria-live="polite">
         {toasts.map(t => (
           <div key={t.id} className="egg-toast">{t.message}</div>
