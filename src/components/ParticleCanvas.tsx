@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isMatrixOn, MATRIX_EVENT } from '../utils/eggs';
 
 const ParticleCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -11,13 +12,17 @@ const ParticleCanvas = () => {
     if (!ctx) return;
 
     const availableAnims = ["cyber", "particles"];
-    let currentAnim = availableAnims[Math.floor(Math.random() * availableAnims.length)];
+    // "matrix" 不在隨機清單裡，只有 Konami Code 彩蛋才會開啟
+    const baseAnim = availableAnims[Math.floor(Math.random() * availableAnims.length)];
+    let currentAnim = isMatrixOn() ? "matrix" : baseAnim;
     let animationFrameId: number;
     let resizeTimeout: ReturnType<typeof setTimeout>;
 
     let pColor = '148, 163, 184';
     let lColor = '203, 213, 225';
     let brandColor = '59, 130, 246';
+    let heroBgColor = '30, 41, 59';
+    let matrixColor = '#22c55e';
 
     const hexToRgb = (hex: string) => {
         if (!hex || typeof hex !== 'string') return '59, 130, 246';
@@ -36,12 +41,14 @@ const ParticleCanvas = () => {
       lColor = style.getPropertyValue('--particle-line-color').trim() || lColor;
       let hexBrand = style.getPropertyValue('--color-brand-primary').trim();
       brandColor = hexToRgb(hexBrand);
+      heroBgColor = hexToRgb(style.getPropertyValue('--bg-secondary').trim());
+      matrixColor = document.documentElement.getAttribute('data-theme') === 'light' ? '#16a34a' : '#22c55e';
     };
 
     updateColors();
 
     const observer = new MutationObserver(updateColors);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-season'] });
 
     const resizeCanvas = () => {
       if (canvas.parentElement) {
@@ -213,8 +220,37 @@ const ParticleCanvas = () => {
         }
     };
 
+    // MATRIX
+    const matrixChars = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789CSIE";
+    const matrixFontSize = 16;
+    let matrixDrops: number[] = [];
+    const initMatrix = () => {
+        matrixDrops = Array.from({ length: Math.ceil(canvas.width / matrixFontSize) }, () => Math.random() * -40);
+        ctx!.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const drawMatrix = () => {
+        // 每一格蓋上一層半透明背景色，留下殘影
+        ctx!.fillStyle = `rgba(${heroBgColor}, 0.12)`;
+        ctx!.fillRect(0, 0, canvas.width, canvas.height);
+        ctx!.fillStyle = matrixColor;
+        ctx!.font = `${matrixFontSize}px monospace`;
+        matrixDrops.forEach((drop, i) => {
+            const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+            ctx!.fillText(char, i * matrixFontSize, drop * matrixFontSize);
+            matrixDrops[i] = drop * matrixFontSize > canvas.height && Math.random() > 0.975 ? 0 : drop + 0.5;
+        });
+    };
+
+    const initCurrent = () => {
+      if(currentAnim === "matrix") initMatrix();
+      else if(currentAnim === "cyber") initCyber();
+      else initParticles();
+    };
+
     const animate = () => {
-      if(currentAnim === "cyber") drawCyber();
+      if(currentAnim === "matrix") drawMatrix();
+      else if(currentAnim === "cyber") drawCyber();
       else drawParticles();
       
       animationFrameId = requestAnimationFrame(animate);
@@ -224,21 +260,26 @@ const ParticleCanvas = () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             resizeCanvas();
-            if(currentAnim === "cyber") initCyber();
-            else initParticles();
+            initCurrent();
         }, 100);
     };
 
+    const handleMatrix = () => {
+        currentAnim = isMatrixOn() ? "matrix" : baseAnim;
+        initCurrent();
+    };
+
     window.addEventListener("resize", handleResize);
+    window.addEventListener(MATRIX_EVENT, handleMatrix);
     
     resizeCanvas();
-    if(currentAnim === "cyber") initCyber();
-    else initParticles();
+    initCurrent();
     animate();
 
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener(MATRIX_EVENT, handleMatrix);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseOut);
       clearTimeout(resizeTimeout);

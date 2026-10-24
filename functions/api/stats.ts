@@ -1,4 +1,5 @@
 import shortlinksConfig from '../../src/data/404.json';
+import eggsConfig from '../../src/data/eggs.json';
 
 interface Env {
   DB: D1Database;
@@ -103,6 +104,35 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       FROM visitors
     `).first() as any;
 
+    // Easter egg discoveries (written by /api/egg)
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS egg_finds (
+        egg TEXT NOT NULL,
+        visitor_id TEXT NOT NULL,
+        found_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (egg, visitor_id)
+      );
+    `).run();
+
+    const eggQuery = await env.DB.prepare(`
+      SELECT egg, COUNT(*) as finders, datetime(MAX(found_at), '+8 hours') as last_found_tw
+      FROM egg_finds
+      GROUP BY egg
+    `).all();
+
+    const eggHuntersQuery = await env.DB.prepare(
+      `SELECT COUNT(DISTINCT visitor_id) as count FROM egg_finds`
+    ).first() as any;
+
+    const eggRows = eggQuery.results || [];
+    const eggStats = (eggsConfig as { id: string; name: string }[])
+      .map(e => {
+        const row: any = eggRows.find((r: any) => r.egg === e.id);
+        return { egg: e.id, name: e.name, finders: row?.finders || 0, last_found_tw: row?.last_found_tw || null };
+      })
+      .sort((a, b) => b.finders - a.finders);
+    const eggHunters = eggHuntersQuery?.count || 0;
+
     const allTraffic = trafficQuery.results || [];
     const pageTraffic = allTraffic.filter((item: any) => item.type === 'page');
     const shortlinkTraffic = allTraffic.filter((item: any) => item.type === 'shortlink');
@@ -134,10 +164,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             returnsAfter30m,
             returnsAfter24h,
             returnsAfter7d,
+            eggHunters,
           },
           traffic: allTraffic,
           pages: pageTraffic,
           shortlinks: shortlinkTraffic,
+          eggs: eggStats,
         }, null, 2),
         {
           headers: {
@@ -450,6 +482,32 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             <td class="time">${row.last_time_tw || '-'}</td>
           </tr>
         `).join('') : '<tr><td colspan="5" style="text-align: center; color: var(--muted);">尚無流量紀錄</td></tr>'}
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <i class="ph ph-egg"></i>
+      <span>彩蛋發現統計 (egg_finds) · 共 ${eggHunters.toLocaleString()} 人找到至少一顆</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>彩蛋</th>
+          <th>ID</th>
+          <th>發現人數</th>
+          <th>最後發現時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${eggStats.map(e => `
+          <tr>
+            <td>${e.name}</td>
+            <td><code>${e.egg}</code></td>
+            <td><span class="badge green">${e.finders}</span></td>
+            <td class="time">${e.last_found_tw || '-'}</td>
+          </tr>
+        `).join('')}
       </tbody>
     </table>
 

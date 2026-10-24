@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# 工程師的內部筆記，機器人不准看！
+Disallow: /backup/dev-notes.txt
+
 Sitemap: https://nutccsie.org/sitemap.xml

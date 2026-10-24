@@ -3,3 +3,9 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+
+# CSIE CTF stage 4: the flag piece rides along in the response headers
+/backup/*
+  X-Robots-Tag: noindex
+  X-CSIE-Flag: 4/5 sch00l_
+  X-CSIE-Hint: Last piece is in a hidden file. Press the backtick key (`) on any page to open the terminal.

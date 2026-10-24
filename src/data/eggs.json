@@ -1,0 +1,16 @@
+[
+  { "id": "console", "name": "Console 探險家", "hint": "工程師的第一個快捷鍵：F12" },
+  { "id": "tab", "name": "別走啊", "hint": "切到別的分頁，再切回來" },
+  { "id": "disco", "name": "電燈開關", "hint": "有個按鈕，按太多次會怎樣？" },
+  { "id": "konami", "name": "↑↑↓↓←→←→BA", "hint": "經典遊戲密技（手機版：連點 logo）" },
+  { "id": "meow", "name": "喵～", "hint": "在某隻章魚貓身上多停留一下" },
+  { "id": "terminal", "name": "Hello, Terminal", "hint": "鍵盤左上角，數字 1 的左邊" },
+  { "id": "sudo", "name": "This incident will be reported", "hint": "在終端機裡亂用 root 權限" },
+  { "id": "rmrf", "name": "刪庫跑路", "hint": "傳說中最危險的一行指令" },
+  { "id": "vim", "name": "成功離開 Vim", "hint": "一個進得去、出不來的編輯器" },
+  { "id": "sl", "name": "蒸汽火車", "hint": "把 ls 打反試試" },
+  { "id": "coffee", "name": "418 I'm a teapot", "hint": "跟終端機要杯咖啡" },
+  { "id": "hack", "name": "駭客任務", "hint": "在終端機裡假裝成駭客" },
+  { "id": "season", "name": "期間限定", "hint": "節日時首頁會多出一個按鈕" },
+  { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" }
+]

@@ -1499,3 +1499,422 @@ section {
 .github-link-tooltip:not(:hover)::before {
     transition-delay: 0s;
 }
+
+/* ===== Easter Eggs ===== */
+
+/* Toast 通知 */
+.egg-toasts {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    transform: translateX(-50%);
+    z-index: 3100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: max-content;
+    max-width: calc(100vw - 2rem);
+    pointer-events: none;
+}
+
+.egg-toast {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--color-brand-primary);
+    border-radius: 999px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: egg-toast-in 0.3s ease;
+}
+
+@keyframes egg-toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 狂按深色模式：整頁彩虹 */
+html.disco {
+    animation: disco-hue 1.5s linear infinite;
+}
+
+@keyframes disco-hue {
+    from { filter: hue-rotate(0deg) saturate(1.6); }
+    to { filter: hue-rotate(360deg) saturate(1.6); }
+}
+
+/* 假終端機（Quake 風格從上方降下） */
+.terminal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(2, 6, 23, 0.35);
+}
+
+.terminal-window {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(960px, 100%);
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    background: #020617;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    animation: terminal-drop 0.25s ease-out;
+}
+
+@keyframes terminal-drop {
+    from { transform: translate(-50%, -100%); }
+    to { transform: translate(-50%, 0); }
+}
+
+.terminal-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.9rem;
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.terminal-dots {
+    display: inline-flex;
+    gap: 6px;
+}
+
+.terminal-dots i {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ef4444;
+}
+
+.terminal-dots i:nth-child(2) { background: #eab308; }
+.terminal-dots i:nth-child(3) { background: #22c55e; }
+
+.terminal-title {
+    flex: 1;
+    text-align: center;
+}
+
+.terminal-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.terminal-close:hover {
+    color: #f8fafc;
+}
+
+.terminal-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.9rem 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.terminal-line {
+    margin: 0;
+    font: inherit;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal-line.input { color: #f8fafc; }
+.terminal-line.error { color: #f87171; }
+.terminal-line.accent { color: #4ade80; }
+
+.terminal-line.train {
+    white-space: pre;
+    overflow: hidden;
+    color: #fbbf24;
+}
+
+.terminal-line.train span {
+    display: inline-block;
+    animation: train-arrive 2.5s ease-out;
+}
+
+@keyframes train-arrive {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(0); }
+}
+
+.terminal-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.terminal-prompt {
+    color: #60a5fa;
+    white-space: nowrap;
+}
+
+.terminal-input-row input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #f8fafc;
+    font: inherit;
+    caret-color: #4ade80;
+}
+
+/* 節日限定配色（seasonal.json 設定期間內才會加上 data-season） */
+[data-season="halloween"] {
+    --color-brand-primary: #fb923c;
+    --color-brand-secondary: #fdba74;
+    --color-brand-light: rgba(249, 115, 22, 0.15);
+}
+
+[data-theme="light"][data-season="halloween"] {
+    --color-brand-primary: #c2410c;
+    --color-brand-secondary: #f97316;
+    --color-brand-light: #fff7ed;
+}
+
+[data-season="christmas"] {
+    --color-brand-primary: #f87171;
+    --color-brand-secondary: #86efac;
+    --color-brand-light: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="light"][data-season="christmas"] {
+    --color-brand-primary: #b91c1c;
+    --color-brand-secondary: #15803d;
+    --color-brand-light: #fef2f2;
+}
+
+[data-season="newyear"] {
+    --color-brand-primary: #fbbf24;
+    --color-brand-secondary: #fde68a;
+    --color-brand-light: rgba(245, 158, 11, 0.15);
+}
+
+[data-theme="light"][data-season="newyear"] {
+    --color-brand-primary: #b45309;
+    --color-brand-secondary: #d97706;
+    --color-brand-light: #fffbeb;
+}
+
+[data-season="aprilfools"] .hero-title {
+    font-family: 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', cursive;
+    letter-spacing: 0;
+}
+
+.season-badge {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-brand-primary);
+    background: var(--color-brand-light);
+    color: var(--color-brand-primary);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.season-badge:hover {
+    transform: translateY(-2px) rotate(-2deg);
+}
+
+.season-decor {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.season-decor span {
+    position: absolute;
+    opacity: 0.4;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.season-decor.rise span {
+    bottom: -3rem;
+    animation-name: season-rise;
+}
+
+.season-decor.fall span {
+    top: -3rem;
+    animation-name: season-fall;
+}
+
+@keyframes season-rise {
+    from { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(2rem, -55vh) rotate(15deg); }
+    to { transform: translate(-1rem, -110vh) rotate(-10deg); }
+}
+
+@keyframes season-fall {
+    from { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-2rem, 55vh) rotate(180deg); }
+    to { transform: translate(1rem, 110vh) rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .season-decor { display: none; }
+    html.disco { animation: none; }
+    .terminal-window, .terminal-line.train span, .egg-toast { animation: none; }
+}
+
+/* CSIE CTF 頁面 */
+.flag-section {
+    max-width: 860px;
+    padding: 2rem 1rem;
+}
+
+.flag-card {
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.flag-rules {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-top: 0.75rem;
+}
+
+.flag-section code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--color-brand-primary);
+}
+
+.flag-stages {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.flag-stage {
+    padding: 1rem 1.25rem;
+}
+
+.flag-stage summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.flag-stage summary::-webkit-details-marker {
+    display: none;
+}
+
+.flag-stage-title {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.flag-stage-skill {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+}
+
+.flag-stage-icon {
+    color: var(--color-brand-primary);
+}
+
+.flag-stage p {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.flag-form {
+    padding: 1.75rem;
+}
+
+.flag-form label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.flag-input-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.flag-input-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--bg-tertiary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1rem;
+}
+
+.flag-input-row .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.flag-result {
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+.flag-result.wrong {
+    color: #ef4444;
+    animation: flag-shake 0.4s ease;
+}
+
+.flag-result.correct {
+    color: #22c55e;
+}
+
+@keyframes flag-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+@media (max-width: 768px) {
+    .terminal-window {
+        height: 70vh;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .terminal-body,
+    .terminal-input-row input {
+        font-size: 16px; /* 避免 iOS 聚焦時自動放大 */
+    }
+
+    .flag-input-row {
+        flex-direction: column;
+    }
+}

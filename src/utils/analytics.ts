@@ -75,3 +75,25 @@ export function trackEvent(params: {
     // Fail silently to avoid blocking user flow
   }
 }
+
+// Records an easter egg discovery in D1 and returns this visitor's rank among finders
+export async function reportEgg(egg: string, flag?: string): Promise<{ rank: number; total: number } | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2500);
+  try {
+    const { vid } = getVisitorInfo();
+    const res = await fetch('/api/egg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ egg, visitor_id: vid, flag }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data?.rank === 'number' ? { rank: data.rank, total: data.total } : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}

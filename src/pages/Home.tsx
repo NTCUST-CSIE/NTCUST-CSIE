@@ -1,10 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { EnvelopeSimple, InstagramLogo, ChatCircleDots, GithubLogo, Link as LinkIcon, Info, UsersThree } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import ParticleCanvas from '../components/ParticleCanvas';
 import OrgChart from '../components/OrgChart';
+import { discoverEgg, showToast } from '../utils/eggs';
+import { getActiveSeason } from '../utils/seasonal';
 
 const Home = () => {
+  const season = getActiveSeason();
+  const meowTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(meowTimer.current), []);
+
   useEffect(() => {
     // Reveal elements on scroll
     const revealElements = document.querySelectorAll('.glass-card:not(.org-node), .org-tree, .member-card, .event-card, .stat-card, .contact-info, .social-links, .section-title');
@@ -31,6 +38,11 @@ const Home = () => {
       <header className="hero" id="home">
         <ParticleCanvas />
         <div className="hero-content">
+          {season && (
+            <button className="season-badge" onClick={() => { showToast(season.surprise); discoverEgg('season'); }}>
+              {season.greeting}
+            </button>
+          )}
           <h1 className="hero-title">探索資訊無限可能</h1>
           <p className="hero-subtitle">國立臺中科技大學<br />五專部資訊工程科 科學會</p>
           <div className="hero-cta">
@@ -100,7 +112,9 @@ const Home = () => {
             <a href="https://line.me/ti/g2/ISzaO-wc9BvFLmqHydqeoL_wRf7sPNUro3MY4A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer" className="icon-link" aria-label="LINE">
               <ChatCircleDots />
             </a>
-            <a href="https://github.com/NTCUST-CSIE/NTCUST-CSIE" target="_blank" rel="noopener noreferrer" className="icon-link github-link-tooltip" aria-label="GitHub">
+            <a href="https://github.com/NTCUST-CSIE/NTCUST-CSIE" target="_blank" rel="noopener noreferrer" className="icon-link github-link-tooltip" aria-label="GitHub"
+              onMouseEnter={() => { meowTimer.current = setTimeout(() => discoverEgg('meow'), 3000); }}
+              onMouseLeave={() => clearTimeout(meowTimer.current)}>
               <GithubLogo />
             </a>
             <a href="https://linktr.ee/nutccsie" target="_blank" rel="noopener noreferrer" className="icon-link" aria-label="Linktree">
