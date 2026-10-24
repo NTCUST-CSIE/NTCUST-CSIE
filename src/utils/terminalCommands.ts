@@ -9,10 +9,17 @@ export type TerminalMode = 'shell' | 'password' | 'vim';
 export interface TerminalApi {
   print: (text: string, kind?: LineKind) => void;
   printSequence: (lines: string[], interval: number, onDone?: () => void) => void;
+  printTimeline: (steps: TimedLine[], onDone?: () => void, pause?: number) => void;
   clear: () => void;
   close: () => void;
   navigate: (path: string) => void;
   setMode: (mode: TerminalMode) => void;
+}
+
+export interface TimedLine {
+  delay: number;
+  text: string;
+  kind?: LineKind;
 }
 
 export interface TerminalSession {
@@ -197,8 +204,49 @@ const showEggs = (api: TerminalApi) => {
   api.print(`🥚 彩蛋收集進度：${eggs.filter(e => found.includes(e.id)).length}/${eggs.length}\n${lines.join('\n')}`);
 };
 
+// 刪整台機器的假輸出，仿 rm -v 的格式；delay 是跟上一行的間隔（毫秒），不是等間隔
+const wipeTimeline: TimedLine[] = [
+  { delay: 120, text: "removed '/home/guest/.bashrc'" },
+  { delay: 90, text: "removed '/home/guest/.bash_history'" },
+  { delay: 140, text: "removed '/home/guest/members.json'" },
+  { delay: 80, text: "removed '/home/guest/finance.json'" },
+  { delay: 60, text: "removed directory '/home/guest'" },
+  { delay: 260, text: "rm: cannot remove '/var/lib/mysql/ibdata1': Device or resource busy", kind: 'error' },
+  { delay: 110, text: "removed '/var/www/nutccsie.org/index.html'" },
+  { delay: 70, text: "removed '/var/www/nutccsie.org/assets/app.8f3c1a.js'" },
+  { delay: 70, text: "removed '/var/www/nutccsie.org/assets/app.8f3c1a.css'" },
+  { delay: 150, text: "removed '/var/log/nginx/access.log'" },
+  { delay: 400, text: "removed '/var/log/nginx/error.log'" },
+  { delay: 90, text: "removed directory '/var/www/nutccsie.org/assets'" },
+  { delay: 90, text: "removed directory '/var/www/nutccsie.org'" },
+  { delay: 330, text: "rm: cannot remove '/proc/1/root': Operation not permitted", kind: 'error' },
+  { delay: 120, text: "removed '/usr/lib/node_modules/npm/lib/cli.js'" },
+  { delay: 50, text: "removed '/usr/lib/node_modules/npm/lib/utils/error-handler.js'" },
+  { delay: 45, text: "removed '/usr/lib/node_modules/npm/lib/utils/output.js'" },
+  { delay: 60, text: "removed '/usr/lib/node_modules/npm/node_modules/semver/semver.js'" },
+  { delay: 900, text: "removed directory '/usr/lib/node_modules/npm'" },
+  { delay: 260, text: "rm: cannot remove '/sys/kernel/debug': Device or resource busy", kind: 'error' },
+  { delay: 200, text: "removed '/usr/bin/git'" },
+  { delay: 160, text: "removed '/usr/bin/python3.11'" },
+  { delay: 700, text: "removed '/bin/bash'" },
+  { delay: 120, text: "removed '/bin/sh'" },
+  { delay: 300, text: "removed '/lib/x86_64-linux-gnu/libc.so.6'" },
+  { delay: 240, text: 'Connection to nutccsie.org closed.', kind: 'error' },
+  { delay: 160, text: 'client_loop: send disconnect: Broken pipe', kind: 'error' },
+];
+
+// rm -rf / 不管有沒有 sudo 都會跑這段；最後停一下才進入「無法連上」
+const wipeSystem = (api: TerminalApi) => {
+  api.printTimeline(wipeTimeline, crashSite, 1600);
+};
+
 const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) => {
   const [cmd, ...args] = command.split(/\s+/);
+  if (cmd === 'rm' && isDangerousRm(args)) {
+    discoverEgg('sudo');
+    wipeSystem(api);
+    return;
+  }
   if (cmd === 'cat' && args[0] === '.flag') {
     api.print(`🚩 CSIE CTF 5/5：${atob('cGwzNHMzfQ==')}`, 'accent');
     api.print('把五片按照順序拼起來，到 /flag 提交吧！');
@@ -389,13 +437,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
         api.print('usage: sudo <command>', 'error');
         return;
       }
-      // 亂用 root 權限：sudo rm -rf / 連密碼都不用問
-      if (args[0] === 'rm' && isDangerousRm(args.slice(1))) {
-        api.print('就算你是 root，我也不會讓你刪的 😤', 'error');
-        api.print('guest is not in the sudoers file. This incident will be reported. 🚨', 'error');
-        discoverEgg('sudo');
-        return;
-      }
+      // 跟真的 sudo 一樣先問密碼，密碼對了才以 root 執行
       session.sudoCommand = args.join(' ');
       api.print('[sudo] password for guest:');
       api.setMode('password');
@@ -405,14 +447,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       return;
     case 'rm':
       if (isDangerousRm(args)) {
-        api.printSequence([
-          'removing /home/guest/members.json…',
-          'removing /home/guest/finance.json…（財務長：？？？）',
-          'removing /var/www/nutccsie.org…',
-          'removing /usr/lib/node_modules…（這個要刪很久）',
-          'removing /bin/bash…',
-          'Connection to nutccsie.org closed.',
-        ], 450, crashSite);
+        wipeSystem(api);
       } else if (args.length === 0) {
         api.print('rm: missing operand', 'error');
       } else {

@@ -53,6 +53,14 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
       seq.forEach((text, i) => timers.current.push(setTimeout(() => print(text), interval * (i + 1))));
       if (onDone) timers.current.push(setTimeout(onDone, interval * seq.length));
     },
+    printTimeline: (steps, onDone, pause = 0) => {
+      let elapsed = 0;
+      steps.forEach(step => {
+        elapsed += step.delay;
+        timers.current.push(setTimeout(() => print(step.text, step.kind), elapsed));
+      });
+      if (onDone) timers.current.push(setTimeout(onDone, elapsed + pause));
+    },
     clear: () => setLines([]),
     close: onClose,
     navigate: path => navigate(path),
