@@ -16,7 +16,7 @@ const logo = String.raw`
 
 export const printConsoleBanner = () => {
   console.log(`%c${logo}`, 'color:#60a5fa;font-weight:700;font-family:monospace;font-size:12px');
-  console.log('%c嗨，工程師 👋 會打開 Console 的你，要不要考慮加入科會資訊部？', 'font-size:14px;font-weight:700');
+  console.log('%c嗨，會打開 Console 的你，要不要考慮加入科會資訊部？', 'font-size:14px;font-weight:700');
   console.log('網站原始碼都在這裡，歡迎發 PR：https://github.com/NTCUST-CSIE/NTCUST-CSIE');
   console.log(`%c🚩 CSIE CTF 1/5：${atob('Q1NJRXtoNGNrXw==')}`, 'color:#f97316;font-weight:700;font-size:13px');
   console.log('💡 下一片藏在這個網頁的原始碼裡（試試 Ctrl+U）。規則與提交：/flag');

@@ -93,7 +93,7 @@ export const toggleMatrix = () => {
 let discoTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const startDisco = () => {
-  showToast('🪩 你是在玩電燈開關嗎？');
+  showToast('🪩 你的眼睛還好嗎？反正資訊部的人已經瞎了');
   discoverEgg('disco');
   if (prefersReducedMotion()) return;
 
