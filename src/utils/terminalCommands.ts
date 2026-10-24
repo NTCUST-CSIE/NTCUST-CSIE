@@ -441,7 +441,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       } else if (args.join(' ') === 'me a sandwich') {
         api.print('What? Make it yourself.');
       } else {
-        api.print('make: *** No targets specified and no makefile found.  Stop.', 'error');
+        api.print('make: *** No targets specified and no makefile found. Stop.', 'error');
       }
       return;
     case 'brew':
@@ -449,7 +449,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
         api.print(teapot);
         discoverEgg('coffee');
       } else {
-        api.print('brew: 這不是 macOS 喔', 'error');
+        api.print('brew: 我不是 macOS 我是CSIE OS', 'error');
       }
       return;
     case 'hack':
