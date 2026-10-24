@@ -42,7 +42,7 @@ NTCUST-CSIE/
 │   │   ├── members.json  # 科會成員、部門與大頭貼資料
 │   │   ├── finance.json  # 財務報表與收支資料
 │   │   ├── events.json   # 活動剪影與連結資料
-│   │   └── nav.json      # 導覽列與短網址設定
+│   │   └── 404.json      # 短網址設定
 │   ├── App.tsx           # React Router 路由設定
 │   └── main.tsx          # 應用程式進入點
 ├── .github/              # GitHub 專用範本與 Actions 工作流
