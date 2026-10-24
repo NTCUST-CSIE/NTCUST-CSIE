@@ -191,10 +191,8 @@ const SIGNALS: { name: string; kills: boolean }[] = [
   { name: 'SIGALRM', kills: false },
 ];
 
-// 三顆 AMD Ryzen Threadripper PRO 9995WX，每顆 96 核，共 288 核
-const SOCKETS = 3;
-const CORES_PER_SOCKET = 96;
-const CORE_COUNT = SOCKETS * CORES_PER_SOCKET;
+// AMD Ryzen Threadripper PRO 9995WX：96 核
+const CORE_COUNT = 96;
 const CPU_HIST = 66;
 const CORE_HIST = 9;
 const NET_HIST = 44;
@@ -331,7 +329,7 @@ export const stepBtop = (s: BtopState) => {
     return false;
   });
 
-  // 288 核各自跳動，整體 CPU% 就是所有核心的平均
+  // 96 核各自跳動，整體 CPU% 就是所有核心的平均
   s.cores = s.cores.map(c => drift(c, 30, 70));
   s.cores.forEach((c, i) => push(s.coreHist[i], c));
   const avg = s.cores.reduce((a, b) => a + b, 0) / CORE_COUNT;
@@ -487,8 +485,6 @@ const renderRickroll = (s: BtopState, now: Date): BtopRow[] => {
   return c.rows();
 };
 
-const heat = (pct: number) => (pct < 25 ? COLOR.green : pct < 60 ? COLOR.yellow : COLOR.red);
-
 const memSize = (pct: number) => {
   const gib = (RAM_GIB * pct) / 100;
   return gib >= 1024 ? `${(gib / 1024).toFixed(2)} TiB` : `${Math.round(gib)} GiB`;
@@ -527,34 +523,18 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   const mins = Math.floor(performance.now() / 60000);
   c.put(3, 14, `up 0d ${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`, COLOR.label);
 
-  // 右側：三顆 CPU 各 96 核，每核一格，顏色代表使用率
+  // 右側：96 核，8 欄 × 12 列，每格是核心編號、曲線、使用率
   c.box(72, 1, 117, 14, COLOR.border.cpu);
-  c.put(75, 1, '3 × AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
+  c.put(75, 1, 'AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
   c.right(186, 1, '5.4 GHz', COLOR.text);
 
-  for (let socket = 0; socket < SOCKETS; socket++) {
-    const x0 = 74 + socket * 24;
-    const base = socket * CORES_PER_SOCKET;
-    for (let k = 0; k < CORES_PER_SOCKET; k++) {
-      const row = Math.floor(k / 8);
-      const col = k % 8;
-      c.put(x0 + col * 2, 2 + row, '■', heat(s.cores[base + k]));
-    }
-    const sum = s.cores.slice(base, base + CORES_PER_SOCKET).reduce((a, b) => a + b, 0);
-    const socketAvg = Math.round(sum / CORES_PER_SOCKET);
-    const temp = Math.round(38 + socketAvg * 0.5);
-    const watt = Math.round(160 + socketAvg * 2.4);
-    const infoX = 146;
-    const infoY = 2 + socket * 4;
-    c.put(infoX, infoY, `socket ${socket}  avg ${socketAvg}%`, COLOR.text);
-    c.put(infoX, infoY + 1, `${CORES_PER_SOCKET} cores  ${temp}°C  ${watt} W`, COLOR.label);
+  for (let k = 0; k < CORE_COUNT; k++) {
+    const x0 = 74 + (k % 8) * 14;
+    const y = 2 + Math.floor(k / 8);
+    c.put(x0, y, `C${k}`, COLOR.text);
+    c.graph(x0 + 4, y, 5, 1, s.coreHist[k]);
+    c.right(x0 + 12, y, `${Math.round(s.cores[k])}%`, COLOR.text);
   }
-  c.put(146, 13, '■', COLOR.green);
-  c.put(148, 13, '<25%', COLOR.label);
-  c.put(154, 13, '■', COLOR.yellow);
-  c.put(156, 13, '<60%', COLOR.label);
-  c.put(162, 13, '■', COLOR.red);
-  c.put(164, 13, '60%+', COLOR.label);
 
   // ── mem ──────────────────────────────────────────────
   c.box(1, 16, 42, 20, COLOR.border.mem);
