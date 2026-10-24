@@ -5,9 +5,13 @@ export interface Egg {
   id: string;
   name: string;
   hint: string;
+  // 隱藏彩蛋：不計入總數，另外記錄（例如只在節日出現的）
+  hidden?: boolean;
 }
 
 export const eggs = eggsData as Egg[];
+export const mainEggs = eggs.filter(e => !e.hidden);
+export const hiddenEggs = eggs.filter(e => e.hidden);
 
 // 彩蛋之間用 window 事件溝通，元件不用互相傳 props
 export const TOAST_EVENT = 'csie:toast';
@@ -61,10 +65,16 @@ export const discoverEgg = async (id: string, flag?: string) => {
   const found = getFoundEggs();
   if (!egg || found.includes(id)) return null;
 
-  saveFoundEggs([...found, id]);
+  const nowFound = [...found, id];
+  saveFoundEggs(nowFound);
   const report = await reportEgg(id, flag);
   const rankText = report ? `・你是第 ${report.rank} 位發現者` : '';
-  showToast(`🥚 發現彩蛋「${egg.name}」${rankText}（${found.length + 1}/${eggs.length}）`);
+  if (egg.hidden) {
+    showToast(`🌟 發現隱藏彩蛋「${egg.name}」${rankText}`);
+  } else {
+    const count = mainEggs.filter(e => nowFound.includes(e.id)).length;
+    showToast(`🥚 發現彩蛋「${egg.name}」${rankText}（${count}/${mainEggs.length}）`);
+  }
   return report;
 };
 

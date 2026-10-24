@@ -10,7 +10,7 @@
   { "id": "sl", "name": "蒸汽火車", "hint": "把 ls 打反試試" },
   { "id": "coffee", "name": "418 I'm a teapot", "hint": "跟終端機要杯咖啡" },
   { "id": "hack", "name": "駭客任務", "hint": "在終端機裡假裝成駭客" },
-  { "id": "season", "name": "期間限定", "hint": "節日時首頁會多出一個按鈕" },
+  { "id": "season", "name": "期間限定", "hint": "節日時首頁會多出一個按鈕", "hidden": true },
   { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" },
   { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "殺掉迷因" }
 ]

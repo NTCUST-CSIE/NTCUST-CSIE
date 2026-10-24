@@ -125,10 +125,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     ).first() as any;
 
     const eggRows = eggQuery.results || [];
-    const eggStats = (eggsConfig as { id: string; name: string }[])
+    const eggStats = (eggsConfig as { id: string; name: string; hidden?: boolean }[])
       .map(e => {
         const row: any = eggRows.find((r: any) => r.egg === e.id);
-        return { egg: e.id, name: e.name, finders: row?.finders || 0, last_found_tw: row?.last_found_tw || null };
+        const name = e.hidden ? `${e.name}（隱藏）` : e.name;
+        return { egg: e.id, name, hidden: !!e.hidden, finders: row?.finders || 0, last_found_tw: row?.last_found_tw || null };
       })
       .sort((a, b) => b.finders - a.finders);
     const eggHunters = eggHuntersQuery?.count || 0;

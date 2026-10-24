@@ -1,4 +1,5 @@
-import { discoverEgg, eggs, getFoundEggs, openTerminal } from './eggs';
+import { discoverEgg, getFoundEggs, hiddenEggs, mainEggs, openTerminal } from './eggs';
+import type { Egg } from './eggs';
 
 declare global {
   interface Window {
@@ -37,11 +38,17 @@ export const printConsoleBanner = () => {
     terminal: withEgg(openTerminal),
     eggs: withEgg(() => {
       const found = getFoundEggs();
-      console.table(eggs.map(e => ({
+      const row = (e: Egg) => ({
         彩蛋: found.includes(e.id) ? e.name : '???',
         狀態: found.includes(e.id) ? '✅' : '⬜',
         提示: e.hint,
-      })));
+      });
+      console.log(`🥚 彩蛋收集進度：${mainEggs.filter(e => found.includes(e.id)).length}/${mainEggs.length}`);
+      console.table(mainEggs.map(row));
+      if (hiddenEggs.length > 0) {
+        console.log('🌟 隱藏彩蛋（不計入總數）');
+        console.table(hiddenEggs.map(row));
+      }
     }),
   };
 };

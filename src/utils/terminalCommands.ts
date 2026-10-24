@@ -1,7 +1,8 @@
 import membersData from '../data/members.json';
 import eventsData from '../data/events.json';
 import financeData from '../data/finance.json';
-import { crashSite, discoverEgg, eggs, getFoundEggs, requestTheme } from './eggs';
+import { crashSite, discoverEgg, getFoundEggs, hiddenEggs, mainEggs, requestTheme } from './eggs';
+import type { Egg } from './eggs';
 
 export type LineKind = 'input' | 'output' | 'error' | 'accent' | 'train';
 export type TerminalMode = 'shell' | 'password' | 'vim' | 'btop';
@@ -201,8 +202,9 @@ const wipesWholeSystem = (args: string[]) => {
 
 const showEggs = (api: TerminalApi) => {
   const found = getFoundEggs();
-  const lines = eggs.map(e => (found.includes(e.id) ? `  ✅ ${e.name}` : `  ⬜ ???　提示：${e.hint}`));
-  api.print(`🥚 彩蛋收集進度：${eggs.filter(e => found.includes(e.id)).length}/${eggs.length}\n${lines.join('\n')}`);
+  const line = (e: Egg) => (found.includes(e.id) ? `  ✅ ${e.name}` : `  ⬜ ???　提示：${e.hint}`);
+  api.print(`🥚 彩蛋收集進度：${mainEggs.filter(e => found.includes(e.id)).length}/${mainEggs.length}\n${mainEggs.map(line).join('\n')}`);
+  if (hiddenEggs.length > 0) api.print(`🌟 隱藏彩蛋（不計入總數）\n${hiddenEggs.map(line).join('\n')}`);
 };
 
 // 刪整台機器的假輸出，仿 rm -v 的格式；delay 是跟上一行的間隔（毫秒），不是等間隔
