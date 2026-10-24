@@ -350,7 +350,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print(`up ${Math.floor(performance.now() / 60000)} 分鐘 —— 你已經在這個網站待這麼久了 👀`);
       return;
     case 'uname':
-      api.print(args.includes('-a') ? 'CSIE-OS nutccsie.org 8.0.0-第8屆 #1 SMP React19 Vite x86_64 GNU/Linux' : 'CSIE-OS');
+      api.print(args.includes('-a') ? 'CSIE-OS nutccsie.org 8.0.0 #1 SMP React19 Vite x86_64 GNU/Linux' : 'CSIE-OS');
       return;
     case 'history':
       api.print(session.history.map((h, i) => `${String(i + 1).padStart(4)}  ${h}`).join('\n'));

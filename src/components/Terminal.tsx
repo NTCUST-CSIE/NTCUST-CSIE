@@ -21,7 +21,7 @@ const PROMPT = 'guest@csie:~$';
 const MAX_LINES = 300;
 
 const welcome = [
-  'CSIE OS 8.0（第 8 屆）tty1',
+  'CSIE OS 8.0 tty1',
   '輸入 help 查看可用指令，按 Esc 或輸入 exit 離開。',
 ];
 

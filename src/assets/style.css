@@ -1693,35 +1693,6 @@ html.disco {
     --color-brand-light: #fff7ed;
 }
 
-[data-season="christmas"] {
-    --color-brand-primary: #f87171;
-    --color-brand-secondary: #86efac;
-    --color-brand-light: rgba(239, 68, 68, 0.15);
-}
-
-[data-theme="light"][data-season="christmas"] {
-    --color-brand-primary: #b91c1c;
-    --color-brand-secondary: #15803d;
-    --color-brand-light: #fef2f2;
-}
-
-[data-season="newyear"] {
-    --color-brand-primary: #fbbf24;
-    --color-brand-secondary: #fde68a;
-    --color-brand-light: rgba(245, 158, 11, 0.15);
-}
-
-[data-theme="light"][data-season="newyear"] {
-    --color-brand-primary: #b45309;
-    --color-brand-secondary: #d97706;
-    --color-brand-light: #fffbeb;
-}
-
-[data-season="aprilfools"] .hero-title {
-    font-family: 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', cursive;
-    letter-spacing: 0;
-}
-
 .season-badge {
     display: inline-block;
     margin-bottom: 1.5rem;

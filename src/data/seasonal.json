@@ -8,35 +8,5 @@
     "motion": "rise",
     "greeting": "🎃 Trick or Treat?",
     "surprise": "Code 別搗蛋好嗎！"
-  },
-  {
-    "id": "christmas",
-    "name": "聖誕節",
-    "start": "12-18",
-    "end": "12-26",
-    "emojis": ["❄️", "❅", "❆", "🎄", "⛄"],
-    "motion": "fall",
-    "greeting": "🎄 Merry Christmas!",
-    "surprise": "🎁 聖誕老人說：今年的你，git commit 很認真！"
-  },
-  {
-    "id": "newyear",
-    "name": "跨年",
-    "start": "12-31",
-    "end": "01-02",
-    "emojis": ["🎆", "🎉", "✨", "🎇"],
-    "motion": "rise",
-    "greeting": "🎆 Happy New Year!",
-    "surprise": "✨ 新年新希望：bug 少一點、睡眠多一點。"
-  },
-  {
-    "id": "aprilfools",
-    "name": "愚人節",
-    "start": "04-01",
-    "end": "04-01",
-    "emojis": [],
-    "motion": "none",
-    "greeting": "🤡 今天的網站怪怪的？",
-    "surprise": "愚人節快樂！導覽列明天就會恢復正常 😜"
   }
 ]
