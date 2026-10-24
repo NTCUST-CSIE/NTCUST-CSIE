@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from '@phosphor-icons/react';
+import { CopySimple, Minus, Square, X } from '@phosphor-icons/react';
 import { complete, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
 import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
 import type { BtopRow, BtopState } from '../utils/btop';
+import { detectWindowStyle } from '../utils/platform';
 
 interface Line {
   id: number;
@@ -20,6 +21,7 @@ interface TerminalProps {
 }
 
 const PROMPT = 'guest@csie:~$';
+const WINDOW_STYLE = detectWindowStyle();
 const MAX_LINES = 300;
 
 const welcome = [
@@ -43,7 +45,9 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const windowRef = useRef<HTMLDivElement>(null);
   // 視窗位置：null 代表還沒拖過，用 CSS 置中；拖過之後關掉再開也會停在原地
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [maximized, setMaximized] = useState(false);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const minimizing = useRef(false);
 
   const print = (text: string, kind: LineKind = 'output') => {
     const id = nextId.current++;
@@ -82,7 +86,12 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
 
   useEffect(() => {
     if (!open) {
-      // 關掉終端機就像關掉視窗：輸到一半的 sudo 密碼、vim、btop 都一起結束
+      // 最小化只是先收起來，執行中的東西都留著
+      if (minimizing.current) {
+        minimizing.current = false;
+        return;
+      }
+      // 其他方式關掉就像關掉視窗：輸到一半的 sudo 密碼、vim、btop 都一起結束
       if (session.current.mode !== 'shell') setMode('shell');
       session.current.sudoFails = 0;
       setInput('');
@@ -112,17 +121,23 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     if (mode !== 'btop') return;
     const state = createBtop();
     btopRef.current = state;
-    const draw = () => setBtopScreen(renderBtop(state, new Date()));
-    draw();
-    const timer = setInterval(() => {
-      stepBtop(state);
-      draw();
-    }, 100);
+    setBtopScreen(renderBtop(state, new Date()));
     return () => {
-      clearInterval(timer);
       btopRef.current = null;
     };
   }, [mode]);
+
+  // 最小化時暫停更新，叫回來再繼續
+  useEffect(() => {
+    if (mode !== 'btop' || !open) return;
+    const timer = setInterval(() => {
+      const state = btopRef.current;
+      if (!state) return;
+      stepBtop(state);
+      setBtopScreen(renderBtop(state, new Date()));
+    }, 100);
+    return () => clearInterval(timer);
+  }, [mode, open]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (mode === 'btop') {
@@ -212,9 +227,16 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     return () => window.removeEventListener('resize', keepInView);
   }, [open]);
 
-  // 按住標題列拖動
+  const minimize = () => {
+    minimizing.current = true;
+    onClose();
+  };
+
+  const toggleMaximize = () => setMaximized(m => !m);
+
+  // 按住標題列拖動（放大時不能拖）
   const startDrag = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0 || (e.target as HTMLElement).closest('button') || !windowRef.current) return;
+    if (maximized || e.button !== 0 || (e.target as HTMLElement).closest('button') || !windowRef.current) return;
     const rect = windowRef.current.getBoundingClientRect();
     drag.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -241,18 +263,56 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     <div className="terminal-overlay" onClick={onClose}>
       <div
         ref={windowRef}
-        className="terminal-window"
-        style={pos ? { left: pos.x, top: pos.y, transform: 'none' } : undefined}
+        className={`terminal-window${maximized ? ' is-maximized' : ''}`}
+        style={pos && !maximized ? { left: pos.x, top: pos.y, transform: 'none' } : undefined}
         role="dialog"
         aria-label="CSIE 終端機"
         onClick={e => { e.stopPropagation(); focusInput(); }}
       >
-        <div className="terminal-titlebar" onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
-          <span className="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span className="terminal-title">guest@csie: ~</span>
-          <button className="terminal-close" aria-label="關閉終端機" onClick={onClose}>
-            <X weight="bold" />
-          </button>
+        <div
+          className={`terminal-titlebar ${WINDOW_STYLE}`}
+          onPointerDown={startDrag}
+          onPointerMove={moveDrag}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onDoubleClick={e => { if (!(e.target as HTMLElement).closest('button')) toggleMaximize(); }}
+        >
+          {WINDOW_STYLE === 'mac' ? (
+            // macOS：紅綠燈在左邊，滑過去才出現 × − +
+            <>
+              <div className="terminal-controls">
+                <button className="terminal-control close" aria-label="關閉終端機" onClick={onClose}>
+                  <span aria-hidden="true">×</span>
+                </button>
+                <button className="terminal-control minimize" aria-label="最小化終端機" onClick={minimize}>
+                  <span aria-hidden="true">−</span>
+                </button>
+                <button className="terminal-control maximize" aria-label={maximized ? '還原終端機大小' : '放大終端機'} onClick={toggleMaximize}>
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+              <span className="terminal-title">guest@csie: ~</span>
+            </>
+          ) : (
+            // Windows：標題靠左、方形按鈕在右；Linux（Ubuntu）：標題置中、圓形按鈕在右
+            <>
+              {WINDOW_STYLE === 'linux' && <span aria-hidden="true"></span>}
+              <span className="terminal-title">guest@csie: ~</span>
+              <div className="terminal-controls">
+                <button className="terminal-control minimize" aria-label="最小化終端機" onClick={minimize}>
+                  <Minus weight={WINDOW_STYLE === 'windows' ? 'light' : 'bold'} aria-hidden="true" />
+                </button>
+                <button className="terminal-control maximize" aria-label={maximized ? '還原終端機大小' : '放大終端機'} onClick={toggleMaximize}>
+                  {maximized
+                    ? <CopySimple weight={WINDOW_STYLE === 'windows' ? 'light' : 'bold'} aria-hidden="true" />
+                    : <Square weight={WINDOW_STYLE === 'windows' ? 'light' : 'bold'} aria-hidden="true" />}
+                </button>
+                <button className="terminal-control close" aria-label="關閉終端機" onClick={onClose}>
+                  <X weight={WINDOW_STYLE === 'windows' ? 'light' : 'bold'} aria-hidden="true" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
         <div className={`terminal-body${mode === 'btop' ? ' is-btop' : ''}`} ref={bodyRef}>
           {mode === 'btop' ? (

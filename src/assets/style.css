@@ -1580,9 +1580,9 @@ html.disco {
 }
 
 .terminal-titlebar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 0.75rem;
     padding: 0.5rem 0.9rem;
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
@@ -1597,37 +1597,116 @@ html.disco {
     cursor: grabbing;
 }
 
-.terminal-dots {
+/* 狀態列依使用者的系統長得不一樣：macOS 紅綠燈在左、Windows 方形按鈕在右、Linux（Ubuntu）圓形按鈕在右 */
+.terminal-controls {
     display: inline-flex;
-    gap: 6px;
+    align-items: center;
 }
 
-.terminal-dots i {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: #ef4444;
+.terminal-control {
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
-
-.terminal-dots i:nth-child(2) { background: #eab308; }
-.terminal-dots i:nth-child(3) { background: #22c55e; }
 
 .terminal-title {
-    flex: 1;
     text-align: center;
 }
 
-.terminal-close {
-    background: none;
-    border: none;
-    color: #94a3b8;
-    font-size: 1rem;
-    cursor: pointer;
-    display: inline-flex;
+/* macOS：平常只是三顆燈，滑過去才出現 × − + */
+.terminal-titlebar.mac .terminal-controls {
+    gap: 8px;
+    justify-self: start;
 }
 
-.terminal-close:hover {
-    color: #f8fafc;
+.terminal-titlebar.mac .terminal-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    font: 700 10px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: transparent;
+}
+
+.terminal-titlebar.mac .terminal-control.close { background: #ef4444; }
+.terminal-titlebar.mac .terminal-control.minimize { background: #eab308; }
+.terminal-titlebar.mac .terminal-control.maximize { background: #22c55e; }
+
+.terminal-titlebar.mac .terminal-controls:hover .terminal-control,
+.terminal-titlebar.mac .terminal-control:focus-visible {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Windows 11：標題靠左，按鈕貼齊右上角，關閉鈕滑過去變紅 */
+.terminal-titlebar.windows {
+    grid-template-columns: 1fr auto;
+    padding: 0 0 0 0.9rem;
+}
+
+.terminal-titlebar.windows .terminal-title {
+    text-align: left;
+}
+
+.terminal-titlebar.windows .terminal-control {
+    width: 46px;
+    height: 34px;
+    font-size: 15px;
+    color: #e2e8f0;
+}
+
+.terminal-titlebar.windows .terminal-control:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.terminal-titlebar.windows .terminal-control.close:hover {
+    background: #c42b1c;
+    color: #ffffff;
+}
+
+/* Linux（Ubuntu）：圓形按鈕在右，關閉鈕是橘色 */
+.terminal-titlebar.linux .terminal-controls {
+    gap: 10px;
+    justify-self: end;
+}
+
+.terminal-titlebar.linux .terminal-control {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 12px;
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.terminal-titlebar.linux .terminal-control:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.terminal-titlebar.linux .terminal-control.close {
+    background: #e95420;
+    color: #ffffff;
+}
+
+.terminal-titlebar.linux .terminal-control.close:hover {
+    background: #f06a3a;
+}
+
+.terminal-window.is-maximized {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+}
+
+.terminal-window.is-maximized .terminal-titlebar {
+    cursor: default;
 }
 
 .terminal-body {
