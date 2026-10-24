@@ -4,7 +4,7 @@ import financeData from '../data/finance.json';
 import { crashSite, discoverEgg, eggs, getFoundEggs, requestTheme } from './eggs';
 
 export type LineKind = 'input' | 'output' | 'error' | 'accent' | 'train';
-export type TerminalMode = 'shell' | 'password' | 'vim';
+export type TerminalMode = 'shell' | 'password' | 'vim' | 'btop';
 
 export interface TerminalApi {
   print: (text: string, kind?: LineKind) => void;
@@ -96,6 +96,7 @@ const visibleCommands: [string, string][] = [
   ['pwd / whoami / date', '基本資訊'],
   ['history / clear', '指令紀錄 / 清除畫面'],
   ['neofetch', '系統資訊'],
+  ['btop', '看看伺服器現在多忙（q 離開）'],
   ['fortune', '來點工程師語錄'],
   ['cowsay <文字>', '讓牛幫你說話'],
   ['theme [dark|light]', '切換主題'],
@@ -104,7 +105,7 @@ const visibleCommands: [string, string][] = [
   ['exit', '離開終端機'],
 ];
 
-const completions = ['help', 'ls', 'cat', 'cd', 'pwd', 'whoami', 'date', 'history', 'clear', 'neofetch',
+const completions = ['help', 'ls', 'cat', 'cd', 'pwd', 'whoami', 'date', 'history', 'clear', 'neofetch', 'btop',
   'fortune', 'cowsay', 'theme', 'eggs', 'ctf', 'exit', 'echo', 'uptime', 'uname'];
 
 const pages: Record<string, string> = {
@@ -268,6 +269,9 @@ const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) 
 };
 
 export const handleInput = (raw: string, api: TerminalApi, session: TerminalSession) => {
+  // btop 全螢幕時不接受指令，按鍵由 Terminal 元件處理
+  if (session.mode === 'btop') return;
+
   if (session.mode === 'password') {
     if (raw === SUDO_PASSWORD) {
       session.sudoFails = 0;
@@ -447,12 +451,26 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       return;
     case 'rm':
       if (isDangerousRm(args)) {
-        wipeSystem(api);
+        // 沒有 root 就刪不了：rm -rf / 會先被 GNU rm 的 preserve-root 擋下
+        const targets = args.filter(a => !a.startsWith('-'));
+        if (targets.includes('/')) {
+          api.print("rm: it is dangerous to operate recursively on '/'", 'error');
+          api.print('rm: use --no-preserve-root to override this failsafe', 'error');
+        } else {
+          api.print(`rm: cannot remove '${targets[0]}': Permission denied`, 'error');
+        }
       } else if (args.length === 0) {
         api.print('rm: missing operand', 'error');
       } else {
         api.print(`rm: cannot remove '${args[args.length - 1]}': Read-only file system`, 'error');
       }
+      return;
+    case 'btop':
+      if (args.length > 0) {
+        api.print(`btop: unrecognized option '${args[0]}'`, 'error');
+        return;
+      }
+      api.setMode('btop');
       return;
     case 'vim':
     case 'vi':

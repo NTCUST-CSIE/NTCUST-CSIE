@@ -1664,6 +1664,26 @@ html.disco {
     gap: 0.6rem;
 }
 
+/* btop 全螢幕時輸入列收起來，但 input 還在，按鍵照樣能抓到 */
+.terminal-body.is-btop {
+    padding: 0.6rem 0.75rem;
+}
+
+.terminal-body.is-btop .terminal-input-row {
+    height: 0;
+    overflow: hidden;
+}
+
+.terminal-btop {
+    margin: 0;
+    font: inherit;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    white-space: pre;
+    color: #cbd5e1;
+    overflow: hidden;
+}
+
 .terminal-prompt {
     color: #60a5fa;
     white-space: nowrap;

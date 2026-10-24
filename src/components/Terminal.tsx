@@ -5,6 +5,7 @@ import { X } from '@phosphor-icons/react';
 import { complete, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
+import { createBtop, renderBtop, stepBtop } from '../utils/btop';
 
 interface Line {
   id: number;
@@ -30,6 +31,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const nextId = useRef(welcome.length);
   const [lines, setLines] = useState<Line[]>(() => welcome.map((text, id) => ({ id, text, kind: 'accent' })));
   const [input, setInput] = useState('');
+  const [btopFrame, setBtopFrame] = useState('');
   const [mode, setModeState] = useState<TerminalMode>('shell');
   const session = useRef<TerminalSession>({ mode: 'shell', history: [], sudoCommand: '', sudoFails: 0, vimTries: 0 });
   const historyCursor = useRef(-1);
@@ -93,7 +95,26 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     handleInput(raw, api, session.current);
   };
 
+  // btop 全螢幕：q / Esc / Ctrl+C 離開，回到剛才的輸出
+  useEffect(() => {
+    if (mode !== 'btop') return;
+    const state = createBtop();
+    const draw = () => setBtopFrame(renderBtop(state, new Date()));
+    draw();
+    const timer = setInterval(() => {
+      stepBtop(state);
+      draw();
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [mode]);
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (mode === 'btop') {
+      e.preventDefault();
+      const quit = e.key === 'q' || e.key === 'Q' || e.key === 'Escape' || (e.ctrlKey && e.key === 'c');
+      if (quit) setMode('shell');
+      return;
+    }
     if (e.key === 'Enter') {
       e.preventDefault();
       submit();
@@ -165,12 +186,16 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
             <X weight="bold" />
           </button>
         </div>
-        <div className="terminal-body" ref={bodyRef}>
-          {lines.map(line => (
-            <pre key={line.id} className={`terminal-line ${line.kind}`}>
-              {line.kind === 'train' ? <span>{line.text}</span> : line.text}
-            </pre>
-          ))}
+        <div className={`terminal-body${mode === 'btop' ? ' is-btop' : ''}`} ref={bodyRef}>
+          {mode === 'btop' ? (
+            <pre className="terminal-btop">{btopFrame}</pre>
+          ) : (
+            lines.map(line => (
+              <pre key={line.id} className={`terminal-line ${line.kind}`}>
+                {line.kind === 'train' ? <span>{line.text}</span> : line.text}
+              </pre>
+            ))
+          )}
           <div className="terminal-input-row">
             {mode === 'shell' && <span className="terminal-prompt">{PROMPT}</span>}
             <input
