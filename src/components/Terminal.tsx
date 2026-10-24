@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from '@phosphor-icons/react';
 import { complete, handleInput } from '../utils/terminalCommands';
@@ -40,6 +40,10 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
+  // 視窗位置：null 代表還沒拖過，用 CSS 置中；拖過之後關掉再開也會停在原地
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const drag = useRef<{ dx: number; dy: number } | null>(null);
 
   const print = (text: string, kind: LineKind = 'output') => {
     const id = nextId.current++;
@@ -185,6 +189,43 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     }
   };
 
+  // 整個視窗都留在畫面裡，關閉鈕才不會被拖到外面；視窗比畫面大時（手機）才允許超出
+  const clampPos = (x: number, y: number) => {
+    const spareX = window.innerWidth - (windowRef.current?.offsetWidth ?? 0);
+    const spareY = window.innerHeight - (windowRef.current?.offsetHeight ?? 0);
+    return {
+      x: Math.min(Math.max(x, Math.min(0, spareX)), Math.max(0, spareX)),
+      y: Math.min(Math.max(y, Math.min(0, spareY)), Math.max(0, spareY)),
+    };
+  };
+
+  // 視窗縮小時把終端機推回畫面裡
+  useEffect(() => {
+    if (!open) return;
+    const keepInView = () => setPos(p => (p ? clampPos(p.x, p.y) : p));
+    keepInView();
+    window.addEventListener('resize', keepInView);
+    return () => window.removeEventListener('resize', keepInView);
+  }, [open]);
+
+  // 按住標題列拖動
+  const startDrag = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || (e.target as HTMLElement).closest('button') || !windowRef.current) return;
+    const rect = windowRef.current.getBoundingClientRect();
+    drag.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const moveDrag = (e: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current) return;
+    setPos(clampPos(e.clientX - drag.current.dx, e.clientY - drag.current.dy));
+  };
+
+  const endDrag = (e: PointerEvent<HTMLDivElement>) => {
+    drag.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+  };
+
   // 點終端機任何地方都能繼續打字，但選取文字複製時不要搶走焦點
   const focusInput = () => {
     if (window.getSelection()?.isCollapsed ?? true) inputRef.current?.focus();
@@ -194,8 +235,15 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
 
   return (
     <div className="terminal-overlay" onClick={onClose}>
-      <div className="terminal-window" role="dialog" aria-label="CSIE 終端機" onClick={e => { e.stopPropagation(); focusInput(); }}>
-        <div className="terminal-titlebar">
+      <div
+        ref={windowRef}
+        className="terminal-window"
+        style={pos ? { left: pos.x, top: pos.y, transform: 'none' } : undefined}
+        role="dialog"
+        aria-label="CSIE 終端機"
+        onClick={e => { e.stopPropagation(); focusInput(); }}
+      >
+        <div className="terminal-titlebar" onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
           <span className="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
           <span className="terminal-title">guest@csie: ~</span>
           <button className="terminal-close" aria-label="關閉終端機" onClick={onClose}>

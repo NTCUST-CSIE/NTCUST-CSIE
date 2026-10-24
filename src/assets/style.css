@@ -1546,7 +1546,7 @@ html.disco {
     to { filter: hue-rotate(360deg) saturate(1.6); }
 }
 
-/* 假終端機（Quake 風格從上方降下） */
+/* 假終端機：一開始置中，按住標題列可以拖動 */
 .terminal-overlay {
     position: fixed;
     inset: 0;
@@ -1556,26 +1556,27 @@ html.disco {
 
 .terminal-window {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: min(960px, 100%);
+    transform: translate(-50%, -50%);
+    width: min(960px, calc(100% - 2rem));
     height: 60vh;
     display: flex;
     flex-direction: column;
     background: #020617;
     color: #e2e8f0;
     border: 1px solid #334155;
-    border-top: none;
-    border-radius: 0 0 12px 12px;
+    border-radius: 12px;
+    overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
-    animation: terminal-drop 0.25s ease-out;
+    animation: terminal-pop 0.2s ease-out;
 }
 
-@keyframes terminal-drop {
-    from { transform: translate(-50%, -100%); }
-    to { transform: translate(-50%, 0); }
+/* 用 scale 而不是 transform，才不會蓋掉置中和拖曳的位置 */
+@keyframes terminal-pop {
+    from { opacity: 0; scale: 0.96; }
+    to { opacity: 1; scale: 1; }
 }
 
 .terminal-titlebar {
@@ -1587,6 +1588,13 @@ html.disco {
     border-bottom: 1px solid #1e293b;
     font-size: 0.85rem;
     color: #94a3b8;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.terminal-titlebar:active {
+    cursor: grabbing;
 }
 
 .terminal-dots {
@@ -1908,8 +1916,9 @@ html.disco {
 
 @media (max-width: 768px) {
     .terminal-window {
+        width: calc(100% - 1rem);
         height: 70vh;
-        border-radius: 0 0 8px 8px;
+        border-radius: 8px;
     }
 
     .terminal-body,
