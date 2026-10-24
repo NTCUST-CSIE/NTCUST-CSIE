@@ -14,5 +14,5 @@
   { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" },
   { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "殺掉迷因" },
   { "id": "pet", "name": "同好見面", "hint": "你也用 Claude Code 嗎？" },
-  { "id": "sqli", "name": "你的輸入沒有被過濾", "hint": "資料庫分不清楚你的輸入是資料還是指令" }
+  { "id": "sqli", "name": "你的輸入沒有被過濾", "hint": "某個輸入框會把你的字直接拼進查詢裡" }
 ]

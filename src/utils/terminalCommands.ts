@@ -291,13 +291,9 @@ export const handleInput = (raw: string, api: TerminalApi, session: TerminalSess
       runAsRoot(session.sudoCommand, api, session);
       return;
     }
-    // 密碼欄位輸入 SQL 注入的寫法：不計入錯誤次數，回一句這裡不是資料庫
-    if (looksLikeSqlInjection(raw)) {
-      discoverEgg('sqli');
-      api.print('sudo: 這裡不是資料庫。密碼欄位只做字串比對，不會替你執行 SQL。', 'error');
-      api.print('[sudo] password for guest:');
-      return;
-    }
+    // SQL 注入的寫法也算一次錯誤密碼；回覆換成「這裡不是資料庫」，照樣計入三次
+    const injected = looksLikeSqlInjection(raw);
+    if (injected) discoverEgg('sqli');
     session.sudoFails += 1;
     if (session.sudoFails >= 3) {
       session.sudoFails = 0;
@@ -307,7 +303,10 @@ export const handleInput = (raw: string, api: TerminalApi, session: TerminalSess
       discoverEgg('sudo');
       return;
     }
-    api.print('Sorry, try again.', 'error');
+    api.print(
+      injected ? 'sudo: 這裡不是資料庫。密碼欄位只做字串比對，不會替你執行 SQL。' : 'Sorry, try again.',
+      'error',
+    );
     api.print('[sudo] password for guest:');
     return;
   }
