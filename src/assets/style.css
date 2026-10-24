@@ -1775,9 +1775,10 @@ html.disco {
 }
 
 /* btop 在終端機視窗裡執行：內容區當容器，字體依內容區大小縮放，190 欄 × 50 列剛好塞進去；輸入列收起來，input 還在，按鍵照樣能抓到 */
+/* 視窗太小時整個畫面可以捲動，不會把右下角切掉 */
 .terminal-body.is-btop {
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
     container-type: size;
     background: #000;
 }
@@ -1787,25 +1788,10 @@ html.disco {
     overflow: hidden;
 }
 
-.terminal-btop {
-    width: max-content;
+/* btop 用 canvas 畫，大小由 BtopCanvas 依視窗計算（字體限制在 7px 到 13px），置中顯示 */
+.terminal-btop-canvas {
+    display: block;
     margin: 0 auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
-    font-size: min(calc(100cqw / 114), calc(100cqh / 60));
-    line-height: 1.2;
-    color: #e6edf3;
-    white-space: pre;
-    overflow: hidden;
-}
-
-.terminal-btop-row {
-    height: 1.2em;
-}
-
-.terminal-btop .btop-cell {
-    display: inline-block;
-    width: 1ch;
-    text-align: center;
 }
 
 .terminal-prompt {

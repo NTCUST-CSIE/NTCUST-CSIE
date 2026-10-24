@@ -6,7 +6,9 @@ import { complete, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
 import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
-import type { BtopRow, BtopState } from '../utils/btop';
+import type { BtopRow } from '../utils/btop';
+import BtopCanvas from './BtopCanvas';
+import type { BtopState } from '../utils/btop';
 import { detectWindowStyle } from '../utils/platform';
 import { playRickrollSound } from '../utils/sound';
 
@@ -35,7 +37,8 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const nextId = useRef(welcome.length);
   const [lines, setLines] = useState<Line[]>(() => welcome.map((text, id) => ({ id, text, kind: 'accent' })));
   const [input, setInput] = useState('');
-  const [btopScreen, setBtopScreen] = useState<BtopRow[]>([]);
+  // btop 目前這一幀的格子資料，交給 BtopCanvas 畫出來
+  const [btopRows, setBtopRows] = useState<BtopRow[]>([]);
   const btopRef = useRef<BtopState | null>(null);
   const [mode, setModeState] = useState<TerminalMode>('shell');
   const session = useRef<TerminalSession>({ mode: 'shell', history: [], sudoCommand: '', sudoFails: 0, vimTries: 0 });
@@ -123,9 +126,18 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   // btop 在終端機視窗裡執行，每 100ms 更新一次；q / Ctrl+C 離開，回到剛才的輸出
   useEffect(() => {
     if (mode !== 'btop') return;
+    // btop 需要的尺寸：沒拉過就用 960 × 60vh（至少 840 × 480），拉過的話也不能比這個小
+    setSize(prev => {
+      const w = prev?.w ?? 960;
+      const h = prev?.h ?? window.innerHeight * 0.6;
+      return {
+        w: Math.min(window.innerWidth - 16, Math.max(w, 840)),
+        h: Math.min(window.innerHeight - 16, Math.max(h, 480)),
+      };
+    });
     const state = createBtop();
     btopRef.current = state;
-    setBtopScreen(renderBtop(state, new Date()));
+    setBtopRows(renderBtop(state, new Date()));
     return () => {
       btopRef.current = null;
     };
@@ -138,7 +150,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
       const state = btopRef.current;
       if (!state) return;
       stepBtop(state);
-      setBtopScreen(renderBtop(state, new Date()));
+      setBtopRows(renderBtop(state, new Date()));
     }, 100);
     return () => clearInterval(timer);
   }, [mode, open]);
@@ -158,7 +170,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
         discoverEgg('rickroll');
         playRickrollSound(8);
       }
-      setBtopScreen(renderBtop(state, new Date()));
+      setBtopRows(renderBtop(state, new Date()));
       return;
     }
     if (e.key === 'Enter') {
@@ -271,8 +283,11 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const moveResize = (e: PointerEvent<HTMLDivElement>) => {
     const start = resizing.current;
     if (!start) return;
-    const w = Math.min(window.innerWidth - 16, Math.max(480, start.w + e.clientX - start.x));
-    const h = Math.min(window.innerHeight - 16, Math.max(300, start.h + e.clientY - start.y));
+    // btop 模式下最小尺寸較大，字才看得清楚；超過就改用捲動
+    const minW = mode === 'btop' ? 840 : 480;
+    const minH = mode === 'btop' ? 480 : 300;
+    const w = Math.min(window.innerWidth - 16, Math.max(minW, start.w + e.clientX - start.x));
+    const h = Math.min(window.innerHeight - 16, Math.max(minH, start.h + e.clientY - start.y));
     setSize({ w, h });
   };
 
@@ -348,21 +363,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
         </div>
         <div className={`terminal-body${mode === 'btop' ? ' is-btop' : ''}`} ref={bodyRef}>
           {mode === 'btop' ? (
-            <div className="terminal-btop">
-              {btopScreen.map((row, y) => (
-                <div key={y} className="terminal-btop-row">
-                  {row.map((run, x) => {
-                    const style = { color: run.color, backgroundColor: run.bg };
-                    // 方塊、框線、箭頭在不同字型裡寬度不一，逐字包成 1ch 寬，欄位才不會錯位
-                    return run.text.split(/([^\x00-\x7f])/).filter(Boolean).map((part, i) =>
-                      /^[^\x00-\x7f]$/.test(part)
-                        ? <span key={`${x}-${i}`} className="btop-cell" style={style}>{part}</span>
-                        : <span key={`${x}-${i}`} style={style}>{part}</span>,
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
+            <BtopCanvas rows={btopRows} />
           ) : (
             lines.map(line => (
               <pre key={line.id} className={`terminal-line ${line.kind}`}>
