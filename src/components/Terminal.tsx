@@ -6,6 +6,7 @@ import { complete, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
 import { createBtop, renderBtop, stepBtop } from '../utils/btop';
+import type { BtopRow } from '../utils/btop';
 
 interface Line {
   id: number;
@@ -31,7 +32,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const nextId = useRef(welcome.length);
   const [lines, setLines] = useState<Line[]>(() => welcome.map((text, id) => ({ id, text, kind: 'accent' })));
   const [input, setInput] = useState('');
-  const [btopFrame, setBtopFrame] = useState('');
+  const [btopScreen, setBtopScreen] = useState<BtopRow[]>([]);
   const [mode, setModeState] = useState<TerminalMode>('shell');
   const session = useRef<TerminalSession>({ mode: 'shell', history: [], sudoCommand: '', sudoFails: 0, vimTries: 0 });
   const historyCursor = useRef(-1);
@@ -99,7 +100,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   useEffect(() => {
     if (mode !== 'btop') return;
     const state = createBtop();
-    const draw = () => setBtopFrame(renderBtop(state, new Date()));
+    const draw = () => setBtopScreen(renderBtop(state, new Date()));
     draw();
     const timer = setInterval(() => {
       stepBtop(state);
@@ -178,7 +179,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
 
   return (
     <div className="terminal-overlay" onClick={onClose}>
-      <div className="terminal-window" role="dialog" aria-label="CSIE 終端機" onClick={e => { e.stopPropagation(); focusInput(); }}>
+      <div className={`terminal-window${mode === 'btop' ? ' is-btop' : ''}`} role="dialog" aria-label="CSIE 終端機" onClick={e => { e.stopPropagation(); focusInput(); }}>
         <div className="terminal-titlebar">
           <span className="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
           <span className="terminal-title">guest@csie: ~</span>
@@ -188,7 +189,21 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
         </div>
         <div className={`terminal-body${mode === 'btop' ? ' is-btop' : ''}`} ref={bodyRef}>
           {mode === 'btop' ? (
-            <pre className="terminal-btop">{btopFrame}</pre>
+            <div className="terminal-btop">
+              {btopScreen.map((row, y) => (
+                <div key={y} className="terminal-btop-row">
+                  {row.map((run, x) => {
+                    const style = run.color ? { color: run.color } : undefined;
+                    // 方塊、框線、箭頭在不同字型裡寬度不一，逐字包成 1ch 寬，欄位才不會錯位
+                    return run.text.split(/([^\x00-\x7f])/).filter(Boolean).map((part, i) =>
+                      /^[^\x00-\x7f]$/.test(part)
+                        ? <span key={`${x}-${i}`} className="btop-cell" style={style}>{part}</span>
+                        : <span key={`${x}-${i}`} style={style}>{part}</span>,
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           ) : (
             lines.map(line => (
               <pre key={line.id} className={`terminal-line ${line.kind}`}>

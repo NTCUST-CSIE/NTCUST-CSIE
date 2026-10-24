@@ -1664,9 +1664,22 @@ html.disco {
     gap: 0.6rem;
 }
 
-/* btop 全螢幕時輸入列收起來，但 input 還在，按鍵照樣能抓到 */
+/* btop 全螢幕：視窗撐滿、隱藏標題列；輸入列收起來，但 input 還在，按鍵照樣能抓到 */
+.terminal-window.is-btop {
+    width: 100%;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+    background: #000;
+}
+
+.terminal-window.is-btop .terminal-titlebar {
+    display: none;
+}
+
 .terminal-body.is-btop {
-    padding: 0.6rem 0.75rem;
+    padding: 0;
+    overflow: hidden;
 }
 
 .terminal-body.is-btop .terminal-input-row {
@@ -1674,14 +1687,24 @@ html.disco {
     overflow: hidden;
 }
 
+/* 版面是 190 欄 × 50 列，字體大小依視窗寬高取較小的那個，整個畫面剛好塞進去 */
 .terminal-btop {
-    margin: 0;
-    font: inherit;
-    font-size: 0.78rem;
-    line-height: 1.25;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: min(calc(100vw / 114), calc(100vh / 60));
+    line-height: 1.2;
+    color: #e6edf3;
     white-space: pre;
-    color: #cbd5e1;
     overflow: hidden;
+}
+
+.terminal-btop-row {
+    height: 1.2em;
+}
+
+.terminal-btop .btop-cell {
+    display: inline-block;
+    width: 1ch;
+    text-align: center;
 }
 
 .terminal-prompt {
