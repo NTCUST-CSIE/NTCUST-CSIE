@@ -393,7 +393,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       api.print('guest');
       return;
     case 'id':
-      api.print('uid=1000(guest) gid=1000(csie) groups=1000(csie),27(sudo)');
+      api.print('uid=1000(guest) gid=1000(csie) groups=1000(csie),27(想當sudo)');
       return;
     case 'echo':
       api.print(args.join(' '));
