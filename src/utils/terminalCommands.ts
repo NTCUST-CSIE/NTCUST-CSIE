@@ -94,7 +94,7 @@ const visibleCommands: [string, string][] = [
   ['theme [dark|light]', '切換主題'],
   ['eggs', '彩蛋收集進度'],
   ['ctf', 'CSIE CTF 說明'],
-  ['exit', '離開終端機（或按 Esc）'],
+  ['exit', '離開終端機'],
 ];
 
 const completions = ['help', 'ls', 'cat', 'cd', 'pwd', 'whoami', 'date', 'history', 'clear', 'neofetch',
@@ -113,21 +113,21 @@ const formatAmount = (num: number | null) => (num === null ? '尚未結算' : `N
 const readFile = (name: string): string | null => {
   switch (name) {
     case 'README.md':
-      return '# CSIE Terminal\n這是一台假的終端機，但彩蛋是真的。\n輸入 help 查看指令，輸入 eggs 查看收集進度。';
+      return '# CSIE Terminal\n這是一台真的假終端機??\n輸入 help 查看指令。';
     case 'about.txt':
-      return '我們是國立臺中科技大學 資訊工程科 科學會（第 8 屆）。\n由一群充滿熱情與活力的學生組成，致力於舉辦各項活動，\n協助大家在五專留下美好的回憶。';
+      return '我們是國立臺中科技大學 資訊工程科 科學會。\n由一群充滿熱情與活力的學生組成，致力於舉辦各項活動，\n協助大家在五專留下美好的回憶。';
     case 'members.json':
       return (membersData as Department[])
         .map(d => `${d.departmentTitle}：${d.members.map(m => `${m.name}（${m.title}）`).join('、')}`)
         .join('\n');
     case 'events.json':
-      return Object.values(eventsData).map(e => `• ${e.title}`).join('\n') + '\n\n詳情請見 /events（輸入 cd events）';
+      return Object.values(eventsData).map(e => `• ${e.title}`).join('\n') + '\n\n試試 cd events';
     case 'finance.json':
       return Object.entries(financeData as Record<string, Semester>)
         .map(([key, s]) => `${key} 學期｜收入 ${formatAmount(s.total.income)}｜支出 ${formatAmount(s.total.expense)}｜結餘 ${formatAmount(s.total.balance)}`)
-        .join('\n') + '\n\n完整收支明細請見 /finance（輸入 cd finance）';
+        .join('\n') + '\n\n試試 cd finance 比較快 :）';
     case '.bash_history':
-      return 'ls\nls -a\ncat .flag\nsudo cat .flag\n# sudo 密碼是什麼來著……好像寫在 dev-notes 裡了，就是機器人不准看的那份\nvim\n:q\n:q!\n:qqqqqq\nhow to exit vim';
+      return 'ls\nls -a\ncat .flag\nsudo cat .flag\n# sudo 密碼是什麼...\nvim\n:q\n:q!\n:qqqqqq\nhow to exit vim';
     default:
       return null;
   }
@@ -172,7 +172,7 @@ const neofetch = () => {
   const info = [
     'guest@nutccsie.org',
     '------------------',
-    'OS: CSIE OS 第 8 屆',
+    'OS: CSIE OS',
     'Host: 國立臺中科技大學 資訊工程科',
     'Kernel: React 19 + Vite',
     `Uptime: ${Math.floor(performance.now() / 60000)} 分鐘`,
@@ -211,7 +211,7 @@ const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) 
   const [cmd, ...args] = command.split(/\s+/);
   if (cmd === 'cat' && args[0] === '.flag') {
     api.print(`🚩 CSIE CTF 5/5：${atob('cGwzNHMzfQ==')}`, 'accent');
-    api.print('把五片按照順序拼起來，到 /flag 提交吧！（輸入 cd flag）');
+    api.print('把五片按照順序拼起來，到 /flag 提交吧！');
     return;
   }
   if (cmd === 'rm' && isDangerousRm(args)) {
@@ -288,7 +288,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
   switch (lower) {
     case 'help':
       api.print(visibleCommands.map(([name, desc]) => `  ${name.padEnd(20)}${desc}`).join('\n'));
-      api.print('（還有一些指令沒有列出來，自己找找看 👀）', 'accent');
+      api.print('（還有一些不能給你看的指令，自己找找看 👀）', 'accent');
       return;
     case 'ls':
     case 'dir': {
@@ -304,7 +304,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
     case 'cat': {
       const file = args[0];
       if (!file) {
-        api.print('cat: 要讀哪個檔案？（如果你要的是貓，輸入 meow）', 'error');
+        api.print('那個...我不會通靈（如果你要的是貓，輸入 meow）', 'error');
         return;
       }
       if (file === '.flag') {

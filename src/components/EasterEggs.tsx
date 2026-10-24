@@ -4,8 +4,8 @@ import Terminal from './Terminal';
 import SeasonalDecor from './SeasonalDecor';
 import { discoverEgg, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
 
-const AWAY_TITLE = '別走啊 QQ 🥺';
-const BACK_TITLE = '歡迎回來！🎉';
+const AWAY_TITLE = '回來好嗎 :)';
+const BACK_TITLE = '歡迎回來！';
 
 interface Toast {
   id: number;
@@ -50,7 +50,7 @@ const EasterEggs = () => {
         document.title = AWAY_TITLE;
       } else {
         document.title = BACK_TITLE;
-        restoreTimer = setTimeout(() => { document.title = originalTitle; }, 2000);
+        restoreTimer = setTimeout(() => { document.title = originalTitle; }, 1000);
         discoverEgg('tab');
       }
     };

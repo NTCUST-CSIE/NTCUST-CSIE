@@ -17,7 +17,6 @@ const logo = String.raw`
 export const printConsoleBanner = () => {
   console.log(`%c${logo}`, 'color:#60a5fa;font-weight:700;font-family:monospace;font-size:12px');
   console.log('%c嗨，會打開 Console 的你，要不要考慮加入科會資訊部？', 'font-size:14px;font-weight:700');
-  console.log('網站原始碼都在這裡，歡迎發 PR：https://github.com/NTCUST-CSIE/NTCUST-CSIE');
   console.log(`%c🚩 CSIE CTF 1/5：${atob('Q1NJRXtoNGNrXw==')}`, 'color:#f97316;font-weight:700;font-size:13px');
   console.log('💡 下一片藏在這個網頁的原始碼裡（試試 Ctrl+U）。規則與提交：/flag');
   console.log('%c輸入 csie.help() 看看還能做什麼', 'color:#94a3b8');
@@ -30,10 +29,10 @@ export const printConsoleBanner = () => {
 
   window.csie = {
     help: withEgg(() => {
-      console.log('csie.hello()     打聲招呼\ncsie.terminal()  打開終端機\ncsie.eggs()      查看彩蛋收集進度');
+      console.log('csie.hello()     打聲招呼\ncsie.terminal()  打開終端機\ncsie.eggs()      來看你找到了多少彩蛋 ouo');
     }),
     hello: withEgg(() => {
-      console.log('哈囉！你解鎖了 Console 彩蛋 🥚');
+      console.log('Hello World!');
     }),
     terminal: withEgg(openTerminal),
     eggs: withEgg(() => {
