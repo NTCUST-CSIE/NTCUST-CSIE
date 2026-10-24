@@ -1705,6 +1705,10 @@ html.disco {
     border-radius: 0;
 }
 
+.terminal-window.is-maximized .terminal-resize {
+    display: none;
+}
+
 .terminal-window.is-maximized .terminal-titlebar {
     cursor: default;
 }
@@ -1716,6 +1720,25 @@ html.disco {
     padding: 0.9rem 1rem;
     font-size: 0.9rem;
     line-height: 1.5;
+}
+
+/* 右下角的拉伸把手：拖它可以把終端機拉大或縮小 */
+.terminal-resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 18px;
+    height: 18px;
+    cursor: nwse-resize;
+    touch-action: none;
+    background: linear-gradient(
+        135deg,
+        transparent 0 55%,
+        #64748b 55% 62%,
+        transparent 62% 72%,
+        #64748b 72% 79%,
+        transparent 79%
+    );
 }
 
 .terminal-line {
@@ -1765,6 +1788,8 @@ html.disco {
 }
 
 .terminal-btop {
+    width: max-content;
+    margin: 0 auto;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
     font-size: min(calc(100cqw / 114), calc(100cqh / 60));
     line-height: 1.2;

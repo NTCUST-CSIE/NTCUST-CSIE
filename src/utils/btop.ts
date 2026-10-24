@@ -1,7 +1,6 @@
 // 模擬 aristocratos/btop 的畫面，版面以截圖的 190 × 50 格對位。
-// 數字是假的：CPU、溫度、網路、行程的 CPU% 會持續飄動；
-// 主機名稱、IP、使用者都換成虛構的值，不暴露真實機器資訊。
-// 行程表可以用 ↑↓ 選取，按 Enter / k / s 送出訊號；權限不夠的行程會被拒絕。
+// 數字是假的，但會跟著圖表一起跳動；主機名稱、IP、使用者都換成虛構的值。
+// 行程表可以用 ↑↓ 選取，按 Enter / k / s 送出訊號。被殺掉的行程會被系統重新拉起來，所以殺不完。
 
 export const COLS = 190;
 export const ROWS = 50;
@@ -132,7 +131,7 @@ interface Proc {
   threads: number;
   user: string;
   memB: string;
-  // 基準 CPU%，0 代表閒置；實際值每次更新會在基準附近飄
+  // 基準 CPU%，0 代表閒置；實際值每次更新會在基準附近大幅跳動
   base: number;
 }
 
@@ -192,12 +191,69 @@ const SIGNALS: { name: string; kills: boolean }[] = [
   { name: 'SIGALRM', kills: false },
 ];
 
-// AMD Ryzen Threadripper PRO 9995WX：96 核
-const CORE_COUNT = 96;
+// 三顆 AMD Ryzen Threadripper PRO 9995WX，每顆 96 核，共 288 核
+const SOCKETS = 3;
+const CORES_PER_SOCKET = 96;
+const CORE_COUNT = SOCKETS * CORES_PER_SOCKET;
 const CPU_HIST = 66;
 const CORE_HIST = 9;
 const NET_HIST = 44;
 const PROC_ROWS = 30;
+const RICKROLL_MS = 8000;
+const ROOT_DISK_TB = 245.76;
+const RAM_GIB = 2048;
+
+// rickroll 播放器裡的 ASCII 小人，三格循環；每格 11 行
+const RICK_FRAMES: string[][] = [
+  [
+    '    .-"""""-.   ',
+    '   /  O   O  \\  ',
+    '  |     ^     | ',
+    '  |   \\___/   | ',
+    '   \\_________/ ',
+    ' .--\'  | |  \'--.',
+    '/      | |      \\',
+    '/_______| |_______\\',
+    '        | |       ',
+    '       /   \\      ',
+    '      /     \\     ',
+  ],
+  [
+    '\\o/ .-"""""-. \\o/',
+    '     /  O   O  \\ ',
+    '    |     ^     |',
+    '    |   \\___/   |',
+    '     \\_________/ ',
+    '      .--\'  \'--.  ',
+    '     /   | |    \\ ',
+    '    /____| |____\\',
+    '         | |      ',
+    '        /   \\     ',
+    '       /     \\    ',
+  ],
+  [
+    '    .-"""""-.   ',
+    '   /  O   O  \\  ',
+    '  |     ^     | ',
+    '  |   /___\\   | ',
+    '   \\_________/ ',
+    ' .--\'  | |  \'--.',
+    '/      | |      \\',
+    '/_______| |_______\\',
+    '        | |       ',
+    '       _/   \\_    ',
+    '      /       \\   ',
+  ],
+];
+
+const fmtTime = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+
+// 行程被殺掉後重新拉起來的紀錄
+interface Respawn {
+  proc: LiveProc;
+  index: number;
+  at: number;
+}
 
 type Modal =
   | { kind: 'confirm'; pid: number; signal: string }
@@ -207,7 +263,6 @@ export interface BtopState {
   cpu: number[];
   cores: number[];
   coreHist: number[][];
-  tempHist: number[][];
   down: number[];
   up: number[];
   // 網路速率 = 曲線值 × 6 GiB/s；累計流量與峰值單位是 GiB
@@ -215,70 +270,96 @@ export interface BtopState {
   upTotal: number;
   downTop: number;
   upTop: number;
-  // mem 面板 Used / Available / Cached / Free 各自的曲線
+  // mem 面板 Used / Available / Cached / Free 各自的百分比曲線
   memHist: number[][];
+  // 根目錄磁碟的使用率（%）
+  diskUsed: number;
+  // load average 1 / 5 / 15 分鐘
+  load: number[];
+  respawns: Respawn[];
   procs: LiveProc[];
   selected: number;
   modal: Modal | null;
   notice: { text: string; color: string; until: number } | null;
-  // kill 到 rick roll 時的 ASCII 動畫，蓋過整個畫面
+  // kill 到 rick roll 時的播放器畫面
   rickroll: { start: number; until: number } | null;
 }
 
-const RICKROLL_MS = 8000;
-
 const filled = (n: number, v: number) => Array<number>(n).fill(v);
 
-export const createBtop = (): BtopState => ({
-  cpu: filled(CPU_HIST, 2),
-  cores: filled(CORE_COUNT, 2),
-  coreHist: Array.from({ length: CORE_COUNT }, () => filled(CORE_HIST, 2)),
-  tempHist: Array.from({ length: CORE_COUNT }, () => filled(CORE_HIST, 22)),
-  down: filled(NET_HIST, 10),
-  up: filled(NET_HIST, 28),
-  downTotal: 39526,
-  upTotal: 22426,
-  downTop: 512,
-  upTop: 344,
-  memHist: [30, 70, 26, 42].map(v => filled(32, v)),
-  procs: PROCS.map(p => ({ ...p, cpu: p.base })),
-  selected: 0,
-  modal: null,
-  notice: null,
-  rickroll: null,
-});
+export const createBtop = (): BtopState => {
+  const cores = Array.from({ length: CORE_COUNT }, () => 20 + Math.random() * 30);
+  return {
+    cpu: filled(CPU_HIST, 30),
+    cores,
+    coreHist: cores.map(v => filled(CORE_HIST, v)),
+    down: filled(NET_HIST, 50),
+    up: filled(NET_HIST, 28),
+    downTotal: 39526,
+    upTotal: 22426,
+    downTop: 512,
+    upTop: 344,
+    memHist: [30, 70, 26, 42].map(v => filled(32, v)),
+    diskUsed: 18,
+    load: [86.1, 84.7, 80.2],
+    respawns: [],
+    procs: PROCS.map(p => ({ ...p, cpu: p.base })),
+    selected: 0,
+    modal: null,
+    notice: null,
+    rickroll: null,
+  };
+};
 
 const push = (arr: number[], v: number) => {
   arr.shift();
   arr.push(v);
 };
 
-// 每 100ms 呼叫一次：數值往目標附近飄，不會突然跳到天邊
+// 每 100ms 呼叫一次：數值往目標附近飄，幅度夠大，看得出來在跑
 export const stepBtop = (s: BtopState) => {
+  const now = Date.now();
   const drift = (prev: number, target: number, spread: number) =>
     clamp(prev + (target - prev) * 0.3 + (Math.random() - 0.5) * spread, 0, 100);
 
-  if (s.rickroll && Date.now() >= s.rickroll.until) s.rickroll = null;
+  if (s.rickroll && now >= s.rickroll.until) s.rickroll = null;
 
-  push(s.cpu, drift(s.cpu[s.cpu.length - 1], 4, 10));
-  s.cores = s.cores.map(c => drift(c, 6, 24));
+  // 被殺掉的行程會被系統重新拉起，回到原本的位置
+  s.respawns = s.respawns.filter(r => {
+    if (now < r.at) return true;
+    s.procs.splice(Math.min(r.index, s.procs.length), 0, r.proc);
+    return false;
+  });
+
+  // 288 核各自跳動，整體 CPU% 就是所有核心的平均
+  s.cores = s.cores.map(c => drift(c, 30, 70));
   s.cores.forEach((c, i) => push(s.coreHist[i], c));
-  s.tempHist.forEach(h => push(h, clamp(h[h.length - 1] + (Math.random() - 0.5) * 2, 10, 40)));
+  const avg = s.cores.reduce((a, b) => a + b, 0) / CORE_COUNT;
+  push(s.cpu, avg);
+  const threads = (avg / 100) * CORE_COUNT;
+  s.load = [
+    s.load[0] + (threads - s.load[0]) * 0.05,
+    s.load[1] + (threads - s.load[1]) * 0.01,
+    s.load[2] + (threads - s.load[2]) * 0.003,
+  ];
+
   // 100ms 內流過的量：速率 × 0.1 秒，累加到總量
-  push(s.down, drift(s.down[s.down.length - 1], 50, 40));
-  push(s.up, drift(s.up[s.up.length - 1], 28, 30));
+  push(s.down, drift(s.down[s.down.length - 1], 50, 60));
+  push(s.up, drift(s.up[s.up.length - 1], 28, 50));
   const downRate = s.down[s.down.length - 1] * 6;
   const upRate = s.up[s.up.length - 1] * 6;
   s.downTotal += downRate * 0.1;
   s.upTotal += upRate * 0.1;
   s.downTop = Math.max(s.downTop, downRate);
   s.upTop = Math.max(s.upTop, upRate);
-  // mem 曲線在各自的百分比附近小幅起伏
-  [30, 70, 26, 42].forEach((target, i) => push(s.memHist[i], drift(s.memHist[i][s.memHist[i].length - 1], target, 12)));
+
+  [30, 70, 26, 42].forEach((target, i) => push(s.memHist[i], drift(s.memHist[i][s.memHist[i].length - 1], target, 24)));
+  s.diskUsed = clamp(s.diskUsed + (18 - s.diskUsed) * 0.05 + (Math.random() - 0.5) * 0.4, 17, 19);
+
   s.procs.forEach(p => {
     p.cpu = p.base > 0
-      ? clamp(p.base * (0.4 + Math.random() * 1.2), 0, 100)
-      : Math.random() < 0.05 ? Math.random() * 0.5 : 0;
+      ? clamp(p.base * (0.2 + Math.random() * 1.8), 0, 100)
+      : Math.random() < 0.15 ? Math.random() * 2 : 0;
   });
 };
 
@@ -288,11 +369,6 @@ const killProc = (s: BtopState, pid: number, signal: string): 'quit' | 'meme' | 
   const proc = s.procs[index];
   const until = Date.now() + 3000;
 
-  // 只能動自己 guest 的行程，其他的跟真的 kill 一樣回 Operation not permitted
-  if (proc.user !== 'guest') {
-    s.notice = { text: `kill(${pid}, ${signal}): Operation not permitted`, color: COLOR.red, until };
-    return;
-  }
   if (pid === BTOP_PID) return 'quit';
 
   const sig = SIGNALS.find(x => x.name === signal);
@@ -302,7 +378,11 @@ const killProc = (s: BtopState, pid: number, signal: string): 'quit' | 'meme' | 
   }
   s.procs.splice(index, 1);
   s.selected = clamp(s.selected, 0, Math.max(0, s.procs.length - 1));
-  s.notice = { text: `${signal} → ${pid} (${proc.program}) terminated`, color: COLOR.green, until };
+
+  // 被殺掉的行程會被重新拉起，所以清單永遠殺不完
+  const newPid = 1000 + Math.floor(Math.random() * 900000);
+  s.respawns.push({ proc: { ...proc, pid: newPid, cpu: 0 }, index, at: Date.now() + 2500 + Math.random() * 1500 });
+  s.notice = { text: `${signal} → ${pid} (${proc.program}) · restarted as ${newPid}`, color: COLOR.green, until };
 
   if (proc.command === 'rick roll') {
     s.rickroll = { start: Date.now(), until: Date.now() + RICKROLL_MS };
@@ -313,7 +393,7 @@ const killProc = (s: BtopState, pid: number, signal: string): 'quit' | 'meme' | 
 // 回傳 'quit' 代表要離開 btop；'meme' 代表觸發了彩蛋
 export const handleBtopKey = (s: BtopState, key: string): 'quit' | 'meme' | void => {
   if (key === 'CtrlC') return 'quit';
-  // rick roll 動畫播放中，按鍵先不理
+  // rickroll 播放中，按鍵先不理
   if (s.rickroll) return;
 
   if (s.modal?.kind === 'confirm') {
@@ -364,69 +444,61 @@ export const handleBtopKey = (s: BtopState, key: string): 'quit' | 'meme' | void
   }
 };
 
-const fmt = (n: number) => n.toFixed(1).padStart(5);
-
-// rickroll 的 ASCII 小人，三格循環跳舞
-const RICK_FRAMES: string[][] = [
-  [
-    '    ___    ',
-    '   /   \\   ',
-    '  | o o |  ♪',
-    '  |  ^  |  ',
-    '   \\___/   ',
-    ' __/   \\__ ',
-    '/  |   |  \\',
-    '   |   |   ',
-    '  _/   \\_  ',
-    ' /       \\ ',
-  ],
-  [
-    '    ___    ',
-    '   /   \\   ',
-    '  | ^ ^ |  ♫',
-    '  |  o  |  ',
-    '   \\___/   ',
-    '  \\_   _/  ',
-    '    \\ /    ',
-    '     |     ',
-    '    / \\    ',
-    '   /   \\   ',
-  ],
-  [
-    '    ___    ',
-    '   /   \\   ',
-    '  | o o |  ♪',
-    '  |  -  |  ',
-    '   \\___/   ',
-    ' __/   \\__ ',
-    '\\  |   |  /',
-    '   |   |   ',
-    '  _/   \\_  ',
-    ' /       \\ ',
-  ],
-];
-
+// rickroll 播放器：仿 YouTube 的版面，影片的前 8 秒。畫面 ASCII 小人每 250ms 換一格
 const renderRickroll = (s: BtopState, now: Date): BtopRow[] => {
   const c = new Canvas();
-  const { start } = s.rickroll!;
-  const frame = RICK_FRAMES[Math.floor((now.getTime() - start) / 250) % RICK_FRAMES.length];
-  c.fill(0, 0, COLS, ROWS, '#000000');
+  const elapsed = (now.getTime() - s.rickroll!.start) / 1000;
+  const shown = Math.min(elapsed, RICKROLL_MS / 1000);
+  c.fill(0, 0, COLS, ROWS, '#0f0f0f');
 
-  const x0 = Math.floor((COLS - 16) / 2);
-  frame.forEach((line, i) => c.put(x0, 12 + i, line, COLOR.text));
+  // 頂欄
+  c.fill(0, 0, COLS, 3, '#212121');
+  c.put(4, 1, '▶', '#ff0000');
+  c.put(6, 1, 'YouTube', COLOR.text);
+  c.right(186, 1, 'Sign in', COLOR.text);
 
-  const center = (text: string, y: number, color: string) =>
-    c.put(Math.floor((COLS - [...text].length) / 2), y, text, color);
-  center('♪ Never gonna give you up ♪', 24, COLOR.yellow);
-  center('Never gonna let you down', 25, COLOR.text);
-  center('youtube (pid 7731) — rick roll', 28, COLOR.label);
-  center('you just got rickrolled', 29, COLOR.label);
+  // 影片畫面
+  const px = 30;
+  const pw = 130;
+  const py = 4;
+  const ph = 30;
+  c.fill(px, py, pw, ph, '#000000');
+  const frame = RICK_FRAMES[Math.floor(elapsed * 4) % RICK_FRAMES.length];
+  const fx = px + Math.floor((pw - 20) / 2);
+  const fy = py + Math.floor((ph - frame.length) / 2);
+  frame.forEach((line, i) => c.put(fx, fy + i, line, COLOR.text));
+
+  // 進度條與控制列
+  const total = 213;
+  const timecode = `${fmtTime(shown)} / ${fmtTime(total)}`;
+  c.fill(px, py + ph, pw, 1, '#3a3a3a');
+  c.fill(px, py + ph, Math.max(1, Math.round((pw * shown) / total)), 1, '#ff0000');
+  c.put(px, py + ph + 1, `▶  ⏭  ♪ ━━━━━     ${timecode}`, COLOR.text);
+  c.right(px + pw - 1, py + ph + 1, 'CC  ⚙  ⛶', COLOR.text);
+
+  // 影片資訊
+  c.put(px, py + ph + 3, 'Rick Astley - Never Gonna Give You Up (Official Music Video)', COLOR.text);
+  c.put(px, py + ph + 4, 'Rick Astley', COLOR.label);
+
+  // 殺掉的紀錄
+  c.put(px, py + ph + 7, 'youtube (pid 7731) · chrome · guest', COLOR.label);
+  c.put(px, py + ph + 8, 'you just got rickrolled', COLOR.yellow);
 
   return c.rows();
 };
 
+const heat = (pct: number) => (pct < 25 ? COLOR.green : pct < 60 ? COLOR.yellow : COLOR.red);
+
+const memSize = (pct: number) => {
+  const gib = (RAM_GIB * pct) / 100;
+  return gib >= 1024 ? `${(gib / 1024).toFixed(2)} TiB` : `${Math.round(gib)} GiB`;
+};
+
+const fmt = (n: number) => n.toFixed(1).padStart(5);
+
 export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   if (s.rickroll && now.getTime() < s.rickroll.until) return renderRickroll(s, now);
+
   const c = new Canvas();
   const time = now.toTimeString().slice(0, 8);
   const cpuNow = Math.round(s.cpu[s.cpu.length - 1]);
@@ -447,49 +519,62 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(3, 2, 'CPU', COLOR.label);
   c.bar(8, 2, 40, cpuNow, COLOR.green);
   c.right(52, 2, `${cpuNow}%`, COLOR.text);
-  c.put(55, 2, `${Math.round(25 + s.tempHist[0][s.tempHist[0].length - 1] * 0.3)}°C`, COLOR.blue);
+  c.put(55, 2, `${Math.round(38 + cpuNow * 0.5)}°C`, COLOR.blue);
   c.graph(3, 3, 66, 10, s.cpu);
   c.put(3, 13, 'Load AVG:', COLOR.label);
-  c.put(13, 13, '14.82', COLOR.text);
-  c.put(20, 13, '12.37', COLOR.text);
-  c.put(27, 13, '9.61', COLOR.text);
+  s.load.forEach((v, i) => c.put(13 + i * 7, 13, v.toFixed(2), COLOR.text));
   // 跟 uptime、neofetch 一樣，算的是你待在網站上的時間
   const mins = Math.floor(performance.now() / 60000);
   c.put(3, 14, `up 0d ${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`, COLOR.label);
 
-  // 右側的 CPU 面板
+  // 右側：三顆 CPU 各 96 核，每核一格，顏色代表使用率
   c.box(72, 1, 117, 14, COLOR.border.cpu);
-  c.put(75, 1, 'AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
+  c.put(75, 1, '3 × AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
   c.right(186, 1, '5.4 GHz', COLOR.text);
 
-  // 96 核：8 欄 × 12 列，每格是 核心編號、曲線、使用率
-  for (let k = 0; k < CORE_COUNT; k++) {
-    const x0 = 74 + (k % 8) * 14;
-    const y = 2 + Math.floor(k / 8);
-    c.put(x0, y, `C${k}`, COLOR.text);
-    c.graph(x0 + 4, y, 5, 1, s.coreHist[k]);
-    c.right(x0 + 12, y, `${Math.round(s.cores[k])}%`, COLOR.text);
+  for (let socket = 0; socket < SOCKETS; socket++) {
+    const x0 = 74 + socket * 24;
+    const base = socket * CORES_PER_SOCKET;
+    for (let k = 0; k < CORES_PER_SOCKET; k++) {
+      const row = Math.floor(k / 8);
+      const col = k % 8;
+      c.put(x0 + col * 2, 2 + row, '■', heat(s.cores[base + k]));
+    }
+    const sum = s.cores.slice(base, base + CORES_PER_SOCKET).reduce((a, b) => a + b, 0);
+    const socketAvg = Math.round(sum / CORES_PER_SOCKET);
+    const temp = Math.round(38 + socketAvg * 0.5);
+    const watt = Math.round(160 + socketAvg * 2.4);
+    const infoX = 146;
+    const infoY = 2 + socket * 4;
+    c.put(infoX, infoY, `socket ${socket}  avg ${socketAvg}%`, COLOR.text);
+    c.put(infoX, infoY + 1, `${CORES_PER_SOCKET} cores  ${temp}°C  ${watt} W`, COLOR.label);
   }
+  c.put(146, 13, '■', COLOR.green);
+  c.put(148, 13, '<25%', COLOR.label);
+  c.put(154, 13, '■', COLOR.yellow);
+  c.put(156, 13, '<60%', COLOR.label);
+  c.put(162, 13, '■', COLOR.red);
+  c.put(164, 13, '60%+', COLOR.label);
 
   // ── mem ──────────────────────────────────────────────
   c.box(1, 16, 42, 20, COLOR.border.mem);
   c.put(2, 16, '²', COLOR.red);
   c.put(3, 16, 'mem', COLOR.text);
   c.put(8, 16, 'DDR5-5600', COLOR.label);
-  const memRows: [number, string, string, string, string][] = [
-    [18, 'Total:', '2.00 TiB', '', ''],
-    [19, 'Used:', '614 GiB', '30%', COLOR.red],
-    [23, 'Available:', '1.39 TiB', '70%', COLOR.orange],
-    [27, 'Cached:', '532 GiB', '26%', COLOR.cyan],
-    [31, 'Free:', '860 GiB', '42%', COLOR.green],
+  c.put(2, 18, 'Total:', COLOR.text);
+  c.right(40, 18, '2.00 TiB', COLOR.text);
+  const memItems: [string, number, string, number][] = [
+    ['Used:', 0, COLOR.red, 19],
+    ['Available:', 1, COLOR.orange, 23],
+    ['Cached:', 2, COLOR.cyan, 27],
+    ['Free:', 3, COLOR.green, 31],
   ];
-  memRows.forEach(([y, label, size, pct, color], i) => {
+  memItems.forEach(([label, i, color, y]) => {
+    const v = s.memHist[i][s.memHist[i].length - 1];
     c.put(2, y, label, COLOR.text);
-    c.right(40, y, size, COLOR.text);
-    if (!pct) return;
-    c.put(3, y + 1, pct, COLOR.text);
-    // 每一項自己的曲線：放在百分比那一行的右邊，三列高，在百分比附近起伏
-    c.graph(8, y + 1, 32, 3, s.memHist[i - 1], color);
+    c.right(40, y, memSize(v), COLOR.text);
+    c.put(3, y + 1, `${Math.round(v)}%`, COLOR.text);
+    c.graph(8, y + 1, 32, 3, s.memHist[i], color);
   });
 
   // ── disks ────────────────────────────────────────────
@@ -497,8 +582,13 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(43, 16, '³', COLOR.red);
   c.put(44, 16, 'disks', COLOR.text);
   c.put(79, 16, 'io', COLOR.text);
+  const used = s.diskUsed;
   const disks: [number, string, string, [string, number, string][]][] = [
-    [18, 'Micron 6600 ION', '245.76 TB', [['IO%', 0, ''], ['Used:', 18, '44.2 TB'], ['Free:', 82, '201.5 TB']]],
+    [18, 'Micron 6600 ION', `${ROOT_DISK_TB} TB`, [
+      ['IO%', 0, ''],
+      ['Used:', used, `${((ROOT_DISK_TB * used) / 100).toFixed(1)} TB`],
+      ['Free:', 100 - used, `${((ROOT_DISK_TB * (100 - used)) / 100).toFixed(1)} TB`],
+    ]],
     [23, 'swap', '64 GiB', [['Used:', 1, '0.6 GiB'], ['Free:', 99, '63.4 GiB']]],
     [27, 'boot', '1.90 GiB', [['IO%', 0, ''], ['Used:', 19, '378 MiB'], ['Free:', 81, '1.53 GiB']]],
     [32, 'efi', '1.04 GiB', [['IO%', 0, ''], ['Used:', 1, '6.08 MiB']]],
@@ -514,7 +604,7 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
       }
       const fill = label === 'Used:' ? COLOR.red : COLOR.green;
       c.put(44, row, label, COLOR.text);
-      c.put(51, row, `${pct}%`, COLOR.text);
+      c.put(51, row, `${Math.round(pct)}%`, COLOR.text);
       c.bar(55, row, 16, pct, fill);
       c.right(84, row, val, COLOR.text);
     });

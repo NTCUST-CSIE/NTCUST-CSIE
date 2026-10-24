@@ -8,6 +8,7 @@ import { discoverEgg } from '../utils/eggs';
 import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
 import type { BtopRow, BtopState } from '../utils/btop';
 import { detectWindowStyle } from '../utils/platform';
+import { playRickrollSound } from '../utils/sound';
 
 interface Line {
   id: number;
@@ -48,6 +49,9 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const [maximized, setMaximized] = useState(false);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
   const minimizing = useRef(false);
+  // 視窗大小：null 代表用預設尺寸，拉過之後會記住
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const resizing = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 
   const print = (text: string, kind: LineKind = 'output') => {
     const id = nextId.current++;
@@ -150,7 +154,10 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
         setMode('shell');
         return;
       }
-      if (result === 'meme') discoverEgg('rickroll');
+      if (result === 'meme') {
+        discoverEgg('rickroll');
+        playRickrollSound(8);
+      }
       setBtopScreen(renderBtop(state, new Date()));
       return;
     }
@@ -252,6 +259,28 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
+  // 拖右下角把手改變大小，最小 480 × 300，最大不超過畫面
+  const startResize = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !windowRef.current) return;
+    e.stopPropagation();
+    const rect = windowRef.current.getBoundingClientRect();
+    resizing.current = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const moveResize = (e: PointerEvent<HTMLDivElement>) => {
+    const start = resizing.current;
+    if (!start) return;
+    const w = Math.min(window.innerWidth - 16, Math.max(480, start.w + e.clientX - start.x));
+    const h = Math.min(window.innerHeight - 16, Math.max(300, start.h + e.clientY - start.y));
+    setSize({ w, h });
+  };
+
+  const endResize = (e: PointerEvent<HTMLDivElement>) => {
+    resizing.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+  };
+
   // 點終端機任何地方都能繼續打字，但選取文字複製時不要搶走焦點
   const focusInput = () => {
     if (window.getSelection()?.isCollapsed ?? true) inputRef.current?.focus();
@@ -264,7 +293,10 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
       <div
         ref={windowRef}
         className={`terminal-window${maximized ? ' is-maximized' : ''}`}
-        style={pos && !maximized ? { left: pos.x, top: pos.y, transform: 'none' } : undefined}
+        style={{
+          ...(pos && !maximized ? { left: pos.x, top: pos.y, transform: 'none' } : {}),
+          ...(size && !maximized ? { width: size.w, height: size.h } : {}),
+        }}
         role="dialog"
         aria-label="CSIE 終端機"
         onClick={e => { e.stopPropagation(); focusInput(); }}
@@ -354,6 +386,14 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
             />
           </div>
         </div>
+        <div
+          className="terminal-resize"
+          aria-hidden="true"
+          onPointerDown={startResize}
+          onPointerMove={moveResize}
+          onPointerUp={endResize}
+          onPointerCancel={endResize}
+        />
       </div>
     </div>
   );
