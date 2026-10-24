@@ -84,31 +84,3 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return json({ success: false, error: err.message }, 500);
   }
 };
-
-// GET -> how many visitors have found each egg
-export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const { env } = context;
-
-  try {
-    if (!env.DB) {
-      return json({ error: 'D1 Database binding DB not found' }, 500);
-    }
-
-    await ensureTable(env.DB);
-
-    const { results } = await env.DB.prepare(`
-      SELECT egg, COUNT(*) as finders
-      FROM egg_finds
-      GROUP BY egg
-      ORDER BY finders DESC
-    `).all();
-
-    const hunters = await env.DB.prepare(
-      `SELECT COUNT(DISTINCT visitor_id) as count FROM egg_finds`
-    ).first() as { count: number } | null;
-
-    return json({ success: true, hunters: hunters?.count ?? 0, eggs: results });
-  } catch (err: any) {
-    return json({ success: false, error: err.message }, 500);
-  }
-};

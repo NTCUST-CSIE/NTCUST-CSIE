@@ -195,16 +195,6 @@ const showEggs = (api: TerminalApi) => {
   const found = getFoundEggs();
   const lines = eggs.map(e => (found.includes(e.id) ? `  ✅ ${e.name}` : `  ⬜ ???　提示：${e.hint}`));
   api.print(`🥚 彩蛋收集進度：${eggs.filter(e => found.includes(e.id)).length}/${eggs.length}\n${lines.join('\n')}`);
-
-  fetch('/api/egg')
-    .then(res => (res.ok ? res.json() : null))
-    .then(data => {
-      if (!data?.success || !Array.isArray(data.eggs) || data.eggs.length === 0) return;
-      const top = [...data.eggs].sort((a, b) => b.finders - a.finders)[0];
-      const topName = eggs.find(e => e.id === top.egg)?.name ?? top.egg;
-      api.print(`🌏 全站已有 ${data.hunters} 人找到至少一顆彩蛋，最多人找到的是「${topName}」（${top.finders} 人）`, 'accent');
-    })
-    .catch(() => {});
 };
 
 const runAsRoot = (command: string, api: TerminalApi, session: TerminalSession) => {
@@ -260,7 +250,7 @@ export const handleInput = (raw: string, api: TerminalApi, session: TerminalSess
     const exits = [':q', ':q!', ':wq', ':wq!', ':x', ':qa', ':qa!', 'ZZ'];
     if (exits.includes(raw.trim())) {
       api.setMode('shell');
-      api.print('🎉 恭喜你成功離開 Vim！這比解 CTF 還難。', 'accent');
+      api.print('恭喜你離開 Vim！這比解 CTF 還難 😇', 'accent');
       discoverEgg('vim');
       return;
     }
@@ -396,7 +386,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
         '• 不需要攻擊任何伺服器，所有線索都在你的瀏覽器裡找得到',
         '• Flag 格式：CSIE{...}',
         '• 規則、提示與提交：輸入 cd flag，或前往 /flag',
-        '• 第一片在哪？工程師最常按的那個 F 開頭的鍵 😉',
+        '• 第一片在哪？試試看 開發人員工具（F12）',
       ].join('\n'), 'accent');
       return;
     case 'sudo':

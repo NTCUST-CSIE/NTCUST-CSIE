@@ -93,14 +93,14 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     }
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (mode === 'vim') print('（在 Vim 裡按 Esc 只會回到 Normal mode，可不會讓你離開喔 😏）', 'error');
+      if (mode === 'vim') print('（你這樣出不去的，查看看怎麼退出vim吧...這不難）', 'error');
       else onClose();
       return;
     }
     if (e.ctrlKey && e.key === 'c' && e.currentTarget.selectionStart === e.currentTarget.selectionEnd) {
       e.preventDefault();
       if (mode === 'vim') {
-        print('Type  :qa!  and press <Enter> to abandon all changes and exit Vim', 'error');
+        print('Type :qa! and press <Enter> to abandon all changes and exit Vim', 'error');
         return;
       }
       print(mode === 'shell' ? `${PROMPT} ${input}^C` : '^C', 'input');
