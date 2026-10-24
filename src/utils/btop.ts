@@ -1,6 +1,7 @@
 // 模擬 aristocratos/btop 的畫面，版面以截圖的 190 × 50 格對位。
-// 數字是假的：CPU、溫度、網路、行程的 CPU% 會每秒飄動；
+// 數字是假的：CPU、溫度、網路、行程的 CPU% 會持續飄動；
 // 主機名稱、IP、使用者都換成虛構的值，不暴露真實機器資訊。
+// 行程表可以用 ↑↓ 選取，按 Enter / k / s 送出訊號；權限不夠的行程會被拒絕。
 
 export const COLS = 190;
 export const ROWS = 50;
@@ -8,7 +9,6 @@ export const ROWS = 50;
 const COLOR = {
   text: '#e6edf3',
   label: '#8b949e',
-  dim: '#4b535c',
   empty: '#2b3038',
   green: '#7fd17f',
   yellow: '#e5c44a',
@@ -16,6 +16,8 @@ const COLOR = {
   blue: '#5b8fe0',
   orange: '#e0873a',
   cyan: '#56c8d8',
+  select: '#2d4a6e',
+  panel: '#161b22',
   border: {
     cpu: '#a7b0b8',
     mem: '#d8c24a',
@@ -31,12 +33,14 @@ const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(mi
 export interface BtopRun {
   text: string;
   color?: string;
+  bg?: string;
 }
 export type BtopRow = BtopRun[];
 
 interface Cell {
   ch: string;
   color?: string;
+  bg?: string;
 }
 
 // 一格一格的畫布，最後轉成帶顏色的列
@@ -45,9 +49,9 @@ class Canvas {
     Array.from({ length: COLS }, (): Cell => ({ ch: ' ' })),
   );
 
-  set(x: number, y: number, ch: string, color?: string) {
+  set(x: number, y: number, ch: string, color?: string, bg?: string) {
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) return;
-    this.grid[y][x] = { ch, color };
+    this.grid[y][x] = { ch, color, bg };
   }
 
   put(x: number, y: number, text: string, color?: string) {
@@ -57,6 +61,16 @@ class Canvas {
   // 文字靠右對齊，最後一個字落在 endX
   right(endX: number, y: number, text: string, color?: string) {
     this.put(endX - [...text].length + 1, y, text, color);
+  }
+
+  fill(x: number, y: number, w: number, h: number, bg: string) {
+    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) this.set(x + i, y + j, ' ', undefined, bg);
+  }
+
+  // 只改背景色，保留原本的字
+  highlight(x0: number, x1: number, y: number, bg: string) {
+    if (y < 0 || y >= ROWS) return;
+    for (let x = x0; x <= x1 && x < COLS; x++) this.grid[y][x] = { ...this.grid[y][x], bg };
   }
 
   box(x: number, y: number, w: number, h: number, color: string) {
@@ -103,8 +117,8 @@ class Canvas {
       const runs: BtopRun[] = [];
       for (const cell of row) {
         const last = runs[runs.length - 1];
-        if (last && last.color === cell.color) last.text += cell.ch;
-        else runs.push({ text: cell.ch, color: cell.color });
+        if (last && last.color === cell.color && last.bg === cell.bg) last.text += cell.ch;
+        else runs.push({ text: cell.ch, color: cell.color, bg: cell.bg });
       }
       return runs;
     });
@@ -118,49 +132,73 @@ interface Proc {
   threads: number;
   user: string;
   memB: string;
-  cpu: number;
-  // 這一列的 CPU% 會飄動
-  live?: boolean;
+  // 基準 CPU%，0 代表閒置；實際值每次更新會在基準附近飄
+  base: number;
 }
 
-// 行程表照截圖排列，cpu 是靜態基準值
+interface LiveProc extends Proc {
+  cpu: number;
+}
+
+// 行程表照截圖排列
 const PROCS: Proc[] = [
-  { pid: 3426753, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '3T', cpu: 0 },
-  { pid: 2012235, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 56, user: 'guest', memB: '2.3G', cpu: 0 },
-  { pid: 3420079, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 129, user: 'guest', memB: '1.6G', cpu: 9.9, live: true },
-  { pid: 3422005, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 92, user: 'guest', memB: '1.5G', cpu: 0 },
-  { pid: 3276018, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 66, user: 'guest', memB: '1.5G', cpu: 0 },
-  { pid: 2151981, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 45, user: 'guest', memB: '1.3G', cpu: 0 },
-  { pid: 3422196, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 39, user: 'guest', memB: '1.3G', cpu: 0 },
-  { pid: 3427061, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 90, user: 'guest', memB: '1.2G', cpu: 0 },
-  { pid: 3425877, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 47, user: 'guest', memB: '791M', cpu: 0 },
-  { pid: 3416374, program: 'python3', command: '/usr/local/bin/python3', threads: 67, user: 'root', memB: '732M', cpu: 0 },
-  { pid: 3420084, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 38, user: 'guest', memB: '623M', cpu: 0 },
-  { pid: 3375361, program: 'systemd-journal', command: '/lib/systemd/systemd-jo', threads: 1, user: 'root', memB: '260M', cpu: 0 },
-  { pid: 3427351, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '209M', cpu: 0 },
-  { pid: 3427508, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '208M', cpu: 0 },
-  { pid: 3427760, program: 'MainThread', command: 'node --require /usr/loc', threads: 32, user: 'guest', memB: '192M', cpu: 0 },
-  { pid: 1165343, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '183M', cpu: 0 },
-  { pid: 881274, program: 'fwupd', command: '/usr/libexec/fwupd/fwup', threads: 5, user: 'root', memB: '157M', cpu: 0 },
-  { pid: 3415964, program: 'dockerd', command: '/usr/bin/dockerd -H fd:', threads: 97, user: 'root', memB: '128M', cpu: 0 },
-  { pid: 1036, program: 'zerotier-one', command: '/usr/sbin/zerotier-one', threads: 49, user: 'zerotier', memB: '102M', cpu: 0 },
-  { pid: 991, program: 'node', command: '/opt/node-v20.12.2-linu', threads: 11, user: 'root', memB: '82M', cpu: 0 },
-  { pid: 547397, program: 'python', command: '/usr/local/bin/python /', threads: 4, user: 'guest', memB: '80M', cpu: 0 },
-  { pid: 3388622, program: 'containerd', command: '/usr/bin/containerd', threads: 27, user: 'root', memB: '55M', cpu: 0 },
-  { pid: 990, program: 'node', command: '/opt/node-v20.12.2-linu', threads: 11, user: 'root', memB: '54M', cpu: 0 },
-  { pid: 3417009, program: 'wings', command: '/usr/local/bin/wings', threads: 27, user: 'root', memB: '53M', cpu: 0 },
-  { pid: 812, program: 'sshd', command: 'sshd: /usr/sbin/sshd -D', threads: 1, user: 'root', memB: '42M', cpu: 0 },
-  { pid: 903, program: 'rsyslogd', command: '/usr/sbin/rsyslogd -n', threads: 4, user: 'root', memB: '38M', cpu: 0 },
-  { pid: 1190, program: 'mysqld', command: '/usr/sbin/mysqld', threads: 36, user: 'mysql', memB: '31M', cpu: 0 },
-  { pid: 1044, program: 'nginx', command: 'nginx: master process', threads: 1, user: 'root', memB: '18M', cpu: 0 },
-  { pid: 1402, program: 'php-fpm', command: 'php-fpm: pool www', threads: 1, user: 'www-data', memB: '14M', cpu: 0 },
-  { pid: 3520, program: 'cron', command: '/usr/sbin/cron -f', threads: 1, user: 'root', memB: '6M', cpu: 0 },
+  { pid: 3426753, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '3T', base: 0.4 },
+  { pid: 2012235, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 56, user: 'guest', memB: '2.3G', base: 0.8 },
+  { pid: 3420079, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 129, user: 'guest', memB: '1.6G', base: 9.9 },
+  { pid: 3422005, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 92, user: 'guest', memB: '1.5G', base: 0 },
+  { pid: 3276018, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 66, user: 'guest', memB: '1.5G', base: 0 },
+  { pid: 2151981, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 45, user: 'guest', memB: '1.3G', base: 0 },
+  { pid: 3422196, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 39, user: 'guest', memB: '1.3G', base: 0 },
+  { pid: 3427061, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 90, user: 'guest', memB: '1.2G', base: 0 },
+  { pid: 3425877, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 47, user: 'guest', memB: '791M', base: 0 },
+  { pid: 3416374, program: 'python3', command: '/usr/local/bin/python3', threads: 67, user: 'root', memB: '732M', base: 0 },
+  { pid: 3420084, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 38, user: 'guest', memB: '623M', base: 0 },
+  { pid: 3375361, program: 'systemd-journal', command: '/lib/systemd/systemd-jo', threads: 1, user: 'root', memB: '260M', base: 0 },
+  { pid: 3427351, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '209M', base: 0.3 },
+  { pid: 3427508, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '208M', base: 0.2 },
+  { pid: 3427760, program: 'MainThread', command: 'node --require /usr/loc', threads: 32, user: 'guest', memB: '192M', base: 0 },
+  { pid: 1165343, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '183M', base: 0 },
+  { pid: 881274, program: 'fwupd', command: '/usr/libexec/fwupd/fwup', threads: 5, user: 'root', memB: '157M', base: 0 },
+  { pid: 3415964, program: 'dockerd', command: '/usr/bin/dockerd -H fd:', threads: 97, user: 'root', memB: '128M', base: 0.6 },
+  { pid: 1036, program: 'zerotier-one', command: '/usr/sbin/zerotier-one', threads: 49, user: 'zerotier', memB: '102M', base: 0 },
+  { pid: 991, program: 'node', command: '/opt/node-v20.12.2-linu', threads: 11, user: 'root', memB: '82M', base: 0 },
+  { pid: 547397, program: 'python', command: '/usr/local/bin/python /', threads: 4, user: 'guest', memB: '80M', base: 0 },
+  { pid: 3388622, program: 'containerd', command: '/usr/bin/containerd', threads: 27, user: 'root', memB: '55M', base: 0 },
+  { pid: 990, program: 'node', command: '/opt/node-v20.12.2-linu', threads: 11, user: 'root', memB: '54M', base: 0 },
+  { pid: 3417009, program: 'wings', command: '/usr/local/bin/wings', threads: 27, user: 'root', memB: '53M', base: 0 },
+  { pid: 812, program: 'sshd', command: 'sshd: /usr/sbin/sshd -D', threads: 1, user: 'root', memB: '42M', base: 0 },
+  { pid: 903, program: 'rsyslogd', command: '/usr/sbin/rsyslogd -n', threads: 4, user: 'root', memB: '38M', base: 0 },
+  { pid: 1190, program: 'mysqld', command: '/usr/sbin/mysqld', threads: 36, user: 'mysql', memB: '31M', base: 1.2 },
+  { pid: 1044, program: 'nginx', command: 'nginx: master process', threads: 1, user: 'root', memB: '18M', base: 0 },
+  { pid: 1402, program: 'php-fpm', command: 'php-fpm: pool www', threads: 1, user: 'www-data', memB: '14M', base: 0 },
+  { pid: 3520, program: 'cron', command: '/usr/sbin/cron -f', threads: 1, user: 'root', memB: '6M', base: 0 },
+];
+
+// 這個模擬本身的行程；kill 到它就等於 q 離開
+const BTOP_PID = 4096;
+
+const SIGNALS: { name: string; kills: boolean }[] = [
+  { name: 'SIGTERM', kills: true },
+  { name: 'SIGKILL', kills: true },
+  { name: 'SIGHUP', kills: true },
+  { name: 'SIGINT', kills: true },
+  { name: 'SIGQUIT', kills: true },
+  { name: 'SIGSTOP', kills: false },
+  { name: 'SIGCONT', kills: false },
+  { name: 'SIGUSR1', kills: false },
+  { name: 'SIGUSR2', kills: false },
+  { name: 'SIGALRM', kills: false },
 ];
 
 const CORE_COUNT = 20;
 const CPU_HIST = 66;
 const CORE_HIST = 9;
 const NET_HIST = 44;
+const PROC_ROWS = 30;
+
+type Modal =
+  | { kind: 'confirm'; pid: number; signal: string }
+  | { kind: 'signals'; index: number };
 
 export interface BtopState {
   cpu: number[];
@@ -169,7 +207,10 @@ export interface BtopState {
   tempHist: number[][];
   down: number[];
   up: number[];
-  procCpu: number[];
+  procs: LiveProc[];
+  selected: number;
+  modal: Modal | null;
+  notice: { text: string; color: string; until: number } | null;
 }
 
 const filled = (n: number, v: number) => Array<number>(n).fill(v);
@@ -181,7 +222,10 @@ export const createBtop = (): BtopState => ({
   tempHist: Array.from({ length: CORE_COUNT }, () => filled(CORE_HIST, 22)),
   down: filled(NET_HIST, 10),
   up: filled(NET_HIST, 6),
-  procCpu: PROCS.map(p => p.cpu),
+  procs: PROCS.map(p => ({ ...p, cpu: p.base })),
+  selected: 0,
+  modal: null,
+  notice: null,
 });
 
 const push = (arr: number[], v: number) => {
@@ -189,20 +233,100 @@ const push = (arr: number[], v: number) => {
   arr.push(v);
 };
 
-// 每秒呼叫一次：數值往目標附近飄，不會突然跳到天邊
+// 每 100ms 呼叫一次：數值往目標附近飄，不會突然跳到天邊
 export const stepBtop = (s: BtopState) => {
   const drift = (prev: number, target: number, spread: number) =>
-    clamp(prev + (target - prev) * 0.4 + (Math.random() - 0.5) * spread, 0, 100);
+    clamp(prev + (target - prev) * 0.3 + (Math.random() - 0.5) * spread, 0, 100);
 
-  push(s.cpu, drift(s.cpu[s.cpu.length - 1], 4, 14));
-  s.cores = s.cores.map(c => drift(c, 6, 30));
+  push(s.cpu, drift(s.cpu[s.cpu.length - 1], 4, 10));
+  s.cores = s.cores.map(c => drift(c, 6, 24));
   s.cores.forEach((c, i) => push(s.coreHist[i], c));
-  s.tempHist.forEach(h => push(h, clamp(h[h.length - 1] + (Math.random() - 0.5) * 3, 10, 40)));
-  push(s.down, drift(s.down[s.down.length - 1], 14, 26));
-  push(s.up, drift(s.up[s.up.length - 1], 8, 16));
-  s.procCpu = s.procCpu.map((c, i) => (PROCS[i].live ? clamp(c + (Math.random() - 0.5) * 4, 2, 15) : 0));
+  s.tempHist.forEach(h => push(h, clamp(h[h.length - 1] + (Math.random() - 0.5) * 2, 10, 40)));
+  push(s.down, drift(s.down[s.down.length - 1], 14, 30));
+  push(s.up, drift(s.up[s.up.length - 1], 8, 20));
+  s.procs.forEach(p => {
+    p.cpu = p.base > 0
+      ? clamp(p.base * (0.4 + Math.random() * 1.2), 0, 100)
+      : Math.random() < 0.05 ? Math.random() * 0.5 : 0;
+  });
 };
 
+const killProc = (s: BtopState, pid: number, signal: string): 'quit' | void => {
+  const index = s.procs.findIndex(p => p.pid === pid);
+  if (index < 0) return;
+  const proc = s.procs[index];
+  const until = Date.now() + 3000;
+
+  // 只能動自己 guest 的行程，其他的跟真的 kill 一樣回 Operation not permitted
+  if (proc.user !== 'guest') {
+    s.notice = { text: `kill(${pid}, ${signal}): Operation not permitted`, color: COLOR.red, until };
+    return;
+  }
+  if (pid === BTOP_PID) return 'quit';
+
+  const sig = SIGNALS.find(x => x.name === signal);
+  if (!sig?.kills) {
+    s.notice = { text: `sent ${signal} to ${pid} (${proc.program})`, color: COLOR.label, until };
+    return;
+  }
+  s.procs.splice(index, 1);
+  s.selected = clamp(s.selected, 0, Math.max(0, s.procs.length - 1));
+  s.notice = { text: `${signal} → ${pid} (${proc.program}) terminated`, color: COLOR.green, until };
+};
+
+// 回傳 'quit' 代表要離開 btop
+export const handleBtopKey = (s: BtopState, key: string): 'quit' | void => {
+  if (key === 'CtrlC') return 'quit';
+
+  if (s.modal?.kind === 'confirm') {
+    const { pid, signal } = s.modal;
+    if (key === 'y' || key === 'Y') {
+      s.modal = null;
+      return killProc(s, pid, signal);
+    }
+    if (key === 'n' || key === 'N' || key === 'Escape') s.modal = null;
+    return;
+  }
+
+  if (s.modal?.kind === 'signals') {
+    const menu = s.modal;
+    if (key === 'ArrowUp') menu.index = Math.max(0, menu.index - 1);
+    else if (key === 'ArrowDown') menu.index = Math.min(SIGNALS.length - 1, menu.index + 1);
+    else if (key === 'Enter') {
+      const proc = s.procs[s.selected];
+      const signal = SIGNALS[menu.index].name;
+      s.modal = null;
+      if (proc) return killProc(s, proc.pid, signal);
+    } else if (key === 'Escape' || key === 's') s.modal = null;
+    return;
+  }
+
+  const proc = s.procs[s.selected];
+  switch (key) {
+    case 'ArrowUp':
+      s.selected = Math.max(0, s.selected - 1);
+      return;
+    case 'ArrowDown':
+      s.selected = Math.min(Math.max(0, s.procs.length - 1), s.selected + 1);
+      return;
+    case 'Enter':
+    case 't':
+      if (proc) s.modal = { kind: 'confirm', pid: proc.pid, signal: 'SIGTERM' };
+      return;
+    case 'k':
+      if (proc) s.modal = { kind: 'confirm', pid: proc.pid, signal: 'SIGKILL' };
+      return;
+    case 's':
+      s.modal = { kind: 'signals', index: 0 };
+      return;
+    case 'q':
+    case 'Q':
+    case 'Escape':
+      return 'quit';
+  }
+};
+
+const fmt = (n: number) => n.toFixed(1).padStart(5);
 
 export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   const c = new Canvas();
@@ -325,10 +449,12 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.box(52, 37, 33, 12, COLOR.border.net);
   c.put(54, 37, 'download', COLOR.text);
   const kib = (v: number) => Math.round(v * 1.2);
-  c.put(54, 39, `▼ ${kib(s.down[s.down.length - 1])} KiB/s (${Math.round(kib(s.down[s.down.length - 1]) * 8.2)} Kbps)`, COLOR.text);
+  const down = kib(s.down[s.down.length - 1]);
+  const up = kib(s.up[s.up.length - 1]);
+  c.put(54, 39, `▼ ${down} KiB/s (${Math.round(down * 8.2)} Kbps)`, COLOR.text);
   c.put(54, 40, '▼ Top: (525 Kbps)', COLOR.text);
   c.put(54, 41, '▼ Total: 501 GiB', COLOR.text);
-  c.put(54, 43, `▲ ${kib(s.up[s.up.length - 1])} KiB/s (${(kib(s.up[s.up.length - 1]) * 8.2 / 1000).toFixed(2)} Mibps)`, COLOR.text);
+  c.put(54, 43, `▲ ${up} KiB/s (${(up * 8.2 / 1000).toFixed(2)} Mibps)`, COLOR.text);
   c.put(54, 44, '▲ Top: (3.14 Mibps)', COLOR.text);
   c.put(54, 45, '▲ Total: 760 GiB', COLOR.text);
   c.put(54, 48, 'upload', COLOR.text);
@@ -352,21 +478,52 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.right(185, 17, 'Cpu%', COLOR.text);
   c.put(186, 17, '▲', COLOR.text);
 
-  PROCS.forEach((p, i) => {
+  // 行程很多時跟著選取的列捲動
+  const offset = Math.max(0, s.selected - PROC_ROWS + 1);
+  s.procs.slice(offset, offset + PROC_ROWS).forEach((p, i) => {
     const y = 18 + i;
-    if (y > 47) return;
-    const cpu = s.procCpu[i];
     c.right(96, y, String(p.pid), COLOR.text);
     c.put(98, y, p.program.slice(0, 15), COLOR.green);
     c.put(117, y, p.command.slice(0, 25), COLOR.label);
     c.right(150, y, String(p.threads), COLOR.text);
     c.put(153, y, p.user.slice(0, 10), COLOR.green);
     c.right(170, y, p.memB, COLOR.text);
-    c.right(185, y, cpu.toFixed(1), COLOR.text);
+    c.right(185, y, fmt(p.cpu), COLOR.text);
   });
+  if (s.procs.length > 0) c.highlight(88, 186, 18 + s.selected - offset, COLOR.select);
 
-  c.put(88, 49, '↑ select ↓ info ↵ terminate kill signals', COLOR.text);
-  c.right(186, 49, `0/${PROCS.length}`, COLOR.text);
+  // ── 彈出視窗：kill 確認 / 訊號選單 ───────────────────
+  const selected = s.procs[s.selected];
+  if (s.modal?.kind === 'confirm' && selected) {
+    const { pid, signal } = s.modal;
+    const proc = s.procs.find(p => p.pid === pid);
+    const verb = signal === 'SIGKILL' ? 'Kill' : 'Terminate';
+    const x = 63;
+    c.fill(x, 21, 64, 5, COLOR.panel);
+    c.box(x, 21, 64, 5, COLOR.border.proc);
+    c.put(x + 2, 23, `${verb} ${proc?.program ?? pid} (PID ${pid}) with ${signal}? [y/N]`, COLOR.text);
+  }
+  if (s.modal?.kind === 'signals') {
+    const x = 70;
+    const h = SIGNALS.length + 4;
+    const chosen = s.modal.index;
+    c.fill(x, 12, 36, h, COLOR.panel);
+    c.box(x, 12, 36, h, COLOR.border.proc);
+    c.put(x + 2, 13, 'Send signal', COLOR.text);
+    SIGNALS.forEach((sig, i) => {
+      const y = 14 + i;
+      c.put(x + 2, y, sig.name, COLOR.text);
+      if (i === chosen) c.highlight(x + 1, x + 34, y, COLOR.select);
+    });
+  }
+
+  // ── 底部：有通知就顯示通知，否則是操作列 ─────────────
+  if (s.notice && now.getTime() < s.notice.until) {
+    c.put(88, 49, s.notice.text, s.notice.color);
+  } else {
+    c.put(88, 49, '↑ select ↓ info ↵ terminate kill signals', COLOR.text);
+  }
+  c.right(186, 49, `${s.procs.length ? s.selected + 1 : 0}/${s.procs.length}`, COLOR.text);
 
   return c.rows();
 };

@@ -5,8 +5,8 @@ import { X } from '@phosphor-icons/react';
 import { complete, handleInput } from '../utils/terminalCommands';
 import type { LineKind, TerminalApi, TerminalMode, TerminalSession } from '../utils/terminalCommands';
 import { discoverEgg } from '../utils/eggs';
-import { createBtop, renderBtop, stepBtop } from '../utils/btop';
-import type { BtopRow } from '../utils/btop';
+import { createBtop, handleBtopKey, renderBtop, stepBtop } from '../utils/btop';
+import type { BtopRow, BtopState } from '../utils/btop';
 
 interface Line {
   id: number;
@@ -33,6 +33,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
   const [lines, setLines] = useState<Line[]>(() => welcome.map((text, id) => ({ id, text, kind: 'accent' })));
   const [input, setInput] = useState('');
   const [btopScreen, setBtopScreen] = useState<BtopRow[]>([]);
+  const btopRef = useRef<BtopState | null>(null);
   const [mode, setModeState] = useState<TerminalMode>('shell');
   const session = useRef<TerminalSession>({ mode: 'shell', history: [], sudoCommand: '', sudoFails: 0, vimTries: 0 });
   const historyCursor = useRef(-1);
@@ -102,24 +103,32 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     handleInput(raw, api, session.current);
   };
 
-  // btop 全螢幕：q / Esc / Ctrl+C 離開，回到剛才的輸出
+  // btop 在終端機視窗裡執行，每 100ms 更新一次；q / Ctrl+C 離開，回到剛才的輸出
   useEffect(() => {
     if (mode !== 'btop') return;
     const state = createBtop();
+    btopRef.current = state;
     const draw = () => setBtopScreen(renderBtop(state, new Date()));
     draw();
     const timer = setInterval(() => {
       stepBtop(state);
       draw();
-    }, 1000);
-    return () => clearInterval(timer);
+    }, 100);
+    return () => {
+      clearInterval(timer);
+      btopRef.current = null;
+    };
   }, [mode]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (mode === 'btop') {
       e.preventDefault();
-      const quit = e.key === 'q' || e.key === 'Q' || e.key === 'Escape' || (e.ctrlKey && e.key === 'c');
-      if (quit) setMode('shell');
+      const state = btopRef.current;
+      if (!state) return;
+      const key = e.ctrlKey && e.key === 'c' ? 'CtrlC' : e.key;
+      const result = handleBtopKey(state, key);
+      if (result === 'quit') setMode('shell');
+      else setBtopScreen(renderBtop(state, new Date()));
       return;
     }
     if (e.key === 'Enter') {
@@ -185,7 +194,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
 
   return (
     <div className="terminal-overlay" onClick={onClose}>
-      <div className={`terminal-window${mode === 'btop' ? ' is-btop' : ''}`} role="dialog" aria-label="CSIE 終端機" onClick={e => { e.stopPropagation(); focusInput(); }}>
+      <div className="terminal-window" role="dialog" aria-label="CSIE 終端機" onClick={e => { e.stopPropagation(); focusInput(); }}>
         <div className="terminal-titlebar">
           <span className="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
           <span className="terminal-title">guest@csie: ~</span>
@@ -199,7 +208,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
               {btopScreen.map((row, y) => (
                 <div key={y} className="terminal-btop-row">
                   {row.map((run, x) => {
-                    const style = run.color ? { color: run.color } : undefined;
+                    const style = { color: run.color, backgroundColor: run.bg };
                     // 方塊、框線、箭頭在不同字型裡寬度不一，逐字包成 1ch 寬，欄位才不會錯位
                     return run.text.split(/([^\x00-\x7f])/).filter(Boolean).map((part, i) =>
                       /^[^\x00-\x7f]$/.test(part)
