@@ -131,8 +131,12 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
       if (!state) return;
       const key = e.ctrlKey && e.key === 'c' ? 'CtrlC' : e.key;
       const result = handleBtopKey(state, key);
-      if (result === 'quit') setMode('shell');
-      else setBtopScreen(renderBtop(state, new Date()));
+      if (result === 'quit') {
+        setMode('shell');
+        return;
+      }
+      if (result === 'meme') discoverEgg('rickroll');
+      setBtopScreen(renderBtop(state, new Date()));
       return;
     }
     if (e.key === 'Enter') {

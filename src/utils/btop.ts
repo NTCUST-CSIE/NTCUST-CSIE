@@ -144,6 +144,8 @@ interface LiveProc extends Proc {
 const PROCS: Proc[] = [
   { pid: 3426753, program: 'MainThread', command: 'node --require /usr/loc', threads: 12, user: 'guest', memB: '486G', base: 0.4 },
   { pid: 2012235, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 56, user: 'guest', memB: '2.3G', base: 0.8 },
+  // 瀏覽器分頁：標題是 rick roll，kill 掉會觸發彩蛋
+  { pid: 7731, program: 'youtube', command: 'rick roll', threads: 8, user: 'guest', memB: '412M', base: 1.8 },
   { pid: 3420079, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 129, user: 'guest', memB: '1.6G', base: 9.9 },
   { pid: 3422005, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 92, user: 'guest', memB: '1.5G', base: 0 },
   { pid: 3276018, program: 'java', command: 'java -Xms128M -XX:MaxRA', threads: 66, user: 'guest', memB: '1.5G', base: 0 },
@@ -190,7 +192,8 @@ const SIGNALS: { name: string; kills: boolean }[] = [
   { name: 'SIGALRM', kills: false },
 ];
 
-const CORE_COUNT = 20;
+// AMD Ryzen Threadripper PRO 9995WX：96 核
+const CORE_COUNT = 96;
 const CPU_HIST = 66;
 const CORE_HIST = 9;
 const NET_HIST = 44;
@@ -218,7 +221,11 @@ export interface BtopState {
   selected: number;
   modal: Modal | null;
   notice: { text: string; color: string; until: number } | null;
+  // kill 到 rick roll 時的 ASCII 動畫，蓋過整個畫面
+  rickroll: { start: number; until: number } | null;
 }
+
+const RICKROLL_MS = 8000;
 
 const filled = (n: number, v: number) => Array<number>(n).fill(v);
 
@@ -238,6 +245,7 @@ export const createBtop = (): BtopState => ({
   selected: 0,
   modal: null,
   notice: null,
+  rickroll: null,
 });
 
 const push = (arr: number[], v: number) => {
@@ -249,6 +257,8 @@ const push = (arr: number[], v: number) => {
 export const stepBtop = (s: BtopState) => {
   const drift = (prev: number, target: number, spread: number) =>
     clamp(prev + (target - prev) * 0.3 + (Math.random() - 0.5) * spread, 0, 100);
+
+  if (s.rickroll && Date.now() >= s.rickroll.until) s.rickroll = null;
 
   push(s.cpu, drift(s.cpu[s.cpu.length - 1], 4, 10));
   s.cores = s.cores.map(c => drift(c, 6, 24));
@@ -272,7 +282,7 @@ export const stepBtop = (s: BtopState) => {
   });
 };
 
-const killProc = (s: BtopState, pid: number, signal: string): 'quit' | void => {
+const killProc = (s: BtopState, pid: number, signal: string): 'quit' | 'meme' | void => {
   const index = s.procs.findIndex(p => p.pid === pid);
   if (index < 0) return;
   const proc = s.procs[index];
@@ -293,11 +303,18 @@ const killProc = (s: BtopState, pid: number, signal: string): 'quit' | void => {
   s.procs.splice(index, 1);
   s.selected = clamp(s.selected, 0, Math.max(0, s.procs.length - 1));
   s.notice = { text: `${signal} → ${pid} (${proc.program}) terminated`, color: COLOR.green, until };
+
+  if (proc.command === 'rick roll') {
+    s.rickroll = { start: Date.now(), until: Date.now() + RICKROLL_MS };
+    return 'meme';
+  }
 };
 
-// 回傳 'quit' 代表要離開 btop
-export const handleBtopKey = (s: BtopState, key: string): 'quit' | void => {
+// 回傳 'quit' 代表要離開 btop；'meme' 代表觸發了彩蛋
+export const handleBtopKey = (s: BtopState, key: string): 'quit' | 'meme' | void => {
   if (key === 'CtrlC') return 'quit';
+  // rick roll 動畫播放中，按鍵先不理
+  if (s.rickroll) return;
 
   if (s.modal?.kind === 'confirm') {
     const { pid, signal } = s.modal;
@@ -349,7 +366,67 @@ export const handleBtopKey = (s: BtopState, key: string): 'quit' | void => {
 
 const fmt = (n: number) => n.toFixed(1).padStart(5);
 
+// rickroll 的 ASCII 小人，三格循環跳舞
+const RICK_FRAMES: string[][] = [
+  [
+    '    ___    ',
+    '   /   \\   ',
+    '  | o o |  ♪',
+    '  |  ^  |  ',
+    '   \\___/   ',
+    ' __/   \\__ ',
+    '/  |   |  \\',
+    '   |   |   ',
+    '  _/   \\_  ',
+    ' /       \\ ',
+  ],
+  [
+    '    ___    ',
+    '   /   \\   ',
+    '  | ^ ^ |  ♫',
+    '  |  o  |  ',
+    '   \\___/   ',
+    '  \\_   _/  ',
+    '    \\ /    ',
+    '     |     ',
+    '    / \\    ',
+    '   /   \\   ',
+  ],
+  [
+    '    ___    ',
+    '   /   \\   ',
+    '  | o o |  ♪',
+    '  |  -  |  ',
+    '   \\___/   ',
+    ' __/   \\__ ',
+    '\\  |   |  /',
+    '   |   |   ',
+    '  _/   \\_  ',
+    ' /       \\ ',
+  ],
+];
+
+const renderRickroll = (s: BtopState, now: Date): BtopRow[] => {
+  const c = new Canvas();
+  const { start } = s.rickroll!;
+  const frame = RICK_FRAMES[Math.floor((now.getTime() - start) / 250) % RICK_FRAMES.length];
+  c.fill(0, 0, COLS, ROWS, '#000000');
+
+  const x0 = Math.floor((COLS - 16) / 2);
+  frame.forEach((line, i) => c.put(x0, 12 + i, line, COLOR.text));
+
+  const center = (text: string, y: number, color: string) =>
+    c.put(Math.floor((COLS - [...text].length) / 2), y, text, color);
+  center('♪ Never gonna give you up ♪', 24, COLOR.yellow);
+  center('Never gonna let you down', 25, COLOR.text);
+  center('youtube (pid 7731) — rick roll', 28, COLOR.label);
+  center('you just got rickrolled', 29, COLOR.label);
+
+  return c.rows();
+};
+
 export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
+  if (s.rickroll && now.getTime() < s.rickroll.until) return renderRickroll(s, now);
   const c = new Canvas();
   const time = now.toTimeString().slice(0, 8);
   const cpuNow = Math.round(s.cpu[s.cpu.length - 1]);
@@ -366,7 +443,16 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(176, 0, '100ms', COLOR.text);
   c.put(183, 0, '+', COLOR.green);
 
-  c.graph(3, 2, 66, 11, s.cpu);
+  // 左邊：整體 CPU 使用率與曲線，下面是 load 和 uptime
+  c.put(3, 2, 'CPU', COLOR.label);
+  c.bar(8, 2, 40, cpuNow, COLOR.green);
+  c.right(52, 2, `${cpuNow}%`, COLOR.text);
+  c.put(55, 2, `${Math.round(25 + s.tempHist[0][s.tempHist[0].length - 1] * 0.3)}°C`, COLOR.blue);
+  c.graph(3, 3, 66, 10, s.cpu);
+  c.put(3, 13, 'Load AVG:', COLOR.label);
+  c.put(13, 13, '14.82', COLOR.text);
+  c.put(20, 13, '12.37', COLOR.text);
+  c.put(27, 13, '9.61', COLOR.text);
   // 跟 uptime、neofetch 一樣，算的是你待在網站上的時間
   const mins = Math.floor(performance.now() / 60000);
   c.put(3, 14, `up 0d ${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`, COLOR.label);
@@ -376,30 +462,14 @@ export const renderBtop = (s: BtopState, now: Date): BtopRow[] => {
   c.put(75, 1, 'AMD Ryzen Threadripper PRO 9995WX', COLOR.text);
   c.right(186, 1, '5.4 GHz', COLOR.text);
 
-  c.put(74, 3, 'CPU', COLOR.label);
-  c.bar(78, 3, 88, cpuNow, COLOR.green);
-  c.right(171, 3, `${cpuNow}%`, COLOR.text);
-  c.put(179, 3, `${Math.round(25 + s.tempHist[0][s.tempHist[0].length - 1] * 0.3)}°C`, COLOR.blue);
-
+  // 96 核：8 欄 × 12 列，每格是 核心編號、曲線、使用率
   for (let k = 0; k < CORE_COUNT; k++) {
-    const block = k < 7 ? 0 : k < 14 ? 1 : 2;
-    const idx = k < 7 ? k : k < 14 ? k - 7 : k - 14;
-    const x0 = 73 + block * 38;
-    const y = 4 + idx;
-    const pct = s.cores[k];
-    const temp = Math.round(25 + s.tempHist[k][s.tempHist[k].length - 1] * 0.3);
+    const x0 = 74 + (k % 8) * 14;
+    const y = 2 + Math.floor(k / 8);
     c.put(x0, y, `C${k}`, COLOR.text);
-    c.graph(x0 + 3, y, 9, 1, s.coreHist[k]);
-    c.right(x0 + 16, y, `${Math.round(pct)}%`, COLOR.text);
-    c.graph(x0 + 19, y, 8, 1, s.tempHist[k], COLOR.blue);
-    c.put(x0 + 28, y, `${temp}°C`, COLOR.blue);
+    c.graph(x0 + 4, y, 5, 1, s.coreHist[k]);
+    c.right(x0 + 12, y, `${Math.round(s.cores[k])}%`, COLOR.text);
   }
-
-  // 96 核的機器，load 也跟著高一些
-  c.put(146, 13, 'Load AVG:', COLOR.label);
-  c.put(157, 13, '14.82', COLOR.text);
-  c.put(164, 13, '12.37', COLOR.text);
-  c.put(171, 13, '9.61', COLOR.text);
 
   // ── mem ──────────────────────────────────────────────
   c.box(1, 16, 42, 20, COLOR.border.mem);
