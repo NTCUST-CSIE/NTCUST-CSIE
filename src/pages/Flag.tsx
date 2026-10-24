@@ -11,7 +11,7 @@ const stages = [
   { title: '第 1 片', skill: '開發者工具', hint: '工程師最常按的 F 開頭的鍵。打開之後，看看 Console 分頁。' },
   { title: '第 2 片', skill: '原始碼 / Base64', hint: '對網頁按右鍵「檢視網頁原始碼」（Ctrl+U）。有一段結尾是 = 的亂碼，資工人應該都認得這種編碼。' },
   { title: '第 3 片', skill: 'robots.txt / ROT13', hint: '每個網站都有一份「搜尋引擎機器人不准看」的清單，就放在網站根目錄。讀到的東西被轉了 13 圈。' },
-  { title: '第 4 片', skill: 'HTTP Header', hint: '在第 3 片那份筆記的頁面按 F12 → 切到「Network（網路）」分頁 → 按 F5 重新整理（Network 只會記錄打開之後的請求）→ 點清單裡的 dev-notes.txt → 看「Headers（標頭）」裡的 Response Headers。習慣用指令的話：curl -I 那份筆記的網址。' },
+  { title: '第 4 片', skill: 'HTTP Header', hint: '伺服器回傳那份檔案時，除了內容之外還「順便」帶了別的東西。試試開發者工具的 Network 分頁。' },
   { title: '第 5 片', skill: 'Linux 指令', hint: '按鍵盤左上角的 ` 打開終端機。隱藏檔的檔名以 . 開頭；權限不夠時，前面幾關可能有人把密碼寫在筆記裡。' },
 ];
 
