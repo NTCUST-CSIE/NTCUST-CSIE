@@ -1,6 +1,6 @@
 [
   { "id": "console", "name": "Console 探險家", "hint": "工程師的第一個快捷鍵：F12" },
-  { "id": "tab", "name": "別走啊", "hint": "切到別的分頁，再切回來" },
+  { "id": "tab", "name": "回來好嗎", "hint": "切到別的分頁，再切回來" },
   { "id": "disco", "name": "電燈開關", "hint": "有個按鈕，按太多次會怎樣？" },
   { "id": "meow", "name": "喵～", "hint": "在某隻章魚貓身上多停留一下" },
   { "id": "terminal", "name": "Hello, Terminal", "hint": "鍵盤左上角，數字 1 的左邊" },
@@ -12,7 +12,7 @@
   { "id": "hack", "name": "駭客任務", "hint": "在終端機裡假裝成駭客" },
   { "id": "season", "name": "期間限定", "hint": "節日時首頁會多出一個按鈕", "hidden": true },
   { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" },
-  { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "殺掉迷因" },
-  { "id": "pet", "name": "同好見面", "hint": "你也用 Claude Code 嗎？" },
-  { "id": "sqli", "name": "你的輸入沒有被過濾", "hint": "某個輸入框會把你的字直接拼進查詢裡" }
+  { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "在 btop 裡把迷因 kill 掉" },
+  { "id": "pet", "name": "同好見面", "hint": "終端機左上角那個小傢伙……你也用 Claude Code 嗎？" },
+  { "id": "sqli", "name": "SQL Injection 未遂", "hint": "密碼欄位不是只能打密碼……吧？" }
 ]

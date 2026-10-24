@@ -37,7 +37,7 @@ const ServerDown = () => {
         <p><strong>{window.location.hostname}</strong> 的伺服器已經不存在了。</p>
         <p>你可以試試：</p>
         <ul>
-          <li>檢查是不是有人執行了 <code>rm -rf /</code></li>
+          <li>檢查是不是有人執行了 <code>sudo rm -rf /</code></li>
           <li>重新整理這個頁面（F5）</li>
         </ul>
         <p className="server-down-code">ERR_SERVER_DELETED</p>

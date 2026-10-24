@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# 內部筆記，不准看別偷看 = =
+# 內部筆記，不准偷看 = =
 Disallow: /backup/dev-notes.txt
 
 Sitemap: https://nutccsie.org/sitemap.xml

@@ -181,7 +181,7 @@ const Terminal = ({ open, onClose }: TerminalProps) => {
     }
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (mode === 'vim') print('（你這樣出不去的，查看看怎麼退出vim吧...這不難）', 'error');
+      if (mode === 'vim') print('（這樣是出不去的，查查看怎麼退出 Vim 吧……這不難）', 'error');
       else onClose();
       return;
     }

@@ -138,7 +138,7 @@ const readFile = (name: string): string | null => {
     case 'finance.json':
       return Object.entries(financeData as Record<string, Semester>)
         .map(([key, s]) => `${key} 學期｜收入 ${formatAmount(s.total.income)}｜支出 ${formatAmount(s.total.expense)}｜結餘 ${formatAmount(s.total.balance)}`)
-        .join('\n') + '\n\n試試 cd finance 比較快 :）';
+        .join('\n') + '\n\n試試 cd finance 比較快 :)';
     case '.bash_history':
       return 'ls\nls -a\ncat .flag\nsudo cat .flag\n# sudo 密碼是什麼...\nvim\n:q\n:q!\n:qqqqqq\nhow to exit vim';
     default:
@@ -359,7 +359,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
     case 'cat': {
       const file = args[0];
       if (!file) {
-        api.print('那個...我不會通靈（如果你要的是貓，輸入 meow）', 'error');
+        api.print('那個……我不會通靈（如果你要的是貓，輸入 meow）', 'error');
         return;
       }
       if (file === '.flag') {
@@ -451,7 +451,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
         '• 不需要攻擊任何伺服器，所有線索都在你的瀏覽器裡找得到',
         '• Flag 格式：CSIE{...}',
         '• 規則、提示與提交：輸入 cd flag，或前往 /flag',
-        '• 第一片在哪？試試看 開發人員工具（F12）',
+        '• 第一片在哪？試試開發人員工具（F12）',
       ].join('\n'), 'accent');
       return;
     case 'sudo':
@@ -517,7 +517,7 @@ export const runCommand = (command: string, api: TerminalApi, session: TerminalS
       if (args[0] === 'coffee') {
         serveCoffee(api);
       } else {
-        api.print('brew: 我不是 macOS 我是CSIE OS', 'error');
+        api.print('brew: 我不是 macOS，我是 CSIE OS', 'error');
       }
       return;
     case 'hack':
