@@ -14,5 +14,6 @@
   { "id": "ctf", "name": "Flag Hunter", "hint": "解開 CSIE CTF（終端機輸入 ctf）" },
   { "id": "rickroll", "name": "Never Gonna Give You Up", "hint": "在 btop 裡把迷因 kill 掉" },
   { "id": "sqli", "name": "SQL Injection 未遂", "hint": "密碼欄位不是只能打密碼……吧？" },
-  { "id": "dvd", "name": "完美的角落", "hint": "放著網站不動，等它自己動起來" }
+  { "id": "dvd", "name": "完美的角落", "hint": "放著網站不動，等它自己動起來" },
+  { "id": "drop", "name": "打怪掉寶", "hint": "點開成員介紹，戳戳看大頭照" }
 ]

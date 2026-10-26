@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import { XCircle } from '@phosphor-icons/react';
+import { discoverEgg } from '../utils/eggs';
+import { dropItem } from '../utils/drops';
 
 interface Member {
   name: string;
   title: string;
   image: string;
   intro: string;
+  // 點介紹視窗裡的大頭照會掉出來的小圖；沒填就掉迷你版大頭照
+  dropImage?: string;
 }
 
 interface MemberModalProps {
@@ -32,6 +36,12 @@ const MemberModal = ({ member, onClose }: MemberModalProps) => {
 
   if (!displayMember) return null;
 
+  const dropFromAvatar = (e: MouseEvent<HTMLDivElement>) => {
+    const { dropImage, image } = displayMember;
+    dropItem(dropImage || image, e.currentTarget.getBoundingClientRect(), !dropImage);
+    discoverEgg('drop');
+  };
+
   return (
     <div className={`modal-overlay ${active ? 'active' : ''}`} onClick={onClose}>
       <div className="modal-card glass-card" onClick={e => e.stopPropagation()}>
@@ -39,7 +49,7 @@ const MemberModal = ({ member, onClose }: MemberModalProps) => {
           <XCircle weight="fill" />
         </button>
         <div className="modal-header">
-          <div className="member-icon" style={{ backgroundImage: `url(${displayMember.image})` }}></div>
+          <div className="member-icon" style={{ backgroundImage: `url(${displayMember.image})` }} onClick={dropFromAvatar}></div>
           <div className="modal-header-info">
             <div className="member-name">{displayMember.name}</div>
             <div className="member-title">{displayMember.title}</div>

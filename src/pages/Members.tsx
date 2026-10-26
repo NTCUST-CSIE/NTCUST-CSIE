@@ -8,6 +8,7 @@ interface Member {
   title: string;
   image: string;
   intro: string;
+  dropImage?: string;
 }
 
 interface Department {
