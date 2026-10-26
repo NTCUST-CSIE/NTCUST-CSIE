@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Terminal from './Terminal';
 import SeasonalDecor from './SeasonalDecor';
 import ServerDown from './ServerDown';
+import Screensaver from './Screensaver';
 import { CRASH_EVENT, discoverEgg, isCrashed, recoveredFromCrash, showToast, TERMINAL_EVENT, TOAST_EVENT } from '../utils/eggs';
 
 const AWAY_TITLE = '回來好嗎 :)';
@@ -17,7 +18,7 @@ const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
-// 全站彩蛋：` 鍵開終端機、分頁標題、通知訊息與節日裝飾
+// 全站彩蛋：` 鍵開終端機、分頁標題、通知訊息、節日裝飾與螢幕保護程式
 const EasterEggs = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -120,7 +121,7 @@ const EasterEggs = () => {
     <>
       <SeasonalDecor />
       <Terminal open={terminalOpen} onClose={closeTerminal} />
-      {crashed && <ServerDown />}
+      {crashed ? <ServerDown /> : <Screensaver />}
       <div className="egg-toasts" aria-live="polite">
         {toasts.map(t => (
           <div key={t.id} className="egg-toast">{t.message}</div>
