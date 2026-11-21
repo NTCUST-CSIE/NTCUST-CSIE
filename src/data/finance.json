@@ -26,13 +26,21 @@
                     { "date": "9/29", "desc": "科會會員衣服", "income": 600, "expense": null, "balance": 116620 },
                     { "date": "9/29", "desc": "非科會會員衣服", "income": 350, "expense": null, "balance": 116970 },
                     { "date": "9/29", "desc": "匿名贊助", "income": 2500, "expense": null, "balance": 119470 },
-                    { "date": "9/30", "desc": "廠商贊助", "income": 2000, "expense": null, "balance": 121470 }
+                    { "date": "9/29", "desc": "廠商贊助", "income": 2000, "expense": null, "balance": 121470 }
                 ]
             },
             {
                 "monthLabel": "2026年 10月",
                 "records": [
-                    { "date": "10/1", "desc": "上期結餘", "income": null, "expense": null, "balance": null }
+                    { "date": "10/1", "desc": "上期結餘", "income": 121470, "expense": null, "balance": 121470 },
+                    { "date": "11/1", "desc": "新生茶會 - 飲料(麥香紅、綠)", "income": null, "expense": 632, "balance": 120838 },
+                    { "date": "11/1", "desc": "新生茶會 - 印刷(卡片)", "income": null, "expense": 30, "balance": 120808 },
+                    { "date": "11/1", "desc": "新生茶會 - 茶會食物(互動糖果)", "income": null, "expense": 198, "balance": 120610 },
+                    { "date": "11/1", "desc": "新生茶會 - 茶會食物(披薩)", "income": null, "expense": 1495, "balance": 119115 },
+                    { "date": "11/1", "desc": "新生茶會 - 茶會食物(烤雞)", "income": null, "expense": 1902, "balance": 117213 },
+                    { "date": "11/1", "desc": "新生茶會 - 冰塊(冰桶)", "income": null, "expense": 336, "balance": 116877 },
+                    { "date": "11/1", "desc": "主題課程 - 印刷費(感謝狀)", "income": null, "expense": 17, "balance": 116860 },
+                    { "date": "11/1", "desc": "主題課程 - 郵資(申請經費）", "income": null, "expense": 28, "balance": 116832 }
                 ]
             },
             {
